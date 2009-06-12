@@ -1,0 +1,6 @@
+lwpb - Lightweight Protocol Buffers
+
+A lightweight implementation of the Google Protocol Buffers for C, with a
+simple streaming interface for encoding and decoding. The library is
+designed to be used for embedded devices.
+
