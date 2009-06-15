@@ -36,6 +36,7 @@
 #define GOOGLE_PROTOBUF_COMPILER_LWPB_GENERATOR_H__
 
 #include <string>
+#include <vector>
 
 #include <google/protobuf/compiler/code_generator.h>
 #include <google/protobuf/stubs/common.h>
@@ -70,52 +71,20 @@ class LIBPROTOC_EXPORT Generator : public CodeGenerator {
                         string* error) const;
 
  private:
+  void CreateEnumList() const;
+  void AddNestedEnums(const Descriptor& containing_descriptor) const;
+
+  void CreateMessageList() const;
+  void AddNestedMessages(const Descriptor& containing_descriptor) const;
+  int GetMessageIndex(const Descriptor* message_descriptor) const;
+  
   void PrintImports() const;
-  void PrintTopLevelEnums() const;
-  void PrintAllNestedEnumsInFile() const;
-  void PrintNestedEnums(const Descriptor& descriptor) const;
-  void PrintEnum(const EnumDescriptor& enum_descriptor) const;
-
-  void PrintTopLevelExtensions() const;
-
-  void PrintFieldDescriptor(
-      const FieldDescriptor& field, bool is_extension) const;
-  void PrintFieldDescriptorsInDescriptor(
-      const Descriptor& message_descriptor,
-      bool is_extension,
-      const string& list_variable_name,
-      int (Descriptor::*CountFn)() const,
-      const FieldDescriptor* (Descriptor::*GetterFn)(int) const) const;
-  void PrintFieldsInDescriptor(const Descriptor& message_descriptor) const;
-  void PrintExtensionsInDescriptor(const Descriptor& message_descriptor) const;
+  void PrintEnumDescriptors() const;
+  void PrintEnumDescriptor(const EnumDescriptor& enum_descriptor) const;
   void PrintMessageDescriptors() const;
-  void PrintDescriptor(const Descriptor& message_descriptor) const;
-  void PrintNestedDescriptors(const Descriptor& containing_descriptor) const;
+  void PrintDescriptorFields(const Descriptor& message_descriptor) const;
+  string StringifyFieldType(const FieldDescriptor& field) const;
 
-  void PrintMessages() const;
-  void PrintMessage(const Descriptor& message_descriptor) const;
-  void PrintNestedMessages(const Descriptor& containing_descriptor) const;
-
-  void FixForeignFieldsInDescriptors() const;
-  void FixForeignFieldsInDescriptor(const Descriptor& descriptor) const;
-  void FixForeignFieldsInField(const Descriptor* containing_type,
-                               const FieldDescriptor& field,
-                               const string& python_dict_name) const;
-  string FieldReferencingExpression(const Descriptor* containing_type,
-                                    const FieldDescriptor& field,
-                                    const string& python_dict_name) const;
-
-  void FixForeignFieldsInExtensions() const;
-  void FixForeignFieldsInExtension(
-      const FieldDescriptor& extension_field) const;
-  void FixForeignFieldsInNestedExtensions(const Descriptor& descriptor) const;
-
-  void PrintServices() const;
-  void PrintServiceDescriptor(const ServiceDescriptor& descriptor) const;
-  void PrintServiceClass(const ServiceDescriptor& descriptor) const;
-  void PrintServiceStub(const ServiceDescriptor& descriptor) const;
-
-  void PrintEnumValueDescriptor(const EnumValueDescriptor& descriptor) const;
   string OptionsValue(const string& class_name,
                       const string& serialized_options) const;
   bool GeneratingDescriptorProto() const;
@@ -131,6 +100,9 @@ class LIBPROTOC_EXPORT Generator : public CodeGenerator {
   mutable Mutex mutex_;
   mutable const FileDescriptor* file_;  // Set in Generate().  Under mutex_.
   mutable io::Printer* printer_;  // Set in Generate().  Under mutex_.
+
+  mutable vector<const EnumDescriptor*> enums_;
+  mutable vector<const Descriptor*> messages_;
 
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(Generator);
 };
