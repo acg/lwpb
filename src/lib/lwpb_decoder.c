@@ -19,8 +19,8 @@ static void debug_print_indent(void)
         printf("  ");
 }
 
-static void debug_msg_start_handler(struct pb_decoder *decoder,
-                                    const struct pb_msg_desc *msg_desc,
+static void debug_msg_start_handler(struct lwpb_decoder *decoder,
+                                    const struct lwpb_msg_desc *msg_desc,
                                     void *arg)
 {
     debug_print_indent();
@@ -28,16 +28,16 @@ static void debug_msg_start_handler(struct pb_decoder *decoder,
     debug_indent++;
 }
 
-static void debug_msg_end_handler(struct pb_decoder *decoder,
-                                  const struct pb_msg_desc *msg_desc,
+static void debug_msg_end_handler(struct lwpb_decoder *decoder,
+                                  const struct lwpb_msg_desc *msg_desc,
                                   void *arg)
 {
     debug_indent--;
 }
 
-static void debug_field_handler(struct pb_decoder *decoder,
-                                const struct pb_field_desc *field_desc,
-                                union pb_value *value, void *arg)
+static void debug_field_handler(struct lwpb_decoder *decoder,
+                                const struct lwpb_field_desc *field_desc,
+                                union lwpb_value *value, void *arg)
 {
     static char *typ_names[] = {
         "(double)",
@@ -57,46 +57,46 @@ static void debug_field_handler(struct pb_decoder *decoder,
         "(bytes)",
         "(message)",
     };
-    pb_typ_t typ;
+    lwpb_typ_t typ;
     
-    typ = field_desc->typ <= PB_MESSAGE ? field_desc->typ : PB_MESSAGE;
+    typ = field_desc->typ <= LWPB_MESSAGE ? field_desc->typ : LWPB_MESSAGE;
     
     debug_print_indent();
     printf("%-20s %-10s = ", field_desc->name, typ_names[typ]);
     
     switch (field_desc->typ) {
-    case PB_DOUBLE:
+    case LWPB_DOUBLE:
         printf("%f", value->_double);
         break;
-    case PB_FLOAT:
+    case LWPB_FLOAT:
         printf("%f", value->_float);
         break;
-    case PB_INT32:
-    case PB_SINT32:
-    case PB_SFIXED32:
+    case LWPB_INT32:
+    case LWPB_SINT32:
+    case LWPB_SFIXED32:
         printf("%d", value->int32);
         break;
-    case PB_INT64:
-    case PB_SINT64:
-    case PB_SFIXED64:
+    case LWPB_INT64:
+    case LWPB_SINT64:
+    case LWPB_SFIXED64:
         printf("%lld", value->int64);
         break;
-    case PB_UINT32:
-    case PB_FIXED32:
+    case LWPB_UINT32:
+    case LWPB_FIXED32:
         printf("%u", value->int32);
         break;
-    case PB_UINT64:
-    case PB_FIXED64:
+    case LWPB_UINT64:
+    case LWPB_FIXED64:
         printf("%llu", value->int64);
         break;
-    case PB_BOOL:
+    case LWPB_BOOL:
         printf("%s", value->bool ? "true" : "false");
         break;
-    case PB_STRING:
+    case LWPB_STRING:
         while (value->string.len--)
             printf("%c", *value->string.str++);
         break;
-    case PB_BYTES:
+    case LWPB_BYTES:
         while (value->bytes.len--)
             printf("%02x ", *value->bytes.data++);
         break;
@@ -134,7 +134,7 @@ static uint32_t decode_32bit(char *buf, char **end)
  * @param decoder Decoder
  * @param dict Message dictionary
  */
-void pb_decoder_init(struct pb_decoder *decoder, pb_dict_t dict)
+void lwpb_decoder_init(struct lwpb_decoder *decoder, lwpb_dict_t dict)
 {
     decoder->dict = dict;
     decoder->arg = NULL;
@@ -148,7 +148,7 @@ void pb_decoder_init(struct pb_decoder *decoder, pb_dict_t dict)
  * @param decoder Decoder
  * @param arg User argument
  */
-void pb_decoder_arg(struct pb_decoder *decoder, void *arg)
+void lwpb_decoder_arg(struct lwpb_decoder *decoder, void *arg)
 {
     decoder->arg = arg;
 }
@@ -159,9 +159,9 @@ void pb_decoder_arg(struct pb_decoder *decoder, void *arg)
  * @param msg_start_handler Message start handler
  * @param msg_end_handler Message end handler
  */
-void pb_decoder_msg_handler(struct pb_decoder *decoder,
-                            pb_decoder_msg_start_handler_t msg_start_handler,
-                            pb_decoder_msg_end_handler_t msg_end_handler)
+void lwpb_decoder_msg_handler(struct lwpb_decoder *decoder,
+                            lwpb_decoder_msg_start_handler_t msg_start_handler,
+                            lwpb_decoder_msg_end_handler_t msg_end_handler)
 {
     decoder->msg_start_handler = msg_start_handler;
     decoder->msg_end_handler = msg_end_handler;
@@ -172,8 +172,8 @@ void pb_decoder_msg_handler(struct pb_decoder *decoder,
  * @param decoder Decoder
  * @param field_handler Field handler
  */
-void pb_decoder_field_handler(struct pb_decoder *decoder,
-                              pb_decoder_field_handler_t field_handler)
+void lwpb_decoder_field_handler(struct lwpb_decoder *decoder,
+                              lwpb_decoder_field_handler_t field_handler)
 {
     decoder->field_handler = field_handler;
 }
@@ -183,11 +183,11 @@ void pb_decoder_field_handler(struct pb_decoder *decoder,
  * message contents to the console.
  * @param decoder Decoder 
  */
-void pb_decoder_use_debug_handlers(struct pb_decoder *decoder)
+void lwpb_decoder_use_debug_handlers(struct lwpb_decoder *decoder)
 {
-    pb_decoder_msg_handler(decoder,
+    lwpb_decoder_msg_handler(decoder,
                            debug_msg_start_handler, debug_msg_end_handler);
-    pb_decoder_field_handler(decoder, debug_field_handler);
+    lwpb_decoder_field_handler(decoder, debug_field_handler);
 }
 
 /**
@@ -197,18 +197,18 @@ void pb_decoder_use_debug_handlers(struct pb_decoder *decoder)
  * @param len Length of data to decode
  * @param msg_id Root message id of the protocol buffer
  */
-void pb_decoder_decode(struct pb_decoder *decoder, void *data, size_t len, int msg_id)
+void lwpb_decoder_decode(struct lwpb_decoder *decoder, void *data, size_t len, int msg_id)
 {
     int i;
     char *buf = data;
     char *buf_end = &buf[len];
     uint64_t key;
     int field_id;
-    const struct pb_msg_desc *msg_desc;
-    const struct pb_field_desc *field_desc = NULL;
+    const struct lwpb_msg_desc *msg_desc;
+    const struct lwpb_field_desc *field_desc = NULL;
     enum wire_type wire_type;
     union wire_value wire_value;
-    union pb_value value;
+    union lwpb_value value;
 
     // Get message description
     // FIXME bounds check
@@ -249,7 +249,7 @@ void pb_decoder_decode(struct pb_decoder *decoder, void *data, size_t len, int m
             buf += 4;
             break;
         default:
-            PB_ASSERT(1, "Unknown wire type");
+            LWPB_ASSERT(1, "Unknown wire type");
             break;
         }
         
@@ -258,63 +258,63 @@ void pb_decoder_decode(struct pb_decoder *decoder, void *data, size_t len, int m
             continue;
         
         switch (field_desc->typ) {
-        case PB_DOUBLE:
+        case LWPB_DOUBLE:
             *((uint64_t *) &value._double) = wire_value.int64;
             break;
-        case PB_FLOAT:
+        case LWPB_FLOAT:
             *((uint32_t *) &value._float) = wire_value.int32;
             break;
-        case PB_INT32:
+        case LWPB_INT32:
             value.int32 = wire_value.varint;
             break;
-        case PB_INT64:
+        case LWPB_INT64:
             value.int64 = wire_value.varint;
             break;
-        case PB_UINT32:
+        case LWPB_UINT32:
             value.uint32 = wire_value.varint;
             break;
-        case PB_UINT64:
+        case LWPB_UINT64:
             value.uint64 = wire_value.varint;
             break;
-        case PB_SINT32:
+        case LWPB_SINT32:
             value.int32 = wire_value.varint;
             break;
-        case PB_SINT64:
+        case LWPB_SINT64:
             value.int64 = wire_value.varint;
             break;
-        case PB_FIXED32:
+        case LWPB_FIXED32:
             value.uint32 = wire_value.int32;
             break;
-        case PB_FIXED64:
+        case LWPB_FIXED64:
             value.uint64 = wire_value.int64;
             break;
-        case PB_SFIXED32:
+        case LWPB_SFIXED32:
             value.int32 = wire_value.int32;
             break;
-        case PB_SFIXED64:
+        case LWPB_SFIXED64:
             value.int64 = wire_value.int64;
             break;
-        case PB_BOOL:
+        case LWPB_BOOL:
             value.bool = wire_value.varint;
             break;
-        case PB_STRING:
+        case LWPB_STRING:
             value.string.len = wire_value.string.len;
             value.string.str = wire_value.string.data;
             break;
-        case PB_BYTES:
+        case LWPB_BYTES:
             value.bytes.len = wire_value.string.len;
             value.bytes.data = wire_value.string.data;
             break;
-        case PB_MESSAGE:
+        case LWPB_MESSAGE:
         default:
             if (decoder->field_handler)
                 decoder->field_handler(decoder, field_desc, NULL, decoder->arg);
             // Decode nested message
-            pb_decoder_decode(decoder, wire_value.string.data, wire_value.string.len, field_desc->typ - PB_MESSAGE);
+            lwpb_decoder_decode(decoder, wire_value.string.data, wire_value.string.len, field_desc->typ - LWPB_MESSAGE);
             break;
         }
         
-        if (field_desc->typ < PB_MESSAGE)
+        if (field_desc->typ < LWPB_MESSAGE)
             if (decoder->field_handler)
                 decoder->field_handler(decoder, field_desc, &value, decoder->arg);
     }
