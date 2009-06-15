@@ -7518,3 +7518,7 @@ AC_SUBST([am__tar])
 AC_SUBST([am__untar])
 ]) # _AM_PROG_TAR
 
+m4_include([m4/ac_system_extensions.m4])
+m4_include([m4/acx_check_suncc.m4])
+m4_include([m4/acx_pthread.m4])
+m4_include([m4/stl_hash.m4])
