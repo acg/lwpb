@@ -64,6 +64,7 @@ nobase_include_HEADERS =                                       \
   google/protobuf/compiler/parser.h                            \
   google/protobuf/compiler/cpp/cpp_generator.h                 \
   google/protobuf/compiler/java/java_generator.h               \
+  google/protobuf/compiler/lwpb/lwpb_generator.h               \
   google/protobuf/compiler/python/python_generator.h
 
 lib_LTLIBRARIES = libprotobuf.la libprotoc.la
@@ -155,6 +156,7 @@ libprotoc_la_SOURCES =                                         \
   google/protobuf/compiler/java/java_primitive_field.h         \
   google/protobuf/compiler/java/java_service.cc                \
   google/protobuf/compiler/java/java_service.h                 \
+  google/protobuf/compiler/lwpb/lwpb_generator.cc              \
   google/protobuf/compiler/python/python_generator.cc
 
 bin_PROGRAMS = protoc
