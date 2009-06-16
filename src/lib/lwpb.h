@@ -5,8 +5,28 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#define LWPB_MAX_DEPTH      8   /**< Maximum depth of message embedding */
+/* Maximum depth of message embedding */
+#ifndef LWPB_MAX_DEPTH
+#define LWPB_MAX_DEPTH 8
+#endif
 
+/* Provide field names as strings */
+#ifndef LWPB_FIELD_NAMES
+#define LWPB_FIELD_NAMES 1
+#endif
+
+/* Provide field default values */
+#ifndef LWPB_FIELD_DEFAULTS
+#define LWPB_FIELD_DEFAULTS 1
+#endif
+
+/* Provide message names as strings */
+#ifndef LWPB_MESSAGE_NAMES
+#define LWPB_MESSAGE_NAMES 1
+#endif
+
+/* Simple assert macro */
+#ifndef LWPB_ASSERT
 #define LWPB_ASSERT(expr, msg)                                              \
     do {                                                                    \
         if (!(expr)) {                                                      \
@@ -14,6 +34,7 @@
             exit(0);                                                        \
         }                                                                   \
     } while (0)
+#endif
 
 /** Protocol buffer error codes */
 typedef enum {

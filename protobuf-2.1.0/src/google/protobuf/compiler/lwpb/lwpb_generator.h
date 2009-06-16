@@ -78,6 +78,9 @@ class LIBPROTOC_EXPORT Generator : public CodeGenerator {
   void AddNestedMessages(const Descriptor& containing_descriptor) const;
   int GetMessageIndex(const Descriptor* message_descriptor) const;
   
+  void PrintHeader() const;
+  void PrintFooter() const;
+  
   void PrintImports() const;
   void PrintEnumDescriptors() const;
   void PrintEnumDescriptor(const EnumDescriptor& enum_descriptor) const;
@@ -99,7 +102,8 @@ class LIBPROTOC_EXPORT Generator : public CodeGenerator {
   // Guards file_ and printer_.
   mutable Mutex mutex_;
   mutable const FileDescriptor* file_;  // Set in Generate().  Under mutex_.
-  mutable io::Printer* printer_;  // Set in Generate().  Under mutex_.
+  mutable io::Printer* h_printer_;  // Set in Generate().  Under mutex_.
+  mutable io::Printer* c_printer_;  // Set in Generate().  Under mutex_.
 
   mutable vector<const EnumDescriptor*> enums_;
   mutable vector<const Descriptor*> messages_;
