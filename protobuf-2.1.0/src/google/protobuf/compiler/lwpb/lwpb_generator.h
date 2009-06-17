@@ -71,6 +71,17 @@ class LIBPROTOC_EXPORT Generator : public CodeGenerator {
                         string* error) const;
 
  private:
+  string FileDescriptorIncludeGuard(const FileDescriptor& descriptor) const;
+  string FileDescriptorMessageArray(const FileDescriptor& descriptor) const;
+  string MessageDescriptorId(const Descriptor& descriptor) const;
+  string MessageDescriptorPtr(const Descriptor& descriptor) const;
+  string MessageDescriptorFieldArray(const Descriptor& descriptor) const;
+  string FieldDescriptorId(const FieldDescriptor& descriptor) const;
+  string FieldDescriptorPtr(const FieldDescriptor& descriptor) const;
+  string FieldDescriptorOptLabel(const FieldDescriptor& field) const;
+  string FieldDescriptorOptTyp(const FieldDescriptor& field) const;
+  string FieldDescriptorOptFlags(const FieldDescriptor& field) const;
+     
   void CreateEnumList() const;
   void AddNestedEnums(const Descriptor& containing_descriptor) const;
 
@@ -86,7 +97,6 @@ class LIBPROTOC_EXPORT Generator : public CodeGenerator {
   void PrintEnumDescriptor(const EnumDescriptor& enum_descriptor) const;
   void PrintMessageDescriptors() const;
   void PrintDescriptorFields(const Descriptor& message_descriptor) const;
-  string StringifyFieldType(const FieldDescriptor& field) const;
 
   string OptionsValue(const string& class_name,
                       const string& serialized_options) const;

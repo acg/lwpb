@@ -81,6 +81,12 @@ string ModuleName(const string& filename) {
   return basename + "_pb2";
 }
 
+// Returns the Python module filename expected for a given .proto filename.
+string ModuleFileName(const string& filename) {
+  string basename = StripProto(filename);
+  StripString(&basename, "-", '_');
+  return basename + "_pb2";
+}
 
 // Returns the name of all containing types for descriptor,
 // in order from outermost to innermost, followed by descriptor's
@@ -140,54 +146,6 @@ string StringifyDefaultValue(const FieldDescriptor& field) {
   return "";
 }
 
-
-string MessageDescriptorId(const Descriptor& descriptor) {
-  string name = descriptor.full_name();
-  name = StringReplace(name, ".", "_", true);
-  UpperString(&name);
-  return name;
-}
-
-string MessageDescriptorFieldArray(const Descriptor& descriptor) {
-  string name = descriptor.full_name();
-  name = StringReplace(name, ".", "_", true);
-  name = "lwpb_fields_" + name;
-  LowerString(&name);
-  return name;
-}
-
-string FieldDescriptorId(const FieldDescriptor& descriptor) {
-  string name = descriptor.full_name();
-  name = StringReplace(name, ".", "_", true);
-  UpperString(&name);
-  return name;
-}
-
-string FileDescriptorMessagesArray(const FileDescriptor& descriptor) {
-  string name = descriptor.package();    
-  name = StringReplace(name, ".", "_", true);
-  name = "lwpb_messages_" + name;
-  LowerString(&name);
-  return name;
-}
-
-string FileDescriptorDictionary(const FileDescriptor& descriptor) {
-  string name = descriptor.package();    
-  name = StringReplace(name, ".", "_", true);
-  name += "_dict";
-  LowerString(&name);
-  return name;
-}
-
-string FileDescriptorIncludeGuard(const FileDescriptor& descriptor) {
-  string name = StripProto(descriptor.name());
-  StripString(&name, "-", '_');
-  StripString(&name, "/", '.');
-  name = "__" + name + "_PB2_H__";
-  UpperString(&name);
-  return name;
-}
-
 }  // namespace
 
 
@@ -211,16 +169,18 @@ bool Generator::Generate(const FileDescriptor* file,
   //   to have any mutable members.  Then it is implicitly thread-safe.
   MutexLock lock(&mutex_);
   file_ = file;
-  string module_name = ModuleName(file->name());
-  string filename = module_name;
-  StripString(&filename, ".", '/');
-  filename += ".h";
+  
+  string filename = ModuleFileName(file->name());
 
-
-  scoped_ptr<io::ZeroCopyOutputStream> output(output_directory->Open(filename));
-  GOOGLE_CHECK(output.get());
-  io::Printer h_printer(output.get(), '$');
+  scoped_ptr<io::ZeroCopyOutputStream> h_output(output_directory->Open(filename + ".h"));
+  GOOGLE_CHECK(h_output.get());
+  io::Printer h_printer(h_output.get(), '$');
   h_printer_ = &h_printer;
+  
+  scoped_ptr<io::ZeroCopyOutputStream> c_output(output_directory->Open(filename + ".c"));
+  GOOGLE_CHECK(c_output.get());
+  io::Printer c_printer(c_output.get(), '$');
+  c_printer_ = &c_printer;
   
   CreateEnumList();
   CreateMessageList();
@@ -234,7 +194,122 @@ bool Generator::Generate(const FileDescriptor* file,
   
   PrintFooter();
   
-  return !h_printer.failed();
+  return (!h_printer.failed()) && (!c_printer.failed());
+}
+
+
+// Returns the name of the include guard.
+string Generator::FileDescriptorIncludeGuard(
+    const FileDescriptor& descriptor) const {
+  string name = StripProto(descriptor.name());
+  StripString(&name, "-", '_');
+  StripString(&name, "/", '.');
+  name = "__" + name + "_PB2_H__";
+  UpperString(&name);
+  return name;
+}
+
+// Returns the name of the message array.
+string Generator::FileDescriptorMessageArray(
+    const FileDescriptor& descriptor) const {
+  string name = descriptor.package();    
+  name = StringReplace(name, ".", "_", true);
+  name = "lwpb_messages_" + name;
+  LowerString(&name);
+  return name;
+}
+
+// Returns the name of the message descriptor.
+string Generator::MessageDescriptorId(
+    const Descriptor& descriptor) const {
+  string name = descriptor.full_name();
+  name = StringReplace(name, ".", "_", true);
+  //UpperString(&name);
+  return name;
+}
+
+// Returns the name of the message descriptor pointer.
+string Generator::MessageDescriptorPtr(
+    const Descriptor& descriptor) const {
+  string array = FileDescriptorMessageArray(*descriptor.file());
+  string ptr = "(&" + array + "[" + SimpleItoa(GetMessageIndex(&descriptor)) + "])";
+  return ptr;
+}
+
+// Returns the name of the message's field array.
+string Generator::MessageDescriptorFieldArray(
+    const Descriptor& descriptor) const {
+  string name = descriptor.full_name();
+  name = StringReplace(name, ".", "_", true);
+  name = "lwpb_fields_" + name;
+  LowerString(&name);
+  return name;
+}
+
+// Returns the name of the field descriptor.
+string Generator::FieldDescriptorId(
+    const FieldDescriptor& descriptor) const {
+  string name = descriptor.full_name();
+  name = StringReplace(name, ".", "_", true);
+  return name;
+}
+
+// Returns the name of the field descriptor pointer.
+string Generator::FieldDescriptorPtr(
+    const FieldDescriptor& descriptor) const {
+  string array = MessageDescriptorFieldArray(*descriptor.containing_type());
+  string ptr = "(&" + array + "[" + SimpleItoa(descriptor.index()) + "])";
+  return ptr;
+}
+
+string Generator::FieldDescriptorOptLabel(const FieldDescriptor& field) const {
+  switch (field.label()) {
+  case FieldDescriptor::LABEL_OPTIONAL: return "LWPB_OPTIONAL";
+  case FieldDescriptor::LABEL_REQUIRED: return "LWPB_REQUIRED";
+  case FieldDescriptor::LABEL_REPEATED: return "LWPB_REPEATED";
+  }
+    
+  GOOGLE_LOG(FATAL) << "Not reached.";
+  return "";
+}
+
+string Generator::FieldDescriptorOptTyp(const FieldDescriptor& field) const {
+  switch (field.type()) {
+  case FieldDescriptor::TYPE_DOUBLE:    return "LWPB_DOUBLE";
+  case FieldDescriptor::TYPE_FLOAT:     return "LWPB_FLOAT";
+  case FieldDescriptor::TYPE_INT32:     return "LWPB_INT32";
+  case FieldDescriptor::TYPE_INT64:     return "LWPB_INT64";
+  case FieldDescriptor::TYPE_UINT32:    return "LWPB_UINT64";
+  case FieldDescriptor::TYPE_UINT64:    return "LWPB_UINT64";
+  case FieldDescriptor::TYPE_SINT32:    return "LWPB_SINT32";
+  case FieldDescriptor::TYPE_SINT64:    return "LWPB_SINT64";
+  case FieldDescriptor::TYPE_FIXED32:   return "LWPB_FIXED32";
+  case FieldDescriptor::TYPE_FIXED64:   return "LWPB_FIXED64";
+  case FieldDescriptor::TYPE_SFIXED32:  return "LWPB_SFIXED32";
+  case FieldDescriptor::TYPE_SFIXED64:  return "LWPB_SFIXED64";
+  case FieldDescriptor::TYPE_BOOL:      return "LWPB_BOOL";
+  case FieldDescriptor::TYPE_STRING:    return "LWPB_STRING";
+  case FieldDescriptor::TYPE_BYTES:     return "LWPB_BYTES";
+  // TODO: we don't support groups
+  case FieldDescriptor::TYPE_GROUP:     return "LWPB_GROUP";
+  case FieldDescriptor::TYPE_MESSAGE:   return "LWPB_MESSAGE";
+  case FieldDescriptor::TYPE_ENUM:      return "LWPB_ENUM";
+  }
+  
+  GOOGLE_LOG(FATAL) << "Not reached.";
+  return "";
+}
+
+string Generator::FieldDescriptorOptFlags(const FieldDescriptor& field) const {
+  string flags = "0";
+  if (field.has_default_value())
+    flags += " | LWPB_HAS_DEFAULT";
+  if (field.options().packed())
+    flags += " | LWPB_IS_PACKED";
+  if (field.options().deprecated())
+    flags += " | LWPB_IS_DEPRECATED";
+  
+  return flags;
 }
 
 // Creates a flat vector |enums| of all enum descriptors.
@@ -278,32 +353,51 @@ int Generator::GetMessageIndex(const Descriptor* message_descriptor) const {
 
 
 void Generator::PrintHeader() const {
-  map<string, string> m;
-  m["guard"] = FileDescriptorIncludeGuard(*file_);
-  h_printer_->Print(m,
-      "// Generated by the protocol buffer compiler.  DO NOT EDIT!\n"
-      "\n"
-      "#include \"lwpb/lwpb.h\"\n"
-      "\n"
-      "#ifndef $guard$\n"
-      "#define $guard$\n"
-      "\n");
+  // Print .h header
+  {
+    map<string, string> m;
+    m["guard"] = FileDescriptorIncludeGuard(*file_);
+    h_printer_->Print(m,
+        "// Generated by the protocol buffer compiler.  DO NOT EDIT!\n"
+        "\n"
+        "#ifndef $guard$\n"
+        "#define $guard$\n"
+        "\n"
+        "#include <lwpb/lwpb.h>\n"
+        "\n");
+  }
+  // Print .c header
+  {
+    map<string, string> m;
+    m["include"] = ModuleFileName(file_->name()) + ".h";
+    c_printer_->Print(m,
+        "// Generated by the protocol buffer compiler.  DO NOT EDIT!\n"
+        "\n"
+        "#include <lwpb/lwpb.h>\n"
+        "\n"
+        "#include \"$include$\"\n"
+        "\n");
+  }
 }
 
 void Generator::PrintFooter() const {
-  map<string, string> m;
-  m["guard"] = FileDescriptorIncludeGuard(*file_);
-  h_printer_->Print(m,
-      "#endif // $guard$\n"
-      "\n");
+  // Print .h footer
+  {
+    map<string, string> m;
+    m["guard"] = FileDescriptorIncludeGuard(*file_);
+    h_printer_->Print(m,
+        "#endif // $guard$\n");
+  }
+  // Print .c footer
+  {
+  }
 }
 
 // Prints Python imports for all modules imported by |file|.
 void Generator::PrintImports() const {
   for (int i = 0; i < file_->dependency_count(); ++i) {
-    string module_name = ModuleName(file_->dependency(i)->name());
-    h_printer_->Print("import $module$\n", "module",
-                    module_name);
+    string module_name = ModuleFileName(file_->dependency(i)->name()) + ".h";
+    h_printer_->Print("#include \"$module$\"\n", "module", module_name);
   }
   h_printer_->Print("\n");
 }
@@ -321,49 +415,46 @@ void Generator::PrintEnumDescriptor(
   string descriptor_name = ModuleLevelDescriptorName(enum_descriptor);
   for (int i = 0; i < enum_descriptor.value_count(); ++i) {
     const EnumValueDescriptor &value_descriptor = *enum_descriptor.value(i);
-    string options_string;
-    value_descriptor.options().SerializeToString(&options_string);
-    map<string, string> m;
-// TODO:    string value_name = descriptor_name + "_" + value_descriptor.name();
-    string value_name = value_descriptor.full_name();
-    value_name = StringReplace(value_name, ".", "_", true);
-    UpperString(&value_name);
-    m["name"] = value_name;
-    m["number"] = SimpleItoa(value_descriptor.number());
-    m["options"] = OptionsValue("EnumValueOptions", options_string);
-    h_printer_->Print(
-        m,
-        "#define $name$ $number$ // options=$options$\n");
+    string name = value_descriptor.full_name();
+    name = StringReplace(name, ".", "_", true);
+    UpperString(&name);
+    string number = SimpleItoa(value_descriptor.number());
+    h_printer_->Print("#define $name$ $number$\n",
+                      "name", name, "number", number);
   }
   h_printer_->Print("\n");
 }
 
 void Generator::PrintMessageDescriptors() const {
+  // Print reference to message array
+  string array_name = FileDescriptorMessageArray(*file_);
+  h_printer_->Print("extern const struct lwpb_msg_desc $array$[];\n",
+                    "array", array_name);
+  h_printer_->Print("\n");
+    
   // Print message id's
-  h_printer_->Print("// Message ids\n");
+  h_printer_->Print("// Message descriptor pointers\n");
   for (int i = 0; i < messages_.size(); ++i) {
-    string name = MessageDescriptorId(*messages_[i]);
-    string id = SimpleItoa(i);
-    h_printer_->Print("#define $name$ $id$\n", "name", name, "id", id);
+    string id = MessageDescriptorId(*messages_[i]);
+    string ptr = MessageDescriptorPtr(*messages_[i]);
+    h_printer_->Print("#define $id$ $ptr$\n", "id", id, "ptr", ptr);
   }
   h_printer_->Print("\n");
-
+    
   // Print field descriptions
   for (int i = 0; i < messages_.size(); ++i)
     PrintDescriptorFields(*messages_[i]);
   
   // Print message descriptions
-  h_printer_->Print("// Message descriptors\n");
-  string array_name = FileDescriptorMessagesArray(*file_);
-  string dict_name = FileDescriptorDictionary(*file_);
-  h_printer_->Print("const struct lwpb_msg_desc $name$[] = {\n", "name", array_name);
+  c_printer_->Print("// Message descriptors\n");
+  c_printer_->Print("const struct lwpb_msg_desc $name$[] = {\n", "name", array_name);
   for (int i = 0; i < messages_.size(); ++i) {
     map<string, string> m;
     m["name"] = NamePrefixedWithNestedTypes(*messages_[i], ".");
     m["num_fields"] = SimpleItoa(messages_[i]->field_count());
     m["fields"] = MessageDescriptorFieldArray(*messages_[i]);
     LowerString(&m["fields"]);
-    h_printer_->Print(m,
+    c_printer_->Print(m,
         "    {\n"
         "        .num_fields = $num_fields$,\n"
         "        .fields = $fields$,\n"
@@ -372,45 +463,54 @@ void Generator::PrintMessageDescriptors() const {
         "#endif\n"
         "    },\n");
   }
-  h_printer_->Print("};\n");
-  h_printer_->Print("\n");
-  h_printer_->Print("const lwpb_dict_t $dict$ = $messages$;\n",
-                  "dict", dict_name,
-                  "messages", array_name);
-  h_printer_->Print("\n");
+  c_printer_->Print("};\n");
+  c_printer_->Print("\n");
 }
 
 void Generator::PrintDescriptorFields(
     const Descriptor& message_descriptor) const {
+  // Print reference to field array
+  string array_name = MessageDescriptorFieldArray(message_descriptor);
+  h_printer_->Print("extern const struct lwpb_field_desc $array$[];\n",
+                    "array", array_name);
+  h_printer_->Print("\n");
+    
   // Print field id's
   string message_name = NamePrefixedWithNestedTypes(message_descriptor, ".");
-  h_printer_->Print("// '$name$' field ids\n", "name", message_name);
+  h_printer_->Print("// '$name$' field descriptor pointers\n", "name", message_name);
   
   string descriptor_name = ModuleLevelDescriptorName(message_descriptor);
   for (int i = 0; i < message_descriptor.field_count(); ++i) {
     const FieldDescriptor &field_descriptor = *message_descriptor.field(i);
-    string name = FieldDescriptorId(field_descriptor);
-    h_printer_->Print("#define $name$ $number$\n", "name", name, "number", SimpleItoa(field_descriptor.number()));
+    string id = FieldDescriptorId(field_descriptor);
+    string ptr = FieldDescriptorPtr(field_descriptor);
+    h_printer_->Print("#define $id$ $ptr$\n", "id", id, "ptr", ptr);
   }
   h_printer_->Print("\n");
   
   // Print field descriptor array
-  h_printer_->Print("// '$name$' field descriptors\n", "name", message_name);
-  string array_name = MessageDescriptorFieldArray(message_descriptor);
-  h_printer_->Print("const struct lwpb_field_desc $name$[] = {\n", "name", array_name);
+  c_printer_->Print("// '$name$' field descriptors\n", "name", message_name);
+  c_printer_->Print("const struct lwpb_field_desc $name$[] = {\n", "name", array_name);
   for (int i = 0; i < message_descriptor.field_count(); ++i) {
     const FieldDescriptor &field_descriptor = *message_descriptor.field(i);
     string name = FieldDescriptorId(field_descriptor);
     
     map <string, string> m;
+    m["number"] = SimpleItoa(field_descriptor.number());
+    m["label"] = FieldDescriptorOptLabel(field_descriptor);
+    m["typ"] = FieldDescriptorOptTyp(field_descriptor);
+    m["flags"] = FieldDescriptorOptFlags(field_descriptor);
+    m["msg_desc"] = field_descriptor.type() == FieldDescriptor::TYPE_MESSAGE ?
+                    MessageDescriptorId(*field_descriptor.message_type()) : "0";
     m["name"] = field_descriptor.name();
-    m["id"] = name;
-    m["typ"] = StringifyFieldType(field_descriptor);
     m["default"] = StringifyDefaultValue(field_descriptor);
-    h_printer_->Print(m,
+    c_printer_->Print(m,
         "    {\n"
-        "        .id = $id$,\n"
-        "        .typ = $typ$,\n"
+        "        .number = $number$,\n"
+        "        .opts.label = $label$,\n"
+        "        .opts.typ = $typ$,\n"
+        "        .opts.flags = $flags$,\n"
+        "        .msg_desc = $msg_desc$,\n"
         "#ifdef LWPB_FIELD_NAMES\n"
         "        .name = \"$name$\",\n"
         "#endif\n"
@@ -419,39 +519,9 @@ void Generator::PrintDescriptorFields(
         "#endif\n"
         "    },\n");
   }
-  h_printer_->Print("};\n");
-  h_printer_->Print("\n");
+  c_printer_->Print("};\n");
+  c_printer_->Print("\n");
 }
-
-string Generator::StringifyFieldType(const FieldDescriptor& field) const {
-  switch (field.type()) {
-  case FieldDescriptor::TYPE_DOUBLE:    return "LWPB_DOUBLE";
-  case FieldDescriptor::TYPE_FLOAT:     return "LWPB_FLOAT";
-  case FieldDescriptor::TYPE_INT32:     return "LWPB_INT32";
-  case FieldDescriptor::TYPE_INT64:     return "LWPB_INT64";
-  case FieldDescriptor::TYPE_UINT32:    return "LWPB_UINT64";
-  case FieldDescriptor::TYPE_UINT64:    return "LWPB_UINT64";
-  case FieldDescriptor::TYPE_SINT32:    return "LWPB_SINT32";
-  case FieldDescriptor::TYPE_SINT64:    return "LWPB_SINT64";
-  case FieldDescriptor::TYPE_FIXED32:   return "LWPB_FIXED32";
-  case FieldDescriptor::TYPE_FIXED64:   return "LWPB_FIXED64";
-  case FieldDescriptor::TYPE_SFIXED32:  return "LWPB_SFIXED32";
-  case FieldDescriptor::TYPE_SFIXED64:  return "LWPB_SFIXED64";
-  case FieldDescriptor::TYPE_BOOL:      return "LWPB_BOOL";
-  case FieldDescriptor::TYPE_STRING:    return "LWPB_STRING";
-  case FieldDescriptor::TYPE_BYTES:     return "LWPB_BYTES";
-  
-  // TODO: we don't support groups
-  case FieldDescriptor::TYPE_GROUP:     return "LWPB_GROUP";
-  case FieldDescriptor::TYPE_MESSAGE:   return "LWPB_MESSAGE + " + 
-    SimpleItoa(GetMessageIndex(field.message_type()));
-  case FieldDescriptor::TYPE_ENUM:      return "LWPB_ENUM";
-  }
-  
-  GOOGLE_LOG(FATAL) << "Not reached.";
-  return "";
-}
-
 
 string Generator::OptionsValue(
     const string& class_name, const string& serialized_options) const {
