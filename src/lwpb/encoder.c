@@ -23,8 +23,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "lwpb_private.h"
-#include "lwpb.h"
+#include <lwpb/lwpb.h>
+
+#include "private.h"
 
 // Encoder utilities
 

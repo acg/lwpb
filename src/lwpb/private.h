@@ -1,5 +1,5 @@
 /**
- * @file lwpb_private.h
+ * @file private.h
  * 
  * Private types and definitions needed by the library.
  * 
@@ -18,8 +18,8 @@
  * limitations under the License.
  */
 
-#ifndef __LWPB_PRIVATE_H__
-#define __LWPB_PRIVATE_H__
+#ifndef __PRIVATE_H__
+#define __PRIVATE_H__
 
 #include <stdint.h>
 
