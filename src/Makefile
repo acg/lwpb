@@ -33,7 +33,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = i686-pc-linux-gnu
 host_triplet = i686-pc-linux-gnu
-bin_PROGRAMS = test1$(EXEEXT)
+bin_PROGRAMS = test1$(EXEEXT) test2_generate$(EXEEXT) \
+	test2_check$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -56,9 +57,19 @@ am_liblwpb_la_OBJECTS = buf.lo decoder.lo encoder.lo
 liblwpb_la_OBJECTS = $(am_liblwpb_la_OBJECTS)
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_test1_OBJECTS = test1.$(OBJEXT) test1_pb2.$(OBJEXT)
+am_test1_OBJECTS = test1-test1.$(OBJEXT) test1-test1_pb2.$(OBJEXT)
 test1_OBJECTS = $(am_test1_OBJECTS)
 test1_DEPENDENCIES = liblwpb.la
+test1_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(CCLD) $(test1_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
+	$(LDFLAGS) -o $@
+am_test2_check_OBJECTS = test2_check.$(OBJEXT) test2_pb2.$(OBJEXT)
+test2_check_OBJECTS = $(am_test2_check_OBJECTS)
+test2_check_DEPENDENCIES = liblwpb.la
+am_test2_generate_OBJECTS = test2_generate.$(OBJEXT) \
+	test2.pb.$(OBJEXT)
+test2_generate_OBJECTS = $(am_test2_generate_OBJECTS)
+test2_generate_DEPENDENCIES = /usr/lib/libprotobuf.la
 DEFAULT_INCLUDES = -I.
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -71,8 +82,19 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(liblwpb_la_SOURCES) $(test1_SOURCES)
-DIST_SOURCES = $(liblwpb_la_SOURCES) $(test1_SOURCES)
+CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
+LTCXXCOMPILE = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
+CXXLD = $(CXX)
+CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
+	$(LDFLAGS) -o $@
+SOURCES = $(liblwpb_la_SOURCES) $(test1_SOURCES) \
+	$(test2_check_SOURCES) $(test2_generate_SOURCES)
+DIST_SOURCES = $(liblwpb_la_SOURCES) $(test1_SOURCES) \
+	$(test2_check_SOURCES) $(test2_generate_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -203,13 +225,24 @@ lwpb/encoder.c
 
 test1_SOURCES = \
 test/test1.c \
-test/test1_pb2.c
+test/generated/test1_pb2.c
 
+test1_CFLAGS = -I${top_dir}/test/generated
 test1_LDADD = liblwpb.la
+test2_generate_SOURCES = \
+test/test2_generate.cc \
+test/generated/test2.pb.cc
+
+test2_generate_LDADD = /usr/lib/libprotobuf.la -lpthread
+test2_check_SOURCES = \
+test/test2_check.c \
+test/generated/test2_pb2.c
+
+test2_check_LDADD = liblwpb.la
 all: all-recursive
 
 .SUFFIXES:
-.SUFFIXES: .c .lo .o .obj
+.SUFFIXES: .c .cc .lo .o .obj
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -298,7 +331,13 @@ clean-binPROGRAMS:
 	done
 test1$(EXEEXT): $(test1_OBJECTS) $(test1_DEPENDENCIES) 
 	@rm -f test1$(EXEEXT)
-	$(LINK) $(test1_OBJECTS) $(test1_LDADD) $(LIBS)
+	$(test1_LINK) $(test1_OBJECTS) $(test1_LDADD) $(LIBS)
+test2_check$(EXEEXT): $(test2_check_OBJECTS) $(test2_check_DEPENDENCIES) 
+	@rm -f test2_check$(EXEEXT)
+	$(LINK) $(test2_check_OBJECTS) $(test2_check_LDADD) $(LIBS)
+test2_generate$(EXEEXT): $(test2_generate_OBJECTS) $(test2_generate_DEPENDENCIES) 
+	@rm -f test2_generate$(EXEEXT)
+	$(CXXLINK) $(test2_generate_OBJECTS) $(test2_generate_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -309,8 +348,12 @@ distclean-compile:
 include ./$(DEPDIR)/buf.Plo
 include ./$(DEPDIR)/decoder.Plo
 include ./$(DEPDIR)/encoder.Plo
-include ./$(DEPDIR)/test1.Po
-include ./$(DEPDIR)/test1_pb2.Po
+include ./$(DEPDIR)/test1-test1.Po
+include ./$(DEPDIR)/test1-test1_pb2.Po
+include ./$(DEPDIR)/test2.pb.Po
+include ./$(DEPDIR)/test2_check.Po
+include ./$(DEPDIR)/test2_generate.Po
+include ./$(DEPDIR)/test2_pb2.Po
 
 .c.o:
 	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -354,33 +397,110 @@ encoder.lo: lwpb/encoder.c
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
 #	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o encoder.lo `test -f 'lwpb/encoder.c' || echo '$(srcdir)/'`lwpb/encoder.c
 
-test1.o: test/test1.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test1.o -MD -MP -MF $(DEPDIR)/test1.Tpo -c -o test1.o `test -f 'test/test1.c' || echo '$(srcdir)/'`test/test1.c
-	mv -f $(DEPDIR)/test1.Tpo $(DEPDIR)/test1.Po
-#	source='test/test1.c' object='test1.o' libtool=no \
+test1-test1.o: test/test1.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test1_CFLAGS) $(CFLAGS) -MT test1-test1.o -MD -MP -MF $(DEPDIR)/test1-test1.Tpo -c -o test1-test1.o `test -f 'test/test1.c' || echo '$(srcdir)/'`test/test1.c
+	mv -f $(DEPDIR)/test1-test1.Tpo $(DEPDIR)/test1-test1.Po
+#	source='test/test1.c' object='test1-test1.o' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test1.o `test -f 'test/test1.c' || echo '$(srcdir)/'`test/test1.c
+#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test1_CFLAGS) $(CFLAGS) -c -o test1-test1.o `test -f 'test/test1.c' || echo '$(srcdir)/'`test/test1.c
 
-test1.obj: test/test1.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test1.obj -MD -MP -MF $(DEPDIR)/test1.Tpo -c -o test1.obj `if test -f 'test/test1.c'; then $(CYGPATH_W) 'test/test1.c'; else $(CYGPATH_W) '$(srcdir)/test/test1.c'; fi`
-	mv -f $(DEPDIR)/test1.Tpo $(DEPDIR)/test1.Po
-#	source='test/test1.c' object='test1.obj' libtool=no \
+test1-test1.obj: test/test1.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test1_CFLAGS) $(CFLAGS) -MT test1-test1.obj -MD -MP -MF $(DEPDIR)/test1-test1.Tpo -c -o test1-test1.obj `if test -f 'test/test1.c'; then $(CYGPATH_W) 'test/test1.c'; else $(CYGPATH_W) '$(srcdir)/test/test1.c'; fi`
+	mv -f $(DEPDIR)/test1-test1.Tpo $(DEPDIR)/test1-test1.Po
+#	source='test/test1.c' object='test1-test1.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test1.obj `if test -f 'test/test1.c'; then $(CYGPATH_W) 'test/test1.c'; else $(CYGPATH_W) '$(srcdir)/test/test1.c'; fi`
+#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test1_CFLAGS) $(CFLAGS) -c -o test1-test1.obj `if test -f 'test/test1.c'; then $(CYGPATH_W) 'test/test1.c'; else $(CYGPATH_W) '$(srcdir)/test/test1.c'; fi`
 
-test1_pb2.o: test/test1_pb2.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test1_pb2.o -MD -MP -MF $(DEPDIR)/test1_pb2.Tpo -c -o test1_pb2.o `test -f 'test/test1_pb2.c' || echo '$(srcdir)/'`test/test1_pb2.c
-	mv -f $(DEPDIR)/test1_pb2.Tpo $(DEPDIR)/test1_pb2.Po
-#	source='test/test1_pb2.c' object='test1_pb2.o' libtool=no \
+test1-test1_pb2.o: test/generated/test1_pb2.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test1_CFLAGS) $(CFLAGS) -MT test1-test1_pb2.o -MD -MP -MF $(DEPDIR)/test1-test1_pb2.Tpo -c -o test1-test1_pb2.o `test -f 'test/generated/test1_pb2.c' || echo '$(srcdir)/'`test/generated/test1_pb2.c
+	mv -f $(DEPDIR)/test1-test1_pb2.Tpo $(DEPDIR)/test1-test1_pb2.Po
+#	source='test/generated/test1_pb2.c' object='test1-test1_pb2.o' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test1_pb2.o `test -f 'test/test1_pb2.c' || echo '$(srcdir)/'`test/test1_pb2.c
+#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test1_CFLAGS) $(CFLAGS) -c -o test1-test1_pb2.o `test -f 'test/generated/test1_pb2.c' || echo '$(srcdir)/'`test/generated/test1_pb2.c
 
-test1_pb2.obj: test/test1_pb2.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test1_pb2.obj -MD -MP -MF $(DEPDIR)/test1_pb2.Tpo -c -o test1_pb2.obj `if test -f 'test/test1_pb2.c'; then $(CYGPATH_W) 'test/test1_pb2.c'; else $(CYGPATH_W) '$(srcdir)/test/test1_pb2.c'; fi`
-	mv -f $(DEPDIR)/test1_pb2.Tpo $(DEPDIR)/test1_pb2.Po
-#	source='test/test1_pb2.c' object='test1_pb2.obj' libtool=no \
+test1-test1_pb2.obj: test/generated/test1_pb2.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test1_CFLAGS) $(CFLAGS) -MT test1-test1_pb2.obj -MD -MP -MF $(DEPDIR)/test1-test1_pb2.Tpo -c -o test1-test1_pb2.obj `if test -f 'test/generated/test1_pb2.c'; then $(CYGPATH_W) 'test/generated/test1_pb2.c'; else $(CYGPATH_W) '$(srcdir)/test/generated/test1_pb2.c'; fi`
+	mv -f $(DEPDIR)/test1-test1_pb2.Tpo $(DEPDIR)/test1-test1_pb2.Po
+#	source='test/generated/test1_pb2.c' object='test1-test1_pb2.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test1_pb2.obj `if test -f 'test/test1_pb2.c'; then $(CYGPATH_W) 'test/test1_pb2.c'; else $(CYGPATH_W) '$(srcdir)/test/test1_pb2.c'; fi`
+#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test1_CFLAGS) $(CFLAGS) -c -o test1-test1_pb2.obj `if test -f 'test/generated/test1_pb2.c'; then $(CYGPATH_W) 'test/generated/test1_pb2.c'; else $(CYGPATH_W) '$(srcdir)/test/generated/test1_pb2.c'; fi`
+
+test2_check.o: test/test2_check.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test2_check.o -MD -MP -MF $(DEPDIR)/test2_check.Tpo -c -o test2_check.o `test -f 'test/test2_check.c' || echo '$(srcdir)/'`test/test2_check.c
+	mv -f $(DEPDIR)/test2_check.Tpo $(DEPDIR)/test2_check.Po
+#	source='test/test2_check.c' object='test2_check.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test2_check.o `test -f 'test/test2_check.c' || echo '$(srcdir)/'`test/test2_check.c
+
+test2_check.obj: test/test2_check.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test2_check.obj -MD -MP -MF $(DEPDIR)/test2_check.Tpo -c -o test2_check.obj `if test -f 'test/test2_check.c'; then $(CYGPATH_W) 'test/test2_check.c'; else $(CYGPATH_W) '$(srcdir)/test/test2_check.c'; fi`
+	mv -f $(DEPDIR)/test2_check.Tpo $(DEPDIR)/test2_check.Po
+#	source='test/test2_check.c' object='test2_check.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test2_check.obj `if test -f 'test/test2_check.c'; then $(CYGPATH_W) 'test/test2_check.c'; else $(CYGPATH_W) '$(srcdir)/test/test2_check.c'; fi`
+
+test2_pb2.o: test/generated/test2_pb2.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test2_pb2.o -MD -MP -MF $(DEPDIR)/test2_pb2.Tpo -c -o test2_pb2.o `test -f 'test/generated/test2_pb2.c' || echo '$(srcdir)/'`test/generated/test2_pb2.c
+	mv -f $(DEPDIR)/test2_pb2.Tpo $(DEPDIR)/test2_pb2.Po
+#	source='test/generated/test2_pb2.c' object='test2_pb2.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test2_pb2.o `test -f 'test/generated/test2_pb2.c' || echo '$(srcdir)/'`test/generated/test2_pb2.c
+
+test2_pb2.obj: test/generated/test2_pb2.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test2_pb2.obj -MD -MP -MF $(DEPDIR)/test2_pb2.Tpo -c -o test2_pb2.obj `if test -f 'test/generated/test2_pb2.c'; then $(CYGPATH_W) 'test/generated/test2_pb2.c'; else $(CYGPATH_W) '$(srcdir)/test/generated/test2_pb2.c'; fi`
+	mv -f $(DEPDIR)/test2_pb2.Tpo $(DEPDIR)/test2_pb2.Po
+#	source='test/generated/test2_pb2.c' object='test2_pb2.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test2_pb2.obj `if test -f 'test/generated/test2_pb2.c'; then $(CYGPATH_W) 'test/generated/test2_pb2.c'; else $(CYGPATH_W) '$(srcdir)/test/generated/test2_pb2.c'; fi`
+
+.cc.o:
+	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+#	source='$<' object='$@' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(CXXCOMPILE) -c -o $@ $<
+
+.cc.obj:
+	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
+	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+#	source='$<' object='$@' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+.cc.lo:
+	$(LTCXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+#	source='$<' object='$@' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(LTCXXCOMPILE) -c -o $@ $<
+
+test2_generate.o: test/test2_generate.cc
+	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test2_generate.o -MD -MP -MF $(DEPDIR)/test2_generate.Tpo -c -o test2_generate.o `test -f 'test/test2_generate.cc' || echo '$(srcdir)/'`test/test2_generate.cc
+	mv -f $(DEPDIR)/test2_generate.Tpo $(DEPDIR)/test2_generate.Po
+#	source='test/test2_generate.cc' object='test2_generate.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test2_generate.o `test -f 'test/test2_generate.cc' || echo '$(srcdir)/'`test/test2_generate.cc
+
+test2_generate.obj: test/test2_generate.cc
+	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test2_generate.obj -MD -MP -MF $(DEPDIR)/test2_generate.Tpo -c -o test2_generate.obj `if test -f 'test/test2_generate.cc'; then $(CYGPATH_W) 'test/test2_generate.cc'; else $(CYGPATH_W) '$(srcdir)/test/test2_generate.cc'; fi`
+	mv -f $(DEPDIR)/test2_generate.Tpo $(DEPDIR)/test2_generate.Po
+#	source='test/test2_generate.cc' object='test2_generate.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test2_generate.obj `if test -f 'test/test2_generate.cc'; then $(CYGPATH_W) 'test/test2_generate.cc'; else $(CYGPATH_W) '$(srcdir)/test/test2_generate.cc'; fi`
+
+test2.pb.o: test/generated/test2.pb.cc
+	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test2.pb.o -MD -MP -MF $(DEPDIR)/test2.pb.Tpo -c -o test2.pb.o `test -f 'test/generated/test2.pb.cc' || echo '$(srcdir)/'`test/generated/test2.pb.cc
+	mv -f $(DEPDIR)/test2.pb.Tpo $(DEPDIR)/test2.pb.Po
+#	source='test/generated/test2.pb.cc' object='test2.pb.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test2.pb.o `test -f 'test/generated/test2.pb.cc' || echo '$(srcdir)/'`test/generated/test2.pb.cc
+
+test2.pb.obj: test/generated/test2.pb.cc
+	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test2.pb.obj -MD -MP -MF $(DEPDIR)/test2.pb.Tpo -c -o test2.pb.obj `if test -f 'test/generated/test2.pb.cc'; then $(CYGPATH_W) 'test/generated/test2.pb.cc'; else $(CYGPATH_W) '$(srcdir)/test/generated/test2.pb.cc'; fi`
+	mv -f $(DEPDIR)/test2.pb.Tpo $(DEPDIR)/test2.pb.Po
+#	source='test/generated/test2.pb.cc' object='test2.pb.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test2.pb.obj `if test -f 'test/generated/test2.pb.cc'; then $(CYGPATH_W) 'test/generated/test2.pb.cc'; else $(CYGPATH_W) '$(srcdir)/test/generated/test2.pb.cc'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

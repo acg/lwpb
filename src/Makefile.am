@@ -7,11 +7,23 @@ lwpb/buf.c \
 lwpb/decoder.c \
 lwpb/encoder.c
 
-bin_PROGRAMS = test1
+bin_PROGRAMS = test1 test2_generate test2_check
 
 test1_SOURCES = \
 test/test1.c \
-test/test1_pb2.c
+test/generated/test1_pb2.c
 
+test1_CFLAGS = -I${top_dir}/test/generated
 test1_LDADD = liblwpb.la
 
+test2_generate_SOURCES = \
+test/test2_generate.cc \
+test/generated/test2.pb.cc
+
+test2_generate_LDADD = /usr/lib/libprotobuf.la -lpthread
+
+test2_check_SOURCES = \
+test/test2_check.c \
+test/generated/test2_pb2.c
+
+test2_check_LDADD = liblwpb.la
