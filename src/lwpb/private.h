@@ -44,6 +44,8 @@ union wire_value {
 
 void lwpb_buf_init(struct lwpb_buf *buf, void *data, size_t len);
 
+size_t lwpb_buf_used(struct lwpb_buf *buf);
+
 size_t lwpb_buf_left(struct lwpb_buf *buf);
 
 #endif // __LWPB_PRIVATE_H__

@@ -217,8 +217,7 @@ lwpb_err_t lwpb_decoder_decode(struct lwpb_decoder *decoder,
 
 
 struct lwpb_encoder_stack_entry {
-    char *buf;
-    char *buf_end;
+    struct lwpb_buf buf;
     const struct lwpb_msg_desc *msg_desc;
 };
 
@@ -237,11 +236,6 @@ void lwpb_encoder_start(struct lwpb_encoder *encoder,
                         void *data, size_t len);
 
 size_t lwpb_encoder_finish(struct lwpb_encoder *encoder);
-
-void lwpb_encoder_msg_start(struct lwpb_encoder *encoder,
-                            const struct lwpb_msg_desc *msg_desc);
-
-void lwpb_encoder_msg_end(struct lwpb_encoder *encoder);
 
 lwpb_err_t lwpb_encoder_nested_start(struct lwpb_encoder *encoder,
                                      const struct lwpb_field_desc *field_desc);

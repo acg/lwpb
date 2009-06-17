@@ -29,27 +29,49 @@
 
 // Encoder utilities
 
-static void encode_varint(uint64_t varint, char *buf, char **end)
+static lwpb_err_t encode_varint(struct lwpb_buf *buf, uint64_t varint)
 {
     while (varint) {
+        if (lwpb_buf_left(buf) < 1)
+            return LWPB_ERR_END_OF_BUF;
         if (varint > 127) {
-            *buf = 0x80 | (varint & 0x7F);
+            *buf->pos = 0x80 | (varint & 0x7F);
         } else {
-            *buf = (varint & 0x7F);
+            *buf->pos = (varint & 0x7F);
         }
         varint >>= 7;
-        buf++;
+        buf->pos++;
     }
-    *end = buf;
+    
+    return LWPB_ERR_OK;
 }
 
-static void encode_32bit(uint32_t value, char *buf, char **end)
+static lwpb_err_t encode_32bit(struct lwpb_buf *buf, uint32_t value)
 {
-    buf[0] = (value) & 0xff;
-    buf[1] = (value >> 8) & 0xff;
-    buf[2] = (value >> 16) & 0xff;
-    buf[3] = (value >> 24) & 0xff;
-    *end = buf + 4;
+    if (lwpb_buf_left(buf) < 4)
+        return LWPB_ERR_END_OF_BUF;
+    
+    buf->pos[0] = (value) & 0xff;
+    buf->pos[1] = (value >> 8) & 0xff;
+    buf->pos[2] = (value >> 16) & 0xff;
+    buf->pos[3] = (value >> 24) & 0xff;
+    buf->pos += 4;
+}
+
+static lwpb_err_t encode_64bit(struct lwpb_buf *buf, uint64_t value)
+{
+    if (lwpb_buf_left(buf) < 8)
+        return LWPB_ERR_END_OF_BUF;
+    
+    buf->pos[0] = (value) & 0xff;
+    buf->pos[1] = (value >> 8) & 0xff;
+    buf->pos[2] = (value >> 16) & 0xff;
+    buf->pos[3] = (value >> 24) & 0xff;
+    buf->pos[4] = (value >> 32) & 0xff;
+    buf->pos[5] = (value >> 40) & 0xff;
+    buf->pos[6] = (value >> 48) & 0xff;
+    buf->pos[7] = (value >> 56) & 0xff;
+    buf->pos += 8;
 }
 
 // Encoder
@@ -69,14 +91,13 @@ void lwpb_encoder_start(struct lwpb_encoder *encoder,
     encoder->data = data;
     encoder->len = len;
     encoder->depth = 1;
-    encoder->stack[0].buf = data;
-    encoder->stack[0].buf_end = &encoder->stack[0].buf[len];
+    lwpb_buf_init(&encoder->stack[0].buf, data, len);
     encoder->stack[0].msg_desc = msg_desc;
 }
 
 size_t lwpb_encoder_finish(struct lwpb_encoder *encoder)
 {
-    return encoder->stack[0].buf - (char *) encoder->data;
+    return lwpb_buf_used(&encoder->stack[0].buf);
 }
 
 lwpb_err_t lwpb_encoder_nested_start(struct lwpb_encoder *encoder,
@@ -108,6 +129,7 @@ lwpb_err_t lwpb_encoder_add_field(struct lwpb_encoder *encoder,
                                   const struct lwpb_field_desc *field_desc,
                                   union lwpb_value *value)
 {
+    lwpb_err_t ret;
     struct lwpb_encoder_stack_entry *entry;
     int i;
     uint64_t key;
@@ -186,23 +208,34 @@ lwpb_err_t lwpb_encoder_add_field(struct lwpb_encoder *encoder,
     }
     
     key = wire_type | (field_desc->number << 3);
-    encode_varint(key, entry->buf, &entry->buf);
+    ret = encode_varint(&entry->buf, key);
+    if (ret != LWPB_ERR_OK)
+        return ret;
     
     switch (wire_type) {
     case WT_VARINT:
-        encode_varint(wire_value.varint, entry->buf, &entry->buf);
+        ret = encode_varint(&entry->buf, wire_value.varint);
+        if (ret != LWPB_ERR_OK)
+            return ret;
         break;
     case WT_64BIT:
-        encode_32bit(wire_value.int64 & 0xffffffff, entry->buf, &entry->buf);
-        encode_32bit(wire_value.int64 >> 32, entry->buf, &entry->buf);
+        ret = encode_64bit(&entry->buf, wire_value.int64);
+        if (ret != LWPB_ERR_OK)
+            return ret;
         break;
     case WT_STRING:
-        encode_varint(wire_value.string.len, entry->buf, &entry->buf);
-        memcpy(entry->buf, wire_value.string.data, wire_value.string.len);
-        entry->buf += wire_value.string.len;
+        ret = encode_varint(&entry->buf, wire_value.string.len);
+        if (ret != LWPB_ERR_OK)
+            return ret;
+        if (lwpb_buf_left(&entry->buf) < wire_value.string.len)
+            return LWPB_ERR_END_OF_BUF;
+        memcpy(entry->buf.pos, wire_value.string.data, wire_value.string.len);
+        entry->buf.pos += wire_value.string.len;
         break;
     case WT_32BIT:
-        encode_32bit(wire_value.int32, entry->buf, &entry->buf);
+        ret = encode_32bit(&entry->buf, wire_value.int32);
+        if (ret != LWPB_ERR_OK)
+            return ret;
         break;
     default:
         LWPB_ASSERT(1, "Unknown wire type");
