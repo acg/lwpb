@@ -29,10 +29,13 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
+build_triplet = i686-pc-linux-gnu
+host_triplet = i686-pc-linux-gnu
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/configure AUTHORS COPYING \
-	ChangeLog INSTALL NEWS depcomp install-sh missing
+	ChangeLog INSTALL NEWS config.guess config.sub depcomp \
+	install-sh ltmain.sh missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -68,6 +71,7 @@ distuninstallcheck_listfiles = find . -type f -print
 distcleancheck_listfiles = find . -type f -print
 ACLOCAL = ${SHELL} /home/simon/lwpb/missing --run aclocal-1.10
 AMTAR = ${SHELL} /home/simon/lwpb/missing --run tar
+AR = ar
 AUTOCONF = ${SHELL} /home/simon/lwpb/missing --run autoconf
 AUTOHEADER = ${SHELL} /home/simon/lwpb/missing --run autoheader
 AUTOMAKE = ${SHELL} /home/simon/lwpb/missing --run automake-1.10
@@ -75,14 +79,25 @@ AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2
+CPP = gcc -E
 CPPFLAGS = 
+CXX = g++
+CXXCPP = g++ -E
+CXXDEPMODE = depmode=gcc3
+CXXFLAGS = -g -O2
 CYGPATH_W = echo
-DEFS = -DPACKAGE_NAME=\"\" -DPACKAGE_TARNAME=\"\" -DPACKAGE_VERSION=\"\" -DPACKAGE_STRING=\"\" -DPACKAGE_BUGREPORT=\"\" -DPACKAGE=\"lwpb\" -DVERSION=\"0.0.1\"
+DEFS = -DPACKAGE_NAME=\"\" -DPACKAGE_TARNAME=\"\" -DPACKAGE_VERSION=\"\" -DPACKAGE_STRING=\"\" -DPACKAGE_BUGREPORT=\"\" -DPACKAGE=\"lwpb\" -DVERSION=\"0.0.1\" -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DHAVE_DLFCN_H=1
 DEPDIR = .deps
+DSYMUTIL = 
+ECHO = echo
 ECHO_C = 
 ECHO_N = -n
 ECHO_T = 
+EGREP = /bin/grep -E
 EXEEXT = 
+F77 = 
+FFLAGS = 
+GREP = /bin/grep
 INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
@@ -91,9 +106,12 @@ INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
 LDFLAGS = 
 LIBOBJS = 
 LIBS = 
+LIBTOOL = $(SHELL) $(top_builddir)/libtool
+LN_S = ln -s
 LTLIBOBJS = 
 MAKEINFO = ${SHELL} /home/simon/lwpb/missing --run makeinfo
 MKDIR_P = /bin/mkdir -p
+NMEDIT = 
 OBJEXT = o
 PACKAGE = lwpb
 PACKAGE_BUGREPORT = 
@@ -102,29 +120,41 @@ PACKAGE_STRING =
 PACKAGE_TARNAME = 
 PACKAGE_VERSION = 
 PATH_SEPARATOR = :
+RANLIB = ranlib
+SED = /bin/sed
 SET_MAKE = 
 SHELL = /bin/bash
-STRIP = 
+STRIP = strip
 VERSION = 0.0.1
 abs_builddir = /home/simon/lwpb
 abs_srcdir = /home/simon/lwpb
 abs_top_builddir = /home/simon/lwpb
 abs_top_srcdir = /home/simon/lwpb
 ac_ct_CC = gcc
+ac_ct_CXX = g++
+ac_ct_F77 = 
 am__include = include
 am__leading_dot = .
 am__quote = 
 am__tar = ${AMTAR} chof - "$$tardir"
 am__untar = ${AMTAR} xf -
 bindir = ${exec_prefix}/bin
+build = i686-pc-linux-gnu
 build_alias = 
+build_cpu = i686
+build_os = linux-gnu
+build_vendor = pc
 builddir = .
 datadir = ${datarootdir}
 datarootdir = ${prefix}/share
 docdir = ${datarootdir}/doc/${PACKAGE}
 dvidir = ${docdir}
 exec_prefix = ${prefix}
+host = i686-pc-linux-gnu
 host_alias = 
+host_cpu = i686
+host_os = linux-gnu
+host_vendor = pc
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
@@ -147,7 +177,7 @@ sysconfdir = ${prefix}/etc
 target_alias = 
 top_builddir = .
 top_srcdir = .
-SUBDIRS = src
+SUBDIRS = . src
 all: all-recursive
 
 .SUFFIXES:
@@ -184,6 +214,15 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 	cd $(srcdir) && $(AUTOCONF)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
+
+mostlyclean-libtool:
+	-rm -f *.lo
+
+clean-libtool:
+	-rm -rf .libs _libs
+
+distclean-libtool:
+	-rm -f libtool
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run `make' without going through this Makefile.
@@ -494,12 +533,13 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-recursive
 
-clean-am: clean-generic mostlyclean-am
+clean-am: clean-generic clean-libtool mostlyclean-am
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -f Makefile
-distclean-am: clean-am distclean-generic distclean-tags
+distclean-am: clean-am distclean-generic distclean-libtool \
+	distclean-tags
 
 dvi: dvi-recursive
 
@@ -537,7 +577,7 @@ maintainer-clean-am: distclean-am maintainer-clean-generic
 
 mostlyclean: mostlyclean-recursive
 
-mostlyclean-am: mostlyclean-generic
+mostlyclean-am: mostlyclean-generic mostlyclean-libtool
 
 pdf: pdf-recursive
 
@@ -554,18 +594,19 @@ uninstall-am:
 
 .PHONY: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) CTAGS GTAGS \
 	all all-am am--refresh check check-am clean clean-generic \
-	ctags ctags-recursive dist dist-all dist-bzip2 dist-gzip \
-	dist-lzma dist-shar dist-tarZ dist-zip distcheck distclean \
-	distclean-generic distclean-tags distcleancheck distdir \
-	distuninstallcheck dvi dvi-am html html-am info info-am \
-	install install-am install-data install-data-am install-dvi \
-	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-info install-info-am install-man \
-	install-pdf install-pdf-am install-ps install-ps-am \
-	install-strip installcheck installcheck-am installdirs \
-	installdirs-am maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-generic pdf pdf-am ps ps-am tags \
-	tags-recursive uninstall uninstall-am
+	clean-libtool ctags ctags-recursive dist dist-all dist-bzip2 \
+	dist-gzip dist-lzma dist-shar dist-tarZ dist-zip distcheck \
+	distclean distclean-generic distclean-libtool distclean-tags \
+	distcleancheck distdir distuninstallcheck dvi dvi-am html \
+	html-am info info-am install install-am install-data \
+	install-data-am install-dvi install-dvi-am install-exec \
+	install-exec-am install-html install-html-am install-info \
+	install-info-am install-man install-pdf install-pdf-am \
+	install-ps install-ps-am install-strip installcheck \
+	installcheck-am installdirs installdirs-am maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-generic \
+	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-recursive \
+	uninstall uninstall-am
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -478,7 +478,7 @@ $debug ||
 if test -n "$CONFIG_FILES"; then
 
 cat >"$tmp/subs-1.sed" <<\CEOF
-/@[a-zA-Z_][a-zA-Z_0-9]*@/!b end
+/@[a-zA-Z_][a-zA-Z_0-9]*@/!b
 s,@SHELL@,|#_!!_#|/bin/bash,g
 s,@PATH_SEPARATOR@,|#_!!_#|:,g
 s,@PACKAGE_NAME@,|#_!!_#|,g
@@ -508,7 +508,7 @@ s,@psdir@,|#_!!_#|${docdir},g
 s,@libdir@,|#_!!_#|${exec_prefix}/lib,g
 s,@localedir@,|#_!!_#|${datarootdir}/locale,g
 s,@mandir@,|#_!!_#|${datarootdir}/man,g
-s,@DEFS@,|#_!!_#|-DPACKAGE_NAME=\\"\\" -DPACKAGE_TARNAME=\\"\\" -DPACKAGE_VERSION=\\"\\" -DPACKAGE_STRING=\\"\\" -DPACKAGE_BUGREPORT=\\"\\" -DPACKAGE=\\"lwpb\\" -DVERSION=\\"0.0.1\\",g
+s,@DEFS@,|#_!!_#|-DPACKAGE_NAME=\\"\\" -DPACKAGE_TARNAME=\\"\\" -DPACKAGE_VERSION=\\"\\" -DPACKAGE_STRING=\\"\\" -DPACKAGE_BUGREPORT=\\"\\" -DPACKAGE=\\"lwpb\\" -DVERSION=\\"0.0.1\\" -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DHAVE_DLFCN_H=1,g
 s,@ECHO_C@,|#_!!_#|,g
 s,@ECHO_N@,|#_!!_#|-n,g
 s,@ECHO_T@,|#_!!_#|,g
@@ -529,7 +529,7 @@ s,@AUTOMAKE@,|#_!!_#|${SHELL} /home/simon/lwpb/missing --run automake-1.10,g
 s,@AUTOHEADER@,|#_!!_#|${SHELL} /home/simon/lwpb/missing --run autoheader,g
 s,@MAKEINFO@,|#_!!_#|${SHELL} /home/simon/lwpb/missing --run makeinfo,g
 s,@install_sh@,|#_!!_#|$(SHELL) /home/simon/lwpb/install-sh,g
-s,@STRIP@,|#_!!_#|,g
+s,@STRIP@,|#_!!_#|strip,g
 s,@INSTALL_STRIP_PROGRAM@,|#_!!_#|$(install_sh) -c -s,g
 s,@mkdir_p@,|#_!!_#|/bin/mkdir -p,g
 s,@AWK@,|#_!!_#|gawk,g
@@ -538,6 +538,14 @@ s,@am__leading_dot@,|#_!!_#|.,g
 s,@AMTAR@,|#_!!_#|${SHELL} /home/simon/lwpb/missing --run tar,g
 s,@am__tar@,|#_!!_#|${AMTAR} chof - "$$tardir",g
 s,@am__untar@,|#_!!_#|${AMTAR} xf -,g
+s,@build@,|#_!!_#|i686-pc-linux-gnu,g
+s,@build_cpu@,|#_!!_#|i686,g
+s,@build_vendor@,|#_!!_#|pc,g
+s,@build_os@,|#_!!_#|linux-gnu,g
+s,@host@,|#_!!_#|i686-pc-linux-gnu,g
+s,@host_cpu@,|#_!!_#|i686,g
+s,@host_vendor@,|#_!!_#|pc,g
+s,@host_os@,|#_!!_#|linux-gnu,g
 s,@CC@,|#_!!_#|gcc,g
 s,@CFLAGS@,|#_!!_#|-g -O2,g
 s,@LDFLAGS@,|#_!!_#|,g
@@ -554,6 +562,30 @@ s,@AMDEPBACKSLASH@,|#_!!_#|\\,g
 s,@CCDEPMODE@,|#_!!_#|depmode=gcc3,g
 s,@am__fastdepCC_TRUE@,|#_!!_#|,g
 s,@am__fastdepCC_FALSE@,|#_!!_#|#,g
+s,@SED@,|#_!!_#|/bin/sed,g
+s,@GREP@,|#_!!_#|/bin/grep,g
+s,@EGREP@,|#_!!_#|/bin/grep -E,g
+s,@LN_S@,|#_!!_#|ln -s,g
+s,@ECHO@,|#_!!_#|echo,g
+s,@AR@,|#_!!_#|ar,g
+s,@RANLIB@,|#_!!_#|ranlib,g
+s,@DSYMUTIL@,|#_!!_#|,g
+s,@NMEDIT@,|#_!!_#|,g
+s,@CPP@,|#_!!_#|gcc -E,g
+s,@CXX@,|#_!!_#|g++,g
+s,@CXXFLAGS@,|#_!!_#|-g -O2,g
+s,@ac_ct_CXX@,|#_!!_#|g++,g
+s,@CXXDEPMODE@,|#_!!_#|depmode=gcc3,g
+CEOF
+cat >"$tmp/subs-2.sed" <<\CEOF
+/@[a-zA-Z_][a-zA-Z_0-9]*@/!b end
+s,@am__fastdepCXX_TRUE@,|#_!!_#|,g
+s,@am__fastdepCXX_FALSE@,|#_!!_#|#,g
+s,@CXXCPP@,|#_!!_#|g++ -E,g
+s,@F77@,|#_!!_#|,g
+s,@FFLAGS@,|#_!!_#|,g
+s,@ac_ct_F77@,|#_!!_#|,g
+s,@LIBTOOL@,|#_!!_#|$(SHELL) $(top_builddir)/libtool,g
 s,@LIBOBJS@,|#_!!_#|,g
 s,@LTLIBOBJS@,|#_!!_#|,g
 :end
@@ -786,7 +818,7 @@ s&@abs_top_builddir@&$ac_abs_top_builddir&;t t
 s&@INSTALL@&$ac_INSTALL&;t t
 s&@MKDIR_P@&$ac_MKDIR_P&;t t
 $ac_datarootdir_hack
-" $ac_file_inputs | sed -f "$tmp/subs-1.sed" >$tmp/out
+" $ac_file_inputs | sed -f "$tmp/subs-1.sed" | sed -f "$tmp/subs-2.sed" >$tmp/out
 
 test -z "$ac_datarootdir_hack$ac_datarootdir_seen" &&
   { ac_out=`sed -n '/\${datarootdir}/p' "$tmp/out"`; test -n "$ac_out"; } &&

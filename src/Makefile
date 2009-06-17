@@ -15,6 +15,7 @@
 
 
 
+
 pkgdatadir = $(datadir)/lwpb
 pkglibdir = $(libdir)/lwpb
 pkgincludedir = $(includedir)/lwpb
@@ -30,7 +31,9 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-bin_PROGRAMS = test$(EXEEXT)
+build_triplet = i686-pc-linux-gnu
+host_triplet = i686-pc-linux-gnu
+bin_PROGRAMS = test1$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -39,22 +42,37 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
 CONFIG_CLEAN_FILES =
-am__installdirs = "$(DESTDIR)$(bindir)"
+am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
+am__vpath_adj = case $$p in \
+    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
+    *) f=$$p;; \
+  esac;
+am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
+am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)"
+libLTLIBRARIES_INSTALL = $(INSTALL)
+LTLIBRARIES = $(lib_LTLIBRARIES)
+liblwpb_la_LIBADD =
+am_liblwpb_la_OBJECTS = decoder.lo encoder.lo
+liblwpb_la_OBJECTS = $(am_liblwpb_la_OBJECTS)
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_test_OBJECTS = lwpb_decoder.$(OBJEXT) lwpb_encoder.$(OBJEXT) \
-	test.$(OBJEXT)
-test_OBJECTS = $(am_test_OBJECTS)
-test_LDADD = $(LDADD)
+am_test1_OBJECTS = test1.$(OBJEXT) test1_pb2.$(OBJEXT)
+test1_OBJECTS = $(am_test1_OBJECTS)
+test1_DEPENDENCIES = liblwpb.la
 DEFAULT_INCLUDES = -I.
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
-LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(test_SOURCES)
-DIST_SOURCES = $(test_SOURCES)
+LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
+	$(LDFLAGS) -o $@
+SOURCES = $(liblwpb_la_SOURCES) $(test1_SOURCES)
+DIST_SOURCES = $(liblwpb_la_SOURCES) $(test1_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -70,6 +88,7 @@ DIST_SUBDIRS = $(SUBDIRS)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = ${SHELL} /home/simon/lwpb/missing --run aclocal-1.10
 AMTAR = ${SHELL} /home/simon/lwpb/missing --run tar
+AR = ar
 AUTOCONF = ${SHELL} /home/simon/lwpb/missing --run autoconf
 AUTOHEADER = ${SHELL} /home/simon/lwpb/missing --run autoheader
 AUTOMAKE = ${SHELL} /home/simon/lwpb/missing --run automake-1.10
@@ -77,14 +96,25 @@ AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2
+CPP = gcc -E
 CPPFLAGS = 
+CXX = g++
+CXXCPP = g++ -E
+CXXDEPMODE = depmode=gcc3
+CXXFLAGS = -g -O2
 CYGPATH_W = echo
-DEFS = -DPACKAGE_NAME=\"\" -DPACKAGE_TARNAME=\"\" -DPACKAGE_VERSION=\"\" -DPACKAGE_STRING=\"\" -DPACKAGE_BUGREPORT=\"\" -DPACKAGE=\"lwpb\" -DVERSION=\"0.0.1\"
+DEFS = -DPACKAGE_NAME=\"\" -DPACKAGE_TARNAME=\"\" -DPACKAGE_VERSION=\"\" -DPACKAGE_STRING=\"\" -DPACKAGE_BUGREPORT=\"\" -DPACKAGE=\"lwpb\" -DVERSION=\"0.0.1\" -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DHAVE_DLFCN_H=1
 DEPDIR = .deps
+DSYMUTIL = 
+ECHO = echo
 ECHO_C = 
 ECHO_N = -n
 ECHO_T = 
+EGREP = /bin/grep -E
 EXEEXT = 
+F77 = 
+FFLAGS = 
+GREP = /bin/grep
 INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
@@ -93,9 +123,12 @@ INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
 LDFLAGS = 
 LIBOBJS = 
 LIBS = 
+LIBTOOL = $(SHELL) $(top_builddir)/libtool
+LN_S = ln -s
 LTLIBOBJS = 
 MAKEINFO = ${SHELL} /home/simon/lwpb/missing --run makeinfo
 MKDIR_P = /bin/mkdir -p
+NMEDIT = 
 OBJEXT = o
 PACKAGE = lwpb
 PACKAGE_BUGREPORT = 
@@ -104,29 +137,41 @@ PACKAGE_STRING =
 PACKAGE_TARNAME = 
 PACKAGE_VERSION = 
 PATH_SEPARATOR = :
+RANLIB = ranlib
+SED = /bin/sed
 SET_MAKE = 
 SHELL = /bin/bash
-STRIP = 
+STRIP = strip
 VERSION = 0.0.1
 abs_builddir = /home/simon/lwpb/src
 abs_srcdir = /home/simon/lwpb/src
 abs_top_builddir = /home/simon/lwpb
 abs_top_srcdir = /home/simon/lwpb
 ac_ct_CC = gcc
+ac_ct_CXX = g++
+ac_ct_F77 = 
 am__include = include
 am__leading_dot = .
 am__quote = 
 am__tar = ${AMTAR} chof - "$$tardir"
 am__untar = ${AMTAR} xf -
 bindir = ${exec_prefix}/bin
+build = i686-pc-linux-gnu
 build_alias = 
+build_cpu = i686
+build_os = linux-gnu
+build_vendor = pc
 builddir = .
 datadir = ${datarootdir}
 datarootdir = ${prefix}/share
 docdir = ${datarootdir}/doc/${PACKAGE}
 dvidir = ${docdir}
 exec_prefix = ${prefix}
+host = i686-pc-linux-gnu
 host_alias = 
+host_cpu = i686
+host_os = linux-gnu
+host_vendor = pc
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
@@ -150,15 +195,20 @@ target_alias =
 top_builddir = ..
 top_srcdir = ..
 SUBDIRS = .
-test_SOURCES = \
-lib/lwpb_decoder.c \
-lib/lwpb_encoder.c \
-test.c
+lib_LTLIBRARIES = liblwpb.la
+liblwpb_la_SOURCES = \
+lwpb/decoder.c \
+lwpb/encoder.c
 
+test1_SOURCES = \
+test/test1.c \
+test/test1_pb2.c
+
+test1_LDADD = liblwpb.la
 all: all-recursive
 
 .SUFFIXES:
-.SUFFIXES: .c .o .obj
+.SUFFIXES: .c .lo .o .obj
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -188,16 +238,46 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+install-libLTLIBRARIES: $(lib_LTLIBRARIES)
+	@$(NORMAL_INSTALL)
+	test -z "$(libdir)" || $(MKDIR_P) "$(DESTDIR)$(libdir)"
+	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
+	  if test -f $$p; then \
+	    f=$(am__strip_dir) \
+	    echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) '$$p' '$(DESTDIR)$(libdir)/$$f'"; \
+	    $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) "$$p" "$(DESTDIR)$(libdir)/$$f"; \
+	  else :; fi; \
+	done
+
+uninstall-libLTLIBRARIES:
+	@$(NORMAL_UNINSTALL)
+	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
+	  p=$(am__strip_dir) \
+	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f '$(DESTDIR)$(libdir)/$$p'"; \
+	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f "$(DESTDIR)$(libdir)/$$p"; \
+	done
+
+clean-libLTLIBRARIES:
+	-test -z "$(lib_LTLIBRARIES)" || rm -f $(lib_LTLIBRARIES)
+	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
+	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
+	  test "$$dir" != "$$p" || dir=.; \
+	  echo "rm -f \"$${dir}/so_locations\""; \
+	  rm -f "$${dir}/so_locations"; \
+	done
+liblwpb.la: $(liblwpb_la_OBJECTS) $(liblwpb_la_DEPENDENCIES) 
+	$(LINK) -rpath $(libdir) $(liblwpb_la_OBJECTS) $(liblwpb_la_LIBADD) $(LIBS)
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	test -z "$(bindir)" || $(MKDIR_P) "$(DESTDIR)$(bindir)"
 	@list='$(bin_PROGRAMS)'; for p in $$list; do \
 	  p1=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
 	  if test -f $$p \
+	     || test -f $$p1 \
 	  ; then \
 	    f=`echo "$$p1" | sed 's,^.*/,,;$(transform);s/$$/$(EXEEXT)/'`; \
-	   echo " $(INSTALL_PROGRAM_ENV) $(binPROGRAMS_INSTALL) '$$p' '$(DESTDIR)$(bindir)/$$f'"; \
-	   $(INSTALL_PROGRAM_ENV) $(binPROGRAMS_INSTALL) "$$p" "$(DESTDIR)$(bindir)/$$f" || exit 1; \
+	   echo " $(INSTALL_PROGRAM_ENV) $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(binPROGRAMS_INSTALL) '$$p' '$(DESTDIR)$(bindir)/$$f'"; \
+	   $(INSTALL_PROGRAM_ENV) $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(binPROGRAMS_INSTALL) "$$p" "$(DESTDIR)$(bindir)/$$f" || exit 1; \
 	  else :; fi; \
 	done
 
@@ -210,10 +290,14 @@ uninstall-binPROGRAMS:
 	done
 
 clean-binPROGRAMS:
-	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
-test$(EXEEXT): $(test_OBJECTS) $(test_DEPENDENCIES) 
-	@rm -f test$(EXEEXT)
-	$(LINK) $(test_OBJECTS) $(test_LDADD) $(LIBS)
+	@list='$(bin_PROGRAMS)'; for p in $$list; do \
+	  f=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
+	  echo " rm -f $$p $$f"; \
+	  rm -f $$p $$f ; \
+	done
+test1$(EXEEXT): $(test1_OBJECTS) $(test1_DEPENDENCIES) 
+	@rm -f test1$(EXEEXT)
+	$(LINK) $(test1_OBJECTS) $(test1_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -221,9 +305,10 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-include ./$(DEPDIR)/lwpb_decoder.Po
-include ./$(DEPDIR)/lwpb_encoder.Po
-include ./$(DEPDIR)/test.Po
+include ./$(DEPDIR)/decoder.Plo
+include ./$(DEPDIR)/encoder.Plo
+include ./$(DEPDIR)/test1.Po
+include ./$(DEPDIR)/test1_pb2.Po
 
 .c.o:
 	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -239,33 +324,60 @@ include ./$(DEPDIR)/test.Po
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
 #	$(COMPILE) -c `$(CYGPATH_W) '$<'`
 
-lwpb_decoder.o: lib/lwpb_decoder.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT lwpb_decoder.o -MD -MP -MF $(DEPDIR)/lwpb_decoder.Tpo -c -o lwpb_decoder.o `test -f 'lib/lwpb_decoder.c' || echo '$(srcdir)/'`lib/lwpb_decoder.c
-	mv -f $(DEPDIR)/lwpb_decoder.Tpo $(DEPDIR)/lwpb_decoder.Po
-#	source='lib/lwpb_decoder.c' object='lwpb_decoder.o' libtool=no \
+.c.lo:
+	$(LTCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+#	source='$<' object='$@' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o lwpb_decoder.o `test -f 'lib/lwpb_decoder.c' || echo '$(srcdir)/'`lib/lwpb_decoder.c
+#	$(LTCOMPILE) -c -o $@ $<
 
-lwpb_decoder.obj: lib/lwpb_decoder.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT lwpb_decoder.obj -MD -MP -MF $(DEPDIR)/lwpb_decoder.Tpo -c -o lwpb_decoder.obj `if test -f 'lib/lwpb_decoder.c'; then $(CYGPATH_W) 'lib/lwpb_decoder.c'; else $(CYGPATH_W) '$(srcdir)/lib/lwpb_decoder.c'; fi`
-	mv -f $(DEPDIR)/lwpb_decoder.Tpo $(DEPDIR)/lwpb_decoder.Po
-#	source='lib/lwpb_decoder.c' object='lwpb_decoder.obj' libtool=no \
+decoder.lo: lwpb/decoder.c
+	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT decoder.lo -MD -MP -MF $(DEPDIR)/decoder.Tpo -c -o decoder.lo `test -f 'lwpb/decoder.c' || echo '$(srcdir)/'`lwpb/decoder.c
+	mv -f $(DEPDIR)/decoder.Tpo $(DEPDIR)/decoder.Plo
+#	source='lwpb/decoder.c' object='decoder.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o lwpb_decoder.obj `if test -f 'lib/lwpb_decoder.c'; then $(CYGPATH_W) 'lib/lwpb_decoder.c'; else $(CYGPATH_W) '$(srcdir)/lib/lwpb_decoder.c'; fi`
+#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o decoder.lo `test -f 'lwpb/decoder.c' || echo '$(srcdir)/'`lwpb/decoder.c
 
-lwpb_encoder.o: lib/lwpb_encoder.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT lwpb_encoder.o -MD -MP -MF $(DEPDIR)/lwpb_encoder.Tpo -c -o lwpb_encoder.o `test -f 'lib/lwpb_encoder.c' || echo '$(srcdir)/'`lib/lwpb_encoder.c
-	mv -f $(DEPDIR)/lwpb_encoder.Tpo $(DEPDIR)/lwpb_encoder.Po
-#	source='lib/lwpb_encoder.c' object='lwpb_encoder.o' libtool=no \
+encoder.lo: lwpb/encoder.c
+	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT encoder.lo -MD -MP -MF $(DEPDIR)/encoder.Tpo -c -o encoder.lo `test -f 'lwpb/encoder.c' || echo '$(srcdir)/'`lwpb/encoder.c
+	mv -f $(DEPDIR)/encoder.Tpo $(DEPDIR)/encoder.Plo
+#	source='lwpb/encoder.c' object='encoder.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o lwpb_encoder.o `test -f 'lib/lwpb_encoder.c' || echo '$(srcdir)/'`lib/lwpb_encoder.c
+#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o encoder.lo `test -f 'lwpb/encoder.c' || echo '$(srcdir)/'`lwpb/encoder.c
 
-lwpb_encoder.obj: lib/lwpb_encoder.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT lwpb_encoder.obj -MD -MP -MF $(DEPDIR)/lwpb_encoder.Tpo -c -o lwpb_encoder.obj `if test -f 'lib/lwpb_encoder.c'; then $(CYGPATH_W) 'lib/lwpb_encoder.c'; else $(CYGPATH_W) '$(srcdir)/lib/lwpb_encoder.c'; fi`
-	mv -f $(DEPDIR)/lwpb_encoder.Tpo $(DEPDIR)/lwpb_encoder.Po
-#	source='lib/lwpb_encoder.c' object='lwpb_encoder.obj' libtool=no \
+test1.o: test/test1.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test1.o -MD -MP -MF $(DEPDIR)/test1.Tpo -c -o test1.o `test -f 'test/test1.c' || echo '$(srcdir)/'`test/test1.c
+	mv -f $(DEPDIR)/test1.Tpo $(DEPDIR)/test1.Po
+#	source='test/test1.c' object='test1.o' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o lwpb_encoder.obj `if test -f 'lib/lwpb_encoder.c'; then $(CYGPATH_W) 'lib/lwpb_encoder.c'; else $(CYGPATH_W) '$(srcdir)/lib/lwpb_encoder.c'; fi`
+#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test1.o `test -f 'test/test1.c' || echo '$(srcdir)/'`test/test1.c
+
+test1.obj: test/test1.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test1.obj -MD -MP -MF $(DEPDIR)/test1.Tpo -c -o test1.obj `if test -f 'test/test1.c'; then $(CYGPATH_W) 'test/test1.c'; else $(CYGPATH_W) '$(srcdir)/test/test1.c'; fi`
+	mv -f $(DEPDIR)/test1.Tpo $(DEPDIR)/test1.Po
+#	source='test/test1.c' object='test1.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test1.obj `if test -f 'test/test1.c'; then $(CYGPATH_W) 'test/test1.c'; else $(CYGPATH_W) '$(srcdir)/test/test1.c'; fi`
+
+test1_pb2.o: test/test1_pb2.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test1_pb2.o -MD -MP -MF $(DEPDIR)/test1_pb2.Tpo -c -o test1_pb2.o `test -f 'test/test1_pb2.c' || echo '$(srcdir)/'`test/test1_pb2.c
+	mv -f $(DEPDIR)/test1_pb2.Tpo $(DEPDIR)/test1_pb2.Po
+#	source='test/test1_pb2.c' object='test1_pb2.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test1_pb2.o `test -f 'test/test1_pb2.c' || echo '$(srcdir)/'`test/test1_pb2.c
+
+test1_pb2.obj: test/test1_pb2.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test1_pb2.obj -MD -MP -MF $(DEPDIR)/test1_pb2.Tpo -c -o test1_pb2.obj `if test -f 'test/test1_pb2.c'; then $(CYGPATH_W) 'test/test1_pb2.c'; else $(CYGPATH_W) '$(srcdir)/test/test1_pb2.c'; fi`
+	mv -f $(DEPDIR)/test1_pb2.Tpo $(DEPDIR)/test1_pb2.Po
+#	source='test/test1_pb2.c' object='test1_pb2.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test1_pb2.obj `if test -f 'test/test1_pb2.c'; then $(CYGPATH_W) 'test/test1_pb2.c'; else $(CYGPATH_W) '$(srcdir)/test/test1_pb2.c'; fi`
+
+mostlyclean-libtool:
+	-rm -f *.lo
+
+clean-libtool:
+	-rm -rf .libs _libs
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run `make' without going through this Makefile.
@@ -442,10 +554,12 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(PROGRAMS)
+all-am: Makefile $(LTLIBRARIES) $(PROGRAMS)
+install-binPROGRAMS: install-libLTLIBRARIES
+
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(bindir)"; do \
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-recursive
@@ -474,7 +588,8 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-recursive
 
-clean-am: clean-binPROGRAMS clean-generic mostlyclean-am
+clean-am: clean-binPROGRAMS clean-generic clean-libLTLIBRARIES \
+	clean-libtool mostlyclean-am
 
 distclean: distclean-recursive
 	-rm -rf ./$(DEPDIR)
@@ -496,7 +611,7 @@ install-data-am:
 
 install-dvi: install-dvi-recursive
 
-install-exec-am: install-binPROGRAMS
+install-exec-am: install-binPROGRAMS install-libLTLIBRARIES
 
 install-html: install-html-recursive
 
@@ -517,7 +632,8 @@ maintainer-clean-am: distclean-am maintainer-clean-generic
 
 mostlyclean: mostlyclean-recursive
 
-mostlyclean-am: mostlyclean-compile mostlyclean-generic
+mostlyclean-am: mostlyclean-compile mostlyclean-generic \
+	mostlyclean-libtool
 
 pdf: pdf-recursive
 
@@ -527,25 +643,27 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-binPROGRAMS
+uninstall-am: uninstall-binPROGRAMS uninstall-libLTLIBRARIES
 
 .MAKE: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) install-am \
 	install-strip
 
 .PHONY: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) CTAGS GTAGS \
 	all all-am check check-am clean clean-binPROGRAMS \
-	clean-generic ctags ctags-recursive distclean \
-	distclean-compile distclean-generic distclean-tags distdir dvi \
-	dvi-am html html-am info info-am install install-am \
-	install-binPROGRAMS install-data install-data-am install-dvi \
-	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-info install-info-am install-man \
-	install-pdf install-pdf-am install-ps install-ps-am \
-	install-strip installcheck installcheck-am installdirs \
-	installdirs-am maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-compile mostlyclean-generic pdf pdf-am \
-	ps ps-am tags tags-recursive uninstall uninstall-am \
-	uninstall-binPROGRAMS
+	clean-generic clean-libLTLIBRARIES clean-libtool ctags \
+	ctags-recursive distclean distclean-compile distclean-generic \
+	distclean-libtool distclean-tags distdir dvi dvi-am html \
+	html-am info info-am install install-am install-binPROGRAMS \
+	install-data install-data-am install-dvi install-dvi-am \
+	install-exec install-exec-am install-html install-html-am \
+	install-info install-info-am install-libLTLIBRARIES \
+	install-man install-pdf install-pdf-am install-ps \
+	install-ps-am install-strip installcheck installcheck-am \
+	installdirs installdirs-am maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	tags tags-recursive uninstall uninstall-am \
+	uninstall-binPROGRAMS uninstall-libLTLIBRARIES
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

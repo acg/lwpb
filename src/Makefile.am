@@ -1,6 +1,16 @@
 SUBDIRS = .
-bin_PROGRAMS = test
-test_SOURCES = \
-lib/lwpb_decoder.c \
-lib/lwpb_encoder.c \
-test.c
+
+lib_LTLIBRARIES = liblwpb.la
+
+liblwpb_la_SOURCES = \
+lwpb/decoder.c \
+lwpb/encoder.c
+
+bin_PROGRAMS = test1
+
+test1_SOURCES = \
+test/test1.c \
+test/test1_pb2.c
+
+test1_LDADD = liblwpb.la
+

@@ -1,4 +1,4 @@
-AC_INIT(src/test.c)
+AC_INIT(src/lwpb/encoder.c)
 
 PACKAGE=lwpb
 VERSION=0.0.1
@@ -9,6 +9,7 @@ AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 #AM_INIT_AUTOMAKE([1.9 foreign])
 #PACKAGE=lwpb
 
+AC_PROG_LIBTOOL
 AC_PROG_CC
 
 AC_OUTPUT( Makefile src/Makefile )
