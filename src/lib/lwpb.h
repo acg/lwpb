@@ -43,36 +43,41 @@ typedef enum {
 } lwpb_err_t;
 
 /**
- * Protocol buffer field types. The first 2 bits are used to specify the field
- * rule (required, optional or repeated). The next 4 bits specify the value
- * type.
+ * Protocol buffer field types. The value is split into several bitfields:
+ * 0-1: Field label
+ * 2-5: Field value type
+ * 6-32: Flags
  */
 typedef enum {
-    /* Field rules */
-    LWPB_REQUIRED   = (0 << 0),
-    LWPB_OPTIONAL   = (1 << 0),
-    LWPB_REPEATED   = (2 << 0),
+    /* Field label */
+    LWPB_REQUIRED       = (0 << 0),
+    LWPB_OPTIONAL       = (1 << 0),
+    LWPB_REPEATED       = (2 << 0),
     /* Field value types */
-    LWPB_DOUBLE     = (0 << 2),
-    LWPB_FLOAT      = (1 << 2),
-    LWPB_INT32      = (2 << 2),
-    LWPB_INT64      = (3 << 2),
-    LWPB_UINT32     = (4 << 2),
-    LWPB_UINT64     = (5 << 2),
-    LWPB_SINT32     = (6 << 2),
-    LWPB_SINT64     = (7 << 2),
-    LWPB_FIXED32    = (8 << 2),
-    LWPB_FIXED64    = (9 << 2),
-    LWPB_SFIXED32   = (10 << 2),
-    LWPB_SFIXED64   = (11 << 2),
-    LWPB_BOOL       = (12 << 2),
-    LWPB_STRING     = (13 << 2),
-    LWPB_BYTES      = (14 << 2),
-    LWPB_MESSAGE    = (15 << 2),
+    LWPB_DOUBLE         = (0 << 2),
+    LWPB_FLOAT          = (1 << 2),
+    LWPB_INT32          = (2 << 2),
+    LWPB_INT64          = (3 << 2),
+    LWPB_UINT32         = (4 << 2),
+    LWPB_UINT64         = (5 << 2),
+    LWPB_SINT32         = (6 << 2),
+    LWPB_SINT64         = (7 << 2),
+    LWPB_FIXED32        = (8 << 2),
+    LWPB_FIXED64        = (9 << 2),
+    LWPB_SFIXED32       = (10 << 2),
+    LWPB_SFIXED64       = (11 << 2),
+    LWPB_BOOL           = (12 << 2),
+    LWPB_STRING         = (13 << 2),
+    LWPB_BYTES          = (14 << 2),
+    LWPB_MESSAGE        = (15 << 2),
+    /* Field flags */
+    LWPB_HAS_DEFAULT    = ((1 << 0) << 6),
+    LWPB_IS_PACKED      = ((1 << 1) << 6),
+    LWPB_IS_DEPRECATED  = ((1 << 2) << 6),
 } lwpb_typ_t;
 
-#define LWPB_TYP_RULE(typ) ((typ) & (3 << 0))
-#define LWPB_TYP_VALUE(typ) ((typ) & (15 << 2))
+#define LWPB_TYP_RULE(typ)  ((typ) & (0x3 << 0))
+#define LWPB_TYP_VALUE(typ) ((typ) & (0xf << 2))
 
 /** Protocol buffer value */
 union lwpb_value {
