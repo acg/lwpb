@@ -81,10 +81,10 @@ typedef enum {
 #define LWPB_SFIXED32       10
 #define LWPB_SFIXED64       11
 #define LWPB_BOOL           12
-#define LWPB_STRING         13
-#define LWPB_BYTES          14
-#define LWPB_MESSAGE        15
-#define LWPB_ENUM           16
+#define LWPB_ENUM           13
+#define LWPB_STRING         14
+#define LWPB_BYTES          15
+#define LWPB_MESSAGE        16
 
 /* Field flags */
 #define LWPB_HAS_DEFAULT    (1 << 0)
@@ -115,6 +115,10 @@ union lwpb_value {
         uint8_t *data;
         size_t len;
     } bytes;
+    struct {
+        void *data;
+        size_t len;
+    } message;
     int enum_;
     int null;
 } value;
@@ -216,8 +220,9 @@ lwpb_err_t lwpb_decoder_decode(struct lwpb_decoder *decoder,
                                void *data, size_t len);
 
 
-struct lwpb_encoder_stack_entry {
+struct lwpb_encoder_stack_frame {
     struct lwpb_buf buf;
+    const struct lwpb_field_desc *field_desc;
     const struct lwpb_msg_desc *msg_desc;
 };
 
@@ -225,7 +230,7 @@ struct lwpb_encoder_stack_entry {
 struct lwpb_encoder {
     void *data;
     size_t len;
-    struct lwpb_encoder_stack_entry stack[LWPB_MAX_DEPTH];
+    struct lwpb_encoder_stack_frame stack[LWPB_MAX_DEPTH];
     int depth;
 };
 
@@ -274,6 +279,10 @@ lwpb_err_t lwpb_encoder_add_bool(struct lwpb_encoder *encoder,
                                  const struct lwpb_field_desc *field_desc,
                                  int bool);
 
+lwpb_err_t lwpb_encoder_add_enum(struct lwpb_encoder *encoder,
+                                 const struct lwpb_field_desc *field_desc,
+                                 int enum_);
+
 lwpb_err_t lwpb_encoder_add_string(struct lwpb_encoder *encoder,
                                    const struct lwpb_field_desc *field_desc,
                                    char *str);
@@ -281,10 +290,6 @@ lwpb_err_t lwpb_encoder_add_string(struct lwpb_encoder *encoder,
 lwpb_err_t lwpb_encoder_add_bytes(struct lwpb_encoder *encoder,
                                   const struct lwpb_field_desc *field_desc,
                                   uint8_t *data, size_t len);
-
-lwpb_err_t lwpb_encoder_add_enum(struct lwpb_encoder *encoder,
-                                 const struct lwpb_field_desc *field_desc,
-                                 int enum_);
 
 
 #endif // __LWPB_H__

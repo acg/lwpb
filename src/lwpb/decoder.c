@@ -82,10 +82,10 @@ static void debug_field_handler(struct lwpb_decoder *decoder,
         "(sfixed32)",
         "(sfixed64)",
         "(bool)",
+        "(enum)",
         "(string)",
         "(bytes)",
         "(message)",
-        "(enum)",
     };
     
     char *name;
@@ -127,6 +127,9 @@ static void debug_field_handler(struct lwpb_decoder *decoder,
     case LWPB_BOOL:
         printf("%s", value->bool ? "true" : "false");
         break;
+    case LWPB_ENUM:
+        printf("%d", value->enum_);
+        break;
     case LWPB_STRING:
         while (value->string.len--)
             printf("%c", *value->string.str++);
@@ -134,9 +137,6 @@ static void debug_field_handler(struct lwpb_decoder *decoder,
     case LWPB_BYTES:
         while (value->bytes.len--)
             printf("%02x ", *value->bytes.data++);
-        break;
-    case LWPB_ENUM:
-        printf("%d", value->enum_);
         break;
     default:
         break;
@@ -374,6 +374,9 @@ lwpb_err_t lwpb_decoder_decode(struct lwpb_decoder *decoder,
         case LWPB_BOOL:
             value.bool = wire_value.varint;
             break;
+        case LWPB_ENUM:
+            value.enum_ = wire_value.varint;
+            break;
         case LWPB_STRING:
             value.string.len = wire_value.string.len;
             value.string.str = wire_value.string.data;
@@ -381,9 +384,6 @@ lwpb_err_t lwpb_decoder_decode(struct lwpb_decoder *decoder,
         case LWPB_BYTES:
             value.bytes.len = wire_value.string.len;
             value.bytes.data = wire_value.string.data;
-            break;
-        case LWPB_ENUM:
-            value.enum_ = wire_value.varint;
             break;
         case LWPB_MESSAGE:
         default:

@@ -27,11 +27,13 @@
 
 #include "private.h"
 
+#define MSG_RESERVE_BYTES 10
+
 // Encoder utilities
 
 static lwpb_err_t encode_varint(struct lwpb_buf *buf, uint64_t varint)
 {
-    while (varint) {
+    do {
         if (lwpb_buf_left(buf) < 1)
             return LWPB_ERR_END_OF_BUF;
         if (varint > 127) {
@@ -41,7 +43,7 @@ static lwpb_err_t encode_varint(struct lwpb_buf *buf, uint64_t varint)
         }
         varint >>= 7;
         buf->pos++;
-    }
+    } while (varint);
     
     return LWPB_ERR_OK;
 }
@@ -92,6 +94,7 @@ void lwpb_encoder_start(struct lwpb_encoder *encoder,
     encoder->len = len;
     encoder->depth = 1;
     lwpb_buf_init(&encoder->stack[0].buf, data, len);
+    encoder->stack[0].field_desc = NULL;
     encoder->stack[0].msg_desc = msg_desc;
 }
 
@@ -103,26 +106,43 @@ size_t lwpb_encoder_finish(struct lwpb_encoder *encoder)
 lwpb_err_t lwpb_encoder_nested_start(struct lwpb_encoder *encoder,
                                      const struct lwpb_field_desc *field_desc)
 {
-    struct lwpb_encoder_stack_entry *entry;
+    struct lwpb_encoder_stack_frame *frame, *new_frame;
     
+    LWPB_ASSERT(field_desc->opts.typ == LWPB_MESSAGE, "Field is not a message");
+
+    // Get parent frame
+    frame = &encoder->stack[encoder->depth - 1];
+
+    // Create a new frame
     encoder->depth++;
     LWPB_ASSERT(encoder->depth <= LWPB_MAX_DEPTH, "Message nesting too deep");
+    new_frame = &encoder->stack[encoder->depth - 1];
+    new_frame->field_desc = field_desc;
+    new_frame->msg_desc = field_desc->msg_desc;
     
-    // Reserve a few bytes for the field (which can only be written, once the
-    // nested message has been ended and it's length is known.
-    
-    entry = &encoder->stack[encoder->depth - 1];
-    entry->msg_desc = field_desc->msg_desc;
+    // Reserve a few bytes for the field on the parent frame. This is where
+    // the field key (message) and the message length will be stored, once it
+    // is known.
+    if (lwpb_buf_left(&frame->buf) < MSG_RESERVE_BYTES)
+        return LWPB_ERR_END_OF_BUF;
+    lwpb_buf_init(&new_frame->buf, frame->buf.pos + MSG_RESERVE_BYTES,
+                  lwpb_buf_left(&frame->buf) - MSG_RESERVE_BYTES);
 }
 
 lwpb_err_t lwpb_encoder_nested_end(struct lwpb_encoder *encoder)
 {
-    struct lwpb_encoder_stack_entry *entry;
+    struct lwpb_encoder_stack_frame *frame, *parent_frame;
+    union lwpb_value value;
+    
+    frame = &encoder->stack[encoder->depth - 1];
     
     encoder->depth--;
     LWPB_ASSERT(encoder->depth > 0, "Message nesting too shallow");
-    
-    entry = &encoder->stack[encoder->depth - 1];
+    parent_frame = &encoder->stack[encoder->depth - 1];
+
+    value.message.data = frame->buf.base;
+    value.message.len = lwpb_buf_used(&frame->buf);
+    return lwpb_encoder_add_field(encoder, frame->field_desc, &value);
 }
 
 lwpb_err_t lwpb_encoder_add_field(struct lwpb_encoder *encoder,
@@ -130,7 +150,7 @@ lwpb_err_t lwpb_encoder_add_field(struct lwpb_encoder *encoder,
                                   union lwpb_value *value)
 {
     lwpb_err_t ret;
-    struct lwpb_encoder_stack_entry *entry;
+    struct lwpb_encoder_stack_frame *frame;
     int i;
     uint64_t key;
     enum wire_type wire_type;
@@ -138,13 +158,13 @@ lwpb_err_t lwpb_encoder_add_field(struct lwpb_encoder *encoder,
     
     LWPB_ASSERT(encoder->depth > 0, "Fields can only be added inside a message");
     
-    entry = &encoder->stack[encoder->depth - 1];
+    frame = &encoder->stack[encoder->depth - 1];
     
     // Check that field belongs to the current message
-    for (i = 0; i < entry->msg_desc->num_fields; i++)
-        if (field_desc == &entry->msg_desc->fields[i])
+    for (i = 0; i < frame->msg_desc->num_fields; i++)
+        if (field_desc == &frame->msg_desc->fields[i])
             break;
-    if (i == entry->msg_desc->num_fields)
+    if (i == frame->msg_desc->num_fields)
         return LWPB_ERR_UNKNOWN_FIELD;
     
     // Encode wire value
@@ -189,6 +209,10 @@ lwpb_err_t lwpb_encoder_add_field(struct lwpb_encoder *encoder,
         wire_type = WT_VARINT;
         wire_value.varint = value->bool;
         break;
+    case LWPB_ENUM:
+        wire_type = WT_VARINT;
+        wire_value.varint = value->enum_;
+        break;
     case LWPB_STRING:
         wire_type = WT_STRING;
         wire_value.string.data = value->string.str;
@@ -199,41 +223,43 @@ lwpb_err_t lwpb_encoder_add_field(struct lwpb_encoder *encoder,
         wire_value.string.data = value->bytes.data;
         wire_value.string.len = value->bytes.len;
         break;
-    case LWPB_ENUM:
-        wire_type = WT_VARINT;
-        wire_value.varint = value->enum_;
-        break;
     case LWPB_MESSAGE:
+        wire_type = WT_STRING;
+        wire_value.string.data = value->message.data;
+        wire_value.string.len = value->message.len;
         break;
     }
     
     key = wire_type | (field_desc->number << 3);
-    ret = encode_varint(&entry->buf, key);
+    ret = encode_varint(&frame->buf, key);
     if (ret != LWPB_ERR_OK)
         return ret;
     
     switch (wire_type) {
     case WT_VARINT:
-        ret = encode_varint(&entry->buf, wire_value.varint);
+        ret = encode_varint(&frame->buf, wire_value.varint);
         if (ret != LWPB_ERR_OK)
             return ret;
         break;
     case WT_64BIT:
-        ret = encode_64bit(&entry->buf, wire_value.int64);
+        ret = encode_64bit(&frame->buf, wire_value.int64);
         if (ret != LWPB_ERR_OK)
             return ret;
         break;
     case WT_STRING:
-        ret = encode_varint(&entry->buf, wire_value.string.len);
+        ret = encode_varint(&frame->buf, wire_value.string.len);
         if (ret != LWPB_ERR_OK)
             return ret;
-        if (lwpb_buf_left(&entry->buf) < wire_value.string.len)
+        if (lwpb_buf_left(&frame->buf) < wire_value.string.len)
             return LWPB_ERR_END_OF_BUF;
-        memcpy(entry->buf.pos, wire_value.string.data, wire_value.string.len);
-        entry->buf.pos += wire_value.string.len;
+        if (field_desc->opts.typ == LWPB_MESSAGE)
+            memmove(frame->buf.pos, wire_value.string.data, wire_value.string.len);
+        else
+            memcpy(frame->buf.pos, wire_value.string.data, wire_value.string.len);
+        frame->buf.pos += wire_value.string.len;
         break;
     case WT_32BIT:
-        ret = encode_32bit(&entry->buf, wire_value.int32);
+        ret = encode_32bit(&frame->buf, wire_value.int32);
         if (ret != LWPB_ERR_OK)
             return ret;
         break;
@@ -308,6 +334,15 @@ lwpb_err_t lwpb_encoder_add_bool(struct lwpb_encoder *encoder,
     return lwpb_encoder_add_field(encoder, field_desc, &value);
 }
 
+lwpb_err_t lwpb_encoder_add_enum(struct lwpb_encoder *encoder,
+                                 const struct lwpb_field_desc *field_desc,
+                                 int enum_)
+{
+    union lwpb_value value;
+    value.enum_ = enum_;
+    return lwpb_encoder_add_field(encoder, field_desc, &value);
+}
+
 lwpb_err_t lwpb_encoder_add_string(struct lwpb_encoder *encoder,
                                    const struct lwpb_field_desc *field_desc,
                                    char *str)
@@ -325,14 +360,5 @@ lwpb_err_t lwpb_encoder_add_bytes(struct lwpb_encoder *encoder,
     union lwpb_value value;
     value.string.str = (char *) data;
     value.string.len = len;
-    return lwpb_encoder_add_field(encoder, field_desc, &value);
-}
-
-lwpb_err_t lwpb_encoder_add_enum(struct lwpb_encoder *encoder,
-                                 const struct lwpb_field_desc *field_desc,
-                                 int enum_)
-{
-    union lwpb_value value;
-    value.enum_ = enum_;
     return lwpb_encoder_add_field(encoder, field_desc, &value);
 }
