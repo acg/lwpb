@@ -12,10 +12,10 @@ const struct lwpb_field_desc lwpb_fields_test_phonenumber[] = {
         .opts.typ = LWPB_STRING,
         .opts.flags = 0,
         .msg_desc = 0,
-#ifdef LWPB_FIELD_NAMES
+#if LWPB_FIELD_NAMES
         .name = "number",
 #endif
-#ifdef LWPB_FIELD_DEFAULTS
+#if LWPB_FIELD_DEFAULTS
         .def.string = "",
 #endif
     },
@@ -25,10 +25,10 @@ const struct lwpb_field_desc lwpb_fields_test_phonenumber[] = {
         .opts.typ = LWPB_ENUM,
         .opts.flags = 0 | LWPB_HAS_DEFAULT,
         .msg_desc = 0,
-#ifdef LWPB_FIELD_NAMES
+#if LWPB_FIELD_NAMES
         .name = "type",
 #endif
-#ifdef LWPB_FIELD_DEFAULTS
+#if LWPB_FIELD_DEFAULTS
         .def.int32 = 1,
 #endif
     },
@@ -42,10 +42,10 @@ const struct lwpb_field_desc lwpb_fields_test_person[] = {
         .opts.typ = LWPB_STRING,
         .opts.flags = 0,
         .msg_desc = 0,
-#ifdef LWPB_FIELD_NAMES
+#if LWPB_FIELD_NAMES
         .name = "name",
 #endif
-#ifdef LWPB_FIELD_DEFAULTS
+#if LWPB_FIELD_DEFAULTS
         .def.string = "",
 #endif
     },
@@ -55,10 +55,10 @@ const struct lwpb_field_desc lwpb_fields_test_person[] = {
         .opts.typ = LWPB_INT32,
         .opts.flags = 0,
         .msg_desc = 0,
-#ifdef LWPB_FIELD_NAMES
+#if LWPB_FIELD_NAMES
         .name = "id",
 #endif
-#ifdef LWPB_FIELD_DEFAULTS
+#if LWPB_FIELD_DEFAULTS
         .def.int32 = 0,
 #endif
     },
@@ -68,10 +68,10 @@ const struct lwpb_field_desc lwpb_fields_test_person[] = {
         .opts.typ = LWPB_STRING,
         .opts.flags = 0 | LWPB_IS_DEPRECATED,
         .msg_desc = 0,
-#ifdef LWPB_FIELD_NAMES
+#if LWPB_FIELD_NAMES
         .name = "email",
 #endif
-#ifdef LWPB_FIELD_DEFAULTS
+#if LWPB_FIELD_DEFAULTS
         .def.string = "",
 #endif
     },
@@ -81,10 +81,10 @@ const struct lwpb_field_desc lwpb_fields_test_person[] = {
         .opts.typ = LWPB_MESSAGE,
         .opts.flags = 0,
         .msg_desc = test_PhoneNumber,
-#ifdef LWPB_FIELD_NAMES
+#if LWPB_FIELD_NAMES
         .name = "phone",
 #endif
-#ifdef LWPB_FIELD_DEFAULTS
+#if LWPB_FIELD_DEFAULTS
         .def.null = 0,
 #endif
     },
@@ -98,10 +98,10 @@ const struct lwpb_field_desc lwpb_fields_test_lookupresult[] = {
         .opts.typ = LWPB_MESSAGE,
         .opts.flags = 0,
         .msg_desc = test_Person,
-#ifdef LWPB_FIELD_NAMES
+#if LWPB_FIELD_NAMES
         .name = "person",
 #endif
-#ifdef LWPB_FIELD_DEFAULTS
+#if LWPB_FIELD_DEFAULTS
         .def.null = 0,
 #endif
     },
@@ -115,10 +115,10 @@ const struct lwpb_field_desc lwpb_fields_test_name[] = {
         .opts.typ = LWPB_STRING,
         .opts.flags = 0,
         .msg_desc = 0,
-#ifdef LWPB_FIELD_NAMES
+#if LWPB_FIELD_NAMES
         .name = "name",
 #endif
-#ifdef LWPB_FIELD_DEFAULTS
+#if LWPB_FIELD_DEFAULTS
         .def.string = "",
 #endif
     },
@@ -129,28 +129,28 @@ const struct lwpb_msg_desc lwpb_messages_test[] = {
     {
         .num_fields = 2,
         .fields = lwpb_fields_test_phonenumber,
-#ifdef LWPB_MESSAGE_NAMES
+#if LWPB_MESSAGE_NAMES
         .name = "PhoneNumber",
 #endif
     },
     {
         .num_fields = 4,
         .fields = lwpb_fields_test_person,
-#ifdef LWPB_MESSAGE_NAMES
+#if LWPB_MESSAGE_NAMES
         .name = "Person",
 #endif
     },
     {
         .num_fields = 1,
         .fields = lwpb_fields_test_lookupresult,
-#ifdef LWPB_MESSAGE_NAMES
+#if LWPB_MESSAGE_NAMES
         .name = "LookupResult",
 #endif
     },
     {
         .num_fields = 1,
         .fields = lwpb_fields_test_name,
-#ifdef LWPB_MESSAGE_NAMES
+#if LWPB_MESSAGE_NAMES
         .name = "Name",
 #endif
     },

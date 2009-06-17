@@ -43,8 +43,16 @@ static void debug_msg_start_handler(struct lwpb_decoder *decoder,
                                     const struct lwpb_msg_desc *msg_desc,
                                     void *arg)
 {
+    char *name;
+
+#if LWPB_MESSAGE_NAMES
+    name = msg_desc->name;
+#else
+    name = "<message>";
+#endif
+    
     debug_print_indent();
-    printf("%s:\n", msg_desc->name);
+    printf("%s:\n", name);
     debug_indent++;
 }
 
@@ -80,8 +88,16 @@ static void debug_field_handler(struct lwpb_decoder *decoder,
         "(enum)",
     };
     
+    char *name;
+    
+#if LWPB_FIELD_NAMES
+    name = field_desc->name;
+#else
+    name = "<field>";
+#endif
+    
     debug_print_indent();
-    printf("%-20s %-10s = ", field_desc->name, typ_names[field_desc->opts.typ]);
+    printf("%-20s %-10s = ", name, typ_names[field_desc->opts.typ]);
     
     switch (field_desc->opts.typ) {
     case LWPB_DOUBLE:

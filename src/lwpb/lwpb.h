@@ -126,10 +126,10 @@ struct lwpb_field_desc {
     uint32_t number;            /**< Field number */
     lwpb_field_opts_t opts;     /**< Field options (label, value type, flags) */
     const struct lwpb_msg_desc *msg_desc; /**< Message descriptor, if field is message */
-#ifdef LWPB_FIELD_NAMES
+#if LWPB_FIELD_NAMES
     char *name;                 /**< Field name */
 #endif
-#ifdef LWPB_FIELD_DEFAULTS
+#if LWPB_FIELD_DEFAULTS
     union lwpb_value def;       /**< Field default value */
 #endif
 };
@@ -138,7 +138,7 @@ struct lwpb_field_desc {
 struct lwpb_msg_desc {
     uint32_t num_fields;        /**< Number of fields */
     const struct lwpb_field_desc *fields; /**< Array of field descriptors */
-#ifdef LWPB_MESSAGE_NAMES
+#if LWPB_MESSAGE_NAMES
     char *name;
 #endif
 };
