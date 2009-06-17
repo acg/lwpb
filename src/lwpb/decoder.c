@@ -57,20 +57,18 @@ static void debug_field_handler(struct lwpb_decoder *decoder,
         "(string)",
         "(bytes)",
         "(message)",
+        "(enum)",
     };
-    lwpb_typ_t typ;
-    
-    typ = field_desc->typ <= LWPB_MESSAGE ? field_desc->typ : LWPB_MESSAGE;
     
     debug_print_indent();
-    printf("%-20s %-10s = ", field_desc->name, typ_names[typ]);
+    printf("%-20s %-10s = ", field_desc->name, typ_names[field_desc->opts.typ]);
     
-    switch (field_desc->typ) {
+    switch (field_desc->opts.typ) {
     case LWPB_DOUBLE:
-        printf("%f", value->_double);
+        printf("%f", value->double_);
         break;
     case LWPB_FLOAT:
-        printf("%f", value->_float);
+        printf("%f", value->float_);
         break;
     case LWPB_INT32:
     case LWPB_SINT32:
@@ -100,6 +98,9 @@ static void debug_field_handler(struct lwpb_decoder *decoder,
     case LWPB_BYTES:
         while (value->bytes.len--)
             printf("%02x ", *value->bytes.data++);
+        break;
+    case LWPB_ENUM:
+        printf("%d", value->enum_);
         break;
     default:
         break;
@@ -204,7 +205,7 @@ void lwpb_decoder_decode(struct lwpb_decoder *decoder,
     char *buf = data;
     char *buf_end = &buf[len];
     uint64_t key;
-    int field_id;
+    int number;
     const struct lwpb_field_desc *field_desc = NULL;
     enum wire_type wire_type;
     union wire_value wire_value;
@@ -216,12 +217,12 @@ void lwpb_decoder_decode(struct lwpb_decoder *decoder,
     while(buf < buf_end)
     {
         key = decode_varint(buf, &buf);
-        field_id = key >> 3;
+        number = key >> 3;
         wire_type = key & 0x07;
         
         // Find the field descriptor
         for (i = 0; i < msg_desc->num_fields; i++)
-            if (msg_desc->fields[i].id == field_id) {
+            if (msg_desc->fields[i].number == number) {
                 field_desc = &msg_desc->fields[i];
                 break;
             }
@@ -253,12 +254,12 @@ void lwpb_decoder_decode(struct lwpb_decoder *decoder,
         if (!field_desc)
             continue;
         
-        switch (field_desc->typ) {
+        switch (field_desc->opts.typ) {
         case LWPB_DOUBLE:
-            *((uint64_t *) &value._double) = wire_value.int64;
+            *((uint64_t *) &value.double_) = wire_value.int64;
             break;
         case LWPB_FLOAT:
-            *((uint32_t *) &value._float) = wire_value.int32;
+            *((uint32_t *) &value.float_) = wire_value.int32;
             break;
         case LWPB_INT32:
             value.int32 = wire_value.varint;
@@ -301,6 +302,9 @@ void lwpb_decoder_decode(struct lwpb_decoder *decoder,
             value.bytes.len = wire_value.string.len;
             value.bytes.data = wire_value.string.data;
             break;
+        case LWPB_ENUM:
+            value.enum_ = wire_value.varint;
+            break;
         case LWPB_MESSAGE:
         default:
             if (decoder->field_handler)
@@ -310,7 +314,7 @@ void lwpb_decoder_decode(struct lwpb_decoder *decoder,
             break;
         }
         
-        if (field_desc->typ < LWPB_MESSAGE)
+        if (field_desc->opts.typ < LWPB_MESSAGE)
             if (decoder->field_handler)
                 decoder->field_handler(decoder, msg_desc, field_desc, &value, decoder->arg);
     }

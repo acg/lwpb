@@ -42,47 +42,46 @@ typedef enum {
     LWPB_ERR_UNKNOWN_FIELD,
 } lwpb_err_t;
 
-/**
- * Protocol buffer field types. The value is split into several bitfields:
- * 0-1: Field label
- * 2-5: Field value type
- * 6-32: Flags
- */
-typedef enum {
-    /* Field label */
-    LWPB_REQUIRED       = (0 << 0),
-    LWPB_OPTIONAL       = (1 << 0),
-    LWPB_REPEATED       = (2 << 0),
-    /* Field value types */
-    LWPB_DOUBLE         = (0 << 2),
-    LWPB_FLOAT          = (1 << 2),
-    LWPB_INT32          = (2 << 2),
-    LWPB_INT64          = (3 << 2),
-    LWPB_UINT32         = (4 << 2),
-    LWPB_UINT64         = (5 << 2),
-    LWPB_SINT32         = (6 << 2),
-    LWPB_SINT64         = (7 << 2),
-    LWPB_FIXED32        = (8 << 2),
-    LWPB_FIXED64        = (9 << 2),
-    LWPB_SFIXED32       = (10 << 2),
-    LWPB_SFIXED64       = (11 << 2),
-    LWPB_BOOL           = (12 << 2),
-    LWPB_STRING         = (13 << 2),
-    LWPB_BYTES          = (14 << 2),
-    LWPB_MESSAGE        = (15 << 2),
-    /* Field flags */
-    LWPB_HAS_DEFAULT    = ((1 << 0) << 6),
-    LWPB_IS_PACKED      = ((1 << 1) << 6),
-    LWPB_IS_DEPRECATED  = ((1 << 2) << 6),
-} lwpb_typ_t;
+/* Field labels */
+#define LWPB_REQUIRED       0
+#define LWPB_OPTIONAL       1
+#define LWPB_REPEATED       2
 
-#define LWPB_TYP_RULE(typ)  ((typ) & (0x3 << 0))
-#define LWPB_TYP_VALUE(typ) ((typ) & (0xf << 2))
+/* Field value types */
+#define LWPB_DOUBLE         0
+#define LWPB_FLOAT          1
+#define LWPB_INT32          2
+#define LWPB_INT64          3
+#define LWPB_UINT32         4
+#define LWPB_UINT64         5
+#define LWPB_SINT32         6
+#define LWPB_SINT64         7
+#define LWPB_FIXED32        8
+#define LWPB_FIXED64        9
+#define LWPB_SFIXED32       10
+#define LWPB_SFIXED64       11
+#define LWPB_BOOL           12
+#define LWPB_STRING         13
+#define LWPB_BYTES          14
+#define LWPB_MESSAGE        15
+#define LWPB_ENUM           16
+
+/* Field flags */
+#define LWPB_HAS_DEFAULT    (1 << 0)
+#define LWPB_IS_PACKED      (1 << 1)
+#define LWPB_IS_DEPRECATED  (1 << 2)
+
+/** Protocol buffer field options */
+typedef struct {
+    unsigned int label : 2;
+    unsigned int typ : 6;
+    unsigned int flags : 8;
+} lwpb_field_opts_t;
 
 /** Protocol buffer value */
 union lwpb_value {
-    double _double;
-    float _float;
+    double double_;
+    float float_;
     int32_t int32;
     int64_t int64;
     uint32_t uint32;
@@ -96,6 +95,8 @@ union lwpb_value {
         uint8_t *data;
         size_t len;
     } bytes;
+    int enum_;
+    int null;
 } value;
 
 /* Forward declaration */
@@ -103,9 +104,9 @@ struct lwpb_msg_desc;
 
 /** Protocol buffer field descriptor */
 struct lwpb_field_desc {
-    uint32_t id;                /**< Field number */
-    lwpb_typ_t typ;             /**< Field type */
-    struct lwpb_msg_desc *msg_desc; /**< Message descriptor, if field is message */
+    uint32_t number;            /**< Field number */
+    lwpb_field_opts_t opts;     /**< Field options (label, value type, flags) */
+    const struct lwpb_msg_desc *msg_desc; /**< Message descriptor, if field is message */
 #ifdef LWPB_FIELD_NAMES
     char *name;                 /**< Field name */
 #endif
@@ -217,34 +218,48 @@ void lwpb_encoder_msg_start(struct lwpb_encoder *encoder,
 void lwpb_encoder_msg_end(struct lwpb_encoder *encoder);
 
 lwpb_err_t lwpb_encoder_add_field(struct lwpb_encoder *encoder,
-                                  int field_id, union lwpb_value *value);
+                                  const struct lwpb_field_desc *field_desc,
+                                  union lwpb_value *value);
 
 lwpb_err_t lwpb_encoder_add_double(struct lwpb_encoder *encoder,
-                                   int field_id, double _double);
+                                   const struct lwpb_field_desc *field_desc,
+                                   double double_);
 
 lwpb_err_t lwpb_encoder_add_float(struct lwpb_encoder *encoder,
-                                  int field_id, float _float);
+                                  const struct lwpb_field_desc *field_desc,
+                                  float float_);
 
 lwpb_err_t lwpb_encoder_add_int32(struct lwpb_encoder *encoder,
-                                  int field_id, int32_t int32);
+                                  const struct lwpb_field_desc *field_desc,
+                                  int32_t int32);
 
 lwpb_err_t lwpb_encoder_add_uint32(struct lwpb_encoder *encoder,
-                                   int field_id, uint32_t uint32);
+                                   const struct lwpb_field_desc *field_desc,
+                                   uint32_t uint32);
 
 lwpb_err_t lwpb_encoder_add_int64(struct lwpb_encoder *encoder,
-                                  int field_id, int64_t int64);
+                                  const struct lwpb_field_desc *field_desc,
+                                  int64_t int64);
 
 lwpb_err_t lwpb_encoder_add_uint64(struct lwpb_encoder *encoder,
-                                   int field_id, uint64_t uint64);
+                                   const struct lwpb_field_desc *field_desc,
+                                   uint64_t uint64);
 
 lwpb_err_t lwpb_encoder_add_bool(struct lwpb_encoder *encoder,
-                                 int field_id, int bool);
+                                 const struct lwpb_field_desc *field_desc,
+                                 int bool);
 
 lwpb_err_t lwpb_encoder_add_string(struct lwpb_encoder *encoder,
-                                   int field_id, char *str);
+                                   const struct lwpb_field_desc *field_desc,
+                                   char *str);
 
 lwpb_err_t lwpb_encoder_add_bytes(struct lwpb_encoder *encoder,
-                                  int field_id, uint8_t *data, size_t len);
+                                  const struct lwpb_field_desc *field_desc,
+                                  uint8_t *data, size_t len);
+
+lwpb_err_t lwpb_encoder_add_enum(struct lwpb_encoder *encoder,
+                                 const struct lwpb_field_desc *field_desc,
+                                 int enum_);
 
 
 #endif // __LWPB_H__
