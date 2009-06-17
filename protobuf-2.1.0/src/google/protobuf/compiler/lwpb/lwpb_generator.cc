@@ -128,11 +128,11 @@ string StringifyDefaultValue(const FieldDescriptor& field) {
     case FieldDescriptor::CPPTYPE_UINT64:
       return ".def.uint64 = " + SimpleItoa(field.default_value_uint64());
     case FieldDescriptor::CPPTYPE_DOUBLE:
-      return ".def._double = " + SimpleDtoa(field.default_value_double());
+      return ".def.double_ = " + SimpleDtoa(field.default_value_double());
     case FieldDescriptor::CPPTYPE_FLOAT:
-      return ".def._float = " + SimpleFtoa(field.default_value_double());
+      return ".def.float_ = " + SimpleFtoa(field.default_value_double());
     case FieldDescriptor::CPPTYPE_BOOL:
-      return ".def.bool = " + field.default_value_bool() ? "True" : "False";
+      return ".def.bool = " + field.default_value_bool() ? "1" : "0";
     case FieldDescriptor::CPPTYPE_ENUM:
       return ".def.int32 = " + SimpleItoa(field.default_value_enum()->number());
     case FieldDescriptor::CPPTYPE_STRING:
