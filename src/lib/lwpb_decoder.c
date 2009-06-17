@@ -36,6 +36,7 @@ static void debug_msg_end_handler(struct lwpb_decoder *decoder,
 }
 
 static void debug_field_handler(struct lwpb_decoder *decoder,
+                                const struct lwpb_msg_desc *msg_desc,
                                 const struct lwpb_field_desc *field_desc,
                                 union lwpb_value *value, void *arg)
 {
@@ -132,11 +133,9 @@ static uint32_t decode_32bit(char *buf, char **end)
 /**
  * Initializes the decoder.
  * @param decoder Decoder
- * @param dict Message dictionary
  */
-void lwpb_decoder_init(struct lwpb_decoder *decoder, lwpb_dict_t dict)
+void lwpb_decoder_init(struct lwpb_decoder *decoder)
 {
-    decoder->dict = dict;
     decoder->arg = NULL;
     decoder->msg_start_handler = NULL;
     decoder->msg_end_handler = NULL;
@@ -195,25 +194,22 @@ void lwpb_decoder_use_debug_handlers(struct lwpb_decoder *decoder)
  * @param decoder Decoder
  * @param data Data to decode
  * @param len Length of data to decode
- * @param msg_id Root message id of the protocol buffer
+ * @param msg_desc Root message descriptor of the protocol buffer
  */
-void lwpb_decoder_decode(struct lwpb_decoder *decoder, void *data, size_t len, int msg_id)
+void lwpb_decoder_decode(struct lwpb_decoder *decoder,
+                         void *data, size_t len,
+                         const struct lwpb_msg_desc *msg_desc)
 {
     int i;
     char *buf = data;
     char *buf_end = &buf[len];
     uint64_t key;
     int field_id;
-    const struct lwpb_msg_desc *msg_desc;
     const struct lwpb_field_desc *field_desc = NULL;
     enum wire_type wire_type;
     union wire_value wire_value;
     union lwpb_value value;
 
-    // Get message description
-    // FIXME bounds check
-    msg_desc = &decoder->dict[msg_id];
-    
     if (decoder->msg_start_handler)
         decoder->msg_start_handler(decoder, msg_desc, decoder->arg);
     
@@ -308,15 +304,15 @@ void lwpb_decoder_decode(struct lwpb_decoder *decoder, void *data, size_t len, i
         case LWPB_MESSAGE:
         default:
             if (decoder->field_handler)
-                decoder->field_handler(decoder, field_desc, NULL, decoder->arg);
+                decoder->field_handler(decoder, msg_desc, field_desc, NULL, decoder->arg);
             // Decode nested message
-            lwpb_decoder_decode(decoder, wire_value.string.data, wire_value.string.len, field_desc->typ - LWPB_MESSAGE);
+            lwpb_decoder_decode(decoder, wire_value.string.data, wire_value.string.len, field_desc->msg_desc);
             break;
         }
         
         if (field_desc->typ < LWPB_MESSAGE)
             if (decoder->field_handler)
-                decoder->field_handler(decoder, field_desc, &value, decoder->arg);
+                decoder->field_handler(decoder, msg_desc, field_desc, &value, decoder->arg);
     }
     
     if (decoder->msg_end_handler)

@@ -37,11 +37,9 @@ static void encode_32bit(uint32_t value, char *buf, char **end)
 /**
  * Initializes the encoder.
  * @param encoder Encoder
- * @param dict Message dictionary
  */
-void lwpb_encoder_init(struct lwpb_encoder *encoder, lwpb_dict_t dict)
+void lwpb_encoder_init(struct lwpb_encoder *encoder)
 {
-    encoder->dict = dict;
 }
 
 void lwpb_encoder_start(struct lwpb_encoder *encoder, void *data, size_t len)
@@ -58,7 +56,8 @@ size_t lwpb_encoder_finish(struct lwpb_encoder *encoder)
     return encoder->stack[0].buf - (char *) encoder->data;
 }
 
-void lwpb_encoder_msg_start(struct lwpb_encoder *encoder, int msg_id)
+void lwpb_encoder_msg_start(struct lwpb_encoder *encoder,
+                            const struct lwpb_msg_desc *msg_desc)
 {
     struct lwpb_encoder_stack_entry *entry;
     
@@ -66,7 +65,7 @@ void lwpb_encoder_msg_start(struct lwpb_encoder *encoder, int msg_id)
     LWPB_ASSERT(encoder->depth < LWPB_MAX_DEPTH, "Message stacking too deep");
     
     entry = &encoder->stack[encoder->depth - 1];
-    entry->msg_desc = &encoder->dict[msg_id];
+    entry->msg_desc = msg_desc;
     
 }
 
@@ -80,7 +79,8 @@ void lwpb_encoder_msg_end(struct lwpb_encoder *encoder)
     entry = &encoder->stack[encoder->depth - 1];
 }
 
-lwpb_err_t lwpb_encoder_add_field(struct lwpb_encoder *encoder, int field_id, union lwpb_value *value)
+lwpb_err_t lwpb_encoder_add_field(struct lwpb_encoder *encoder,
+                                  int field_id, union lwpb_value *value)
 {
     struct lwpb_encoder_stack_entry *entry;
     int i;
@@ -185,56 +185,64 @@ lwpb_err_t lwpb_encoder_add_field(struct lwpb_encoder *encoder, int field_id, un
     return LWPB_ERR_OK;
 }
 
-lwpb_err_t lwpb_encoder_add_double(struct lwpb_encoder *encoder, int field_id, double _double)
+lwpb_err_t lwpb_encoder_add_double(struct lwpb_encoder *encoder,
+                                   int field_id, double _double)
 {
     union lwpb_value value;
     value._double = _double;
     return lwpb_encoder_add_field(encoder, field_id, &value);
 }
 
-lwpb_err_t lwpb_encoder_add_float(struct lwpb_encoder *encoder, int field_id, float _float)
+lwpb_err_t lwpb_encoder_add_float(struct lwpb_encoder *encoder,
+                                  int field_id, float _float)
 {
     union lwpb_value value;
     value._float = _float;
     return lwpb_encoder_add_field(encoder, field_id, &value);
 }
 
-lwpb_err_t lwpb_encoder_add_int32(struct lwpb_encoder *encoder, int field_id, int32_t int32)
+lwpb_err_t lwpb_encoder_add_int32(struct lwpb_encoder *encoder,
+                                  int field_id, int32_t int32)
 {
     union lwpb_value value;
     value.int32 = int32;
     return lwpb_encoder_add_field(encoder, field_id, &value);
 }
 
-lwpb_err_t lwpb_encoder_add_uint32(struct lwpb_encoder *encoder, int field_id, uint32_t uint32)
+lwpb_err_t lwpb_encoder_add_uint32(struct lwpb_encoder *encoder,
+                                   int field_id, uint32_t uint32)
 {
     union lwpb_value value;
     value.uint32 = uint32;
     return lwpb_encoder_add_field(encoder, field_id, &value);
 }
 
-lwpb_err_t lwpb_encoder_add_int64(struct lwpb_encoder *encoder, int field_id, int64_t int64)
+lwpb_err_t lwpb_encoder_add_int64(struct lwpb_encoder *encoder,
+                                  int field_id, int64_t int64)
 {
     union lwpb_value value;
     value.int64 = int64;
     return lwpb_encoder_add_field(encoder, field_id, &value);
 }
 
-lwpb_err_t lwpb_encoder_add_uint64(struct lwpb_encoder *encoder, int field_id, uint64_t uint64)
+lwpb_err_t lwpb_encoder_add_uint64(struct lwpb_encoder *encoder,
+                                   int field_id, uint64_t uint64)
 {
     union lwpb_value value;
     value.uint64 = uint64;
     return lwpb_encoder_add_field(encoder, field_id, &value);
 }
 
-lwpb_err_t lwpb_encoder_add_bool(struct lwpb_encoder *encoder, int field_id, int bool)
+lwpb_err_t lwpb_encoder_add_bool(struct lwpb_encoder *encoder,
+                                 int field_id, int bool)
 {
     union lwpb_value value;
     value.bool = bool;
     return lwpb_encoder_add_field(encoder, field_id, &value);
 }
 
-lwpb_err_t lwpb_encoder_add_string(struct lwpb_encoder *encoder, int field_id, char *str)
+lwpb_err_t lwpb_encoder_add_string(struct lwpb_encoder *encoder,
+                                   int field_id, char *str)
 {
     union lwpb_value value;
     value.string.str = str;
@@ -242,7 +250,8 @@ lwpb_err_t lwpb_encoder_add_string(struct lwpb_encoder *encoder, int field_id, c
     return lwpb_encoder_add_field(encoder, field_id, &value);
 }
 
-lwpb_err_t lwpb_encoder_add_bytes(struct lwpb_encoder *encoder, int field_id, uint8_t *data, size_t len)
+lwpb_err_t lwpb_encoder_add_bytes(struct lwpb_encoder *encoder,
+                                  int field_id, uint8_t *data, size_t len)
 {
     union lwpb_value value;
     value.string.str = (char *) data;

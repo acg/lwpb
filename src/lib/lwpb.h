@@ -38,46 +38,41 @@
 
 /** Protocol buffer error codes */
 typedef enum {
-    LWPB_ERR_OK = 0,
+    LWPB_ERR_OK,
     LWPB_ERR_UNKNOWN_FIELD,
 } lwpb_err_t;
 
-/** Protocol buffer types */
+/**
+ * Protocol buffer field types. The first 2 bits are used to specify the field
+ * rule (required, optional or repeated). The next 4 bits specify the value
+ * type.
+ */
 typedef enum {
-    LWPB_DOUBLE,
-    LWPB_FLOAT,
-    LWPB_INT32,
-    LWPB_INT64,
-    LWPB_UINT32,
-    LWPB_UINT64,
-    LWPB_SINT32,
-    LWPB_SINT64,
-    LWPB_FIXED32,
-    LWPB_FIXED64,
-    LWPB_SFIXED32,
-    LWPB_SFIXED64,
-    LWPB_BOOL,
-    LWPB_STRING,
-    LWPB_BYTES,
-    LWPB_MESSAGE,
+    /* Field rules */
+    LWPB_REQUIRED   = (0 << 0),
+    LWPB_OPTIONAL   = (1 << 0),
+    LWPB_REPEATED   = (2 << 0),
+    /* Field value types */
+    LWPB_DOUBLE     = (0 << 2),
+    LWPB_FLOAT      = (1 << 2),
+    LWPB_INT32      = (2 << 2),
+    LWPB_INT64      = (3 << 2),
+    LWPB_UINT32     = (4 << 2),
+    LWPB_UINT64     = (5 << 2),
+    LWPB_SINT32     = (6 << 2),
+    LWPB_SINT64     = (7 << 2),
+    LWPB_FIXED32    = (8 << 2),
+    LWPB_FIXED64    = (9 << 2),
+    LWPB_SFIXED32   = (10 << 2),
+    LWPB_SFIXED64   = (11 << 2),
+    LWPB_BOOL       = (12 << 2),
+    LWPB_STRING     = (13 << 2),
+    LWPB_BYTES      = (14 << 2),
+    LWPB_MESSAGE    = (15 << 2),
 } lwpb_typ_t;
 
-/** Protocol buffer field descriptor */
-struct lwpb_field_desc {
-    char *name;
-    uint32_t id;
-    lwpb_typ_t typ;
-};
-
-/** Protocol buffer message descriptor */
-struct lwpb_msg_desc {
-    char *name;
-    uint32_t num_fields;
-    const struct lwpb_field_desc *fields;
-};
-
-/** Protocol buffer dictionary */
-typedef const struct lwpb_msg_desc *lwpb_dict_t;
+#define LWPB_TYP_RULE(typ) ((typ) & (3 << 0))
+#define LWPB_TYP_VALUE(typ) ((typ) & (15 << 2))
 
 /** Protocol buffer value */
 union lwpb_value {
@@ -99,30 +94,82 @@ union lwpb_value {
 } value;
 
 /* Forward declaration */
+struct lwpb_msg_desc;
+
+/** Protocol buffer field descriptor */
+struct lwpb_field_desc {
+    uint32_t id;                /**< Field number */
+    lwpb_typ_t typ;             /**< Field type */
+    struct lwpb_msg_desc *msg_desc; /**< Message descriptor, if field is message */
+#ifdef LWPB_FIELD_NAMES
+    char *name;                 /**< Field name */
+#endif
+#ifdef LWPB_FIELD_DEFAULTS
+    union lwpb_value def;       /**< Field default value */
+#endif
+};
+
+/** Protocol buffer message descriptor */
+struct lwpb_msg_desc {
+    uint32_t num_fields;        /**< Number of fields */
+    const struct lwpb_field_desc *fields; /**< Array of field descriptors */
+#ifdef LWPB_MESSAGE_NAMES
+    char *name;
+#endif
+};
+
+/** Protocol buffer dictionary */
+typedef const struct lwpb_msg_desc *lwpb_dict_t;
+
+
+/* Forward declaration */
 struct lwpb_decoder;
 
 // Event handlers
 
+/**
+ * This handler is called when the decoder encountered a new message.
+ * @param decoder Decoder
+ * @param msg_desc Message descriptor
+ * @param arg User argument
+ */
 typedef void (*lwpb_decoder_msg_start_handler_t)
-    (struct lwpb_decoder *decoder, const struct lwpb_msg_desc *msg_desc, void *arg);
+    (struct lwpb_decoder *decoder,
+     const struct lwpb_msg_desc *msg_desc, void *arg);
 
+/**
+ * This handler is called when the decoder finished decoding a message.
+ * @param decoder Decoder
+ * @param msg_desc Message descriptor
+ * @param arg User argument
+ */
 typedef void (*lwpb_decoder_msg_end_handler_t)
-    (struct lwpb_decoder *decoder, const struct lwpb_msg_desc *msg_desc, void *arg);
+    (struct lwpb_decoder *decoder,
+     const struct lwpb_msg_desc *msg_desc, void *arg);
 
+/**
+ * This handler is called when the decoder has decoded a field.
+ * @param decoder Decoder
+ * @param msg_desc Message descriptor of the message containing the field
+ * @param field_desc Field descriptor
+ * @param value Field value
+ * @param arg User argument
+ */
 typedef void (*lwpb_decoder_field_handler_t)
-    (struct lwpb_decoder *decoder, const struct lwpb_field_desc *field_desc,
+    (struct lwpb_decoder *decoder,
+     const struct lwpb_msg_desc *msg_desc,
+     const struct lwpb_field_desc *field_desc,
      union lwpb_value *value, void *arg);
 
 /** Protocol buffer decoder */
 struct lwpb_decoder {
-    lwpb_dict_t dict;
     void *arg;
     lwpb_decoder_msg_start_handler_t msg_start_handler;
     lwpb_decoder_msg_end_handler_t msg_end_handler;
     lwpb_decoder_field_handler_t field_handler;
 };
 
-void lwpb_decoder_init(struct lwpb_decoder *decoder, lwpb_dict_t dict);
+void lwpb_decoder_init(struct lwpb_decoder *decoder);
 
 void lwpb_decoder_arg(struct lwpb_decoder *decoder, void *arg);
 
@@ -135,7 +182,9 @@ void lwpb_decoder_field_handler(struct lwpb_decoder *decoder,
 
 void lwpb_decoder_use_debug_handlers(struct lwpb_decoder *decoder);
 
-void lwpb_decoder_decode(struct lwpb_decoder *decoder, void *data, size_t len, int msg_id);
+void lwpb_decoder_decode(struct lwpb_decoder *decoder,
+                         void *data, size_t len,
+                         const struct lwpb_msg_desc *desc);
 
 struct lwpb_encoder_stack_entry {
     char *buf;
@@ -145,42 +194,52 @@ struct lwpb_encoder_stack_entry {
 
 /** Protocol buffer encoder */
 struct lwpb_encoder {
-    lwpb_dict_t dict;
     void *data;
     size_t len;
     struct lwpb_encoder_stack_entry stack[LWPB_MAX_DEPTH];
     int depth;
 };
 
-void lwpb_encoder_init(struct lwpb_encoder *encoder, lwpb_dict_t dict);
+void lwpb_encoder_init(struct lwpb_encoder *encoder);
 
 void lwpb_encoder_start(struct lwpb_encoder *encoder, void *data, size_t len);
 
 size_t lwpb_encoder_finish(struct lwpb_encoder *encoder);
 
-void lwpb_encoder_msg_start(struct lwpb_encoder *encoder, int msg_id);
+void lwpb_encoder_msg_start(struct lwpb_encoder *encoder,
+                            const struct lwpb_msg_desc *msg_desc);
 
 void lwpb_encoder_msg_end(struct lwpb_encoder *encoder);
 
-lwpb_err_t lwpb_encoder_add_field(struct lwpb_encoder *encoder, int field_id, union lwpb_value *value);
+lwpb_err_t lwpb_encoder_add_field(struct lwpb_encoder *encoder,
+                                  int field_id, union lwpb_value *value);
 
-lwpb_err_t lwpb_encoder_add_double(struct lwpb_encoder *encoder, int field_id, double _double);
+lwpb_err_t lwpb_encoder_add_double(struct lwpb_encoder *encoder,
+                                   int field_id, double _double);
 
-lwpb_err_t lwpb_encoder_add_float(struct lwpb_encoder *encoder, int field_id, float _float);
+lwpb_err_t lwpb_encoder_add_float(struct lwpb_encoder *encoder,
+                                  int field_id, float _float);
 
-lwpb_err_t lwpb_encoder_add_int32(struct lwpb_encoder *encoder, int field_id, int32_t int32);
+lwpb_err_t lwpb_encoder_add_int32(struct lwpb_encoder *encoder,
+                                  int field_id, int32_t int32);
 
-lwpb_err_t lwpb_encoder_add_uint32(struct lwpb_encoder *encoder, int field_id, uint32_t uint32);
+lwpb_err_t lwpb_encoder_add_uint32(struct lwpb_encoder *encoder,
+                                   int field_id, uint32_t uint32);
 
-lwpb_err_t lwpb_encoder_add_int64(struct lwpb_encoder *encoder, int field_id, int64_t int64);
+lwpb_err_t lwpb_encoder_add_int64(struct lwpb_encoder *encoder,
+                                  int field_id, int64_t int64);
 
-lwpb_err_t lwpb_encoder_add_uint64(struct lwpb_encoder *encoder, int field_id, uint64_t uint64);
+lwpb_err_t lwpb_encoder_add_uint64(struct lwpb_encoder *encoder,
+                                   int field_id, uint64_t uint64);
 
-lwpb_err_t lwpb_encoder_add_bool(struct lwpb_encoder *encoder, int field_id, int bool);
+lwpb_err_t lwpb_encoder_add_bool(struct lwpb_encoder *encoder,
+                                 int field_id, int bool);
 
-lwpb_err_t lwpb_encoder_add_string(struct lwpb_encoder *encoder, int field_id, char *str);
+lwpb_err_t lwpb_encoder_add_string(struct lwpb_encoder *encoder,
+                                   int field_id, char *str);
 
-lwpb_err_t lwpb_encoder_add_bytes(struct lwpb_encoder *encoder, int field_id, uint8_t *data, size_t len);
+lwpb_err_t lwpb_encoder_add_bytes(struct lwpb_encoder *encoder,
+                                  int field_id, uint8_t *data, size_t len);
 
 
 #endif // __LWPB_H__

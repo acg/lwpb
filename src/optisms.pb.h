@@ -77,4 +77,10 @@ const struct lwpb_msg_desc optisms_messages[] = {
 
 const lwpb_dict_t optisms_dict = optisms_messages;
 
+#define optisms_NetworkConfiguration_number (&networkconfiguration_fields[0])
+
+#define optisms_NetworkConfiguration (&optisms_messages[0])
+#define optisms_SetConfigRequest (&optisms_messages[1])
+
+
 #endif /* OPTISMS_PB_H_ */

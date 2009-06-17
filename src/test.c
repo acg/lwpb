@@ -22,11 +22,11 @@ int main()
     len = fread(buf, 1, sizeof(buf), f);
     fclose(f);
     
-    lwpb_decoder_init(&decoder, optisms_dict);
+    lwpb_decoder_init(&decoder);
     lwpb_decoder_use_debug_handlers(&decoder);
     lwpb_decoder_decode(&decoder, &buf, len, MESSAGE_SETCONFIGREQUEST);
     
-    lwpb_encoder_init(&encoder, optisms_dict);
+    lwpb_encoder_init(&encoder);
     lwpb_encoder_start(&encoder, buf, sizeof(buf));
     lwpb_encoder_msg_start(&encoder, MESSAGE_NETWORKCONFIGURATION);
     lwpb_encoder_add_string(&encoder, FIELD_NETWORKCONFIGURATION_NUMBER, "just a number");
@@ -39,7 +39,7 @@ int main()
     
     printf("encoded message length = %d\n", len);
     
-    lwpb_decoder_init(&decoder, optisms_dict);
+    lwpb_decoder_init(&decoder);
     lwpb_decoder_use_debug_handlers(&decoder);
     lwpb_decoder_decode(&decoder, &buf, len, MESSAGE_NETWORKCONFIGURATION);
     
