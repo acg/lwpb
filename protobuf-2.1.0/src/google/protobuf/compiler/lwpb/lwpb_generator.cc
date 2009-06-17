@@ -458,7 +458,7 @@ void Generator::PrintMessageDescriptors() const {
         "    {\n"
         "        .num_fields = $num_fields$,\n"
         "        .fields = $fields$,\n"
-        "#ifdef LWPB_MESSAGE_NAMES\n"
+        "#if LWPB_MESSAGE_NAMES\n"
         "        .name = \"$name$\",\n"
         "#endif\n"
         "    },\n");
@@ -511,10 +511,10 @@ void Generator::PrintDescriptorFields(
         "        .opts.typ = $typ$,\n"
         "        .opts.flags = $flags$,\n"
         "        .msg_desc = $msg_desc$,\n"
-        "#ifdef LWPB_FIELD_NAMES\n"
+        "#if LWPB_FIELD_NAMES\n"
         "        .name = \"$name$\",\n"
         "#endif\n"
-        "#ifdef LWPB_FIELD_DEFAULTS\n"
+        "#if LWPB_FIELD_DEFAULTS\n"
         "        $default$,\n"
         "#endif\n"
         "    },\n");
