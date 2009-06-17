@@ -147,6 +147,15 @@ static void debug_field_handler(struct lwpb_decoder *decoder,
 
 // Decoder utilities
 
+/**
+ * Decodes a variable integer in base-128 format.
+ * See http://code.google.com/apis/protocolbuffers/docs/encoding.html for more
+ * information.
+ * @param buf Memory buffer
+ * @param varint Buffer to decode into
+ * @return Returns LWPB_ERR_OK if successful or LWPB_ERR_END_OF_BUF if there
+ * were not enough bytes in the memory buffer. 
+ */
 static lwpb_err_t decode_varint(struct lwpb_buf *buf, uint64_t *varint)
 {
     int bitpos;
@@ -163,6 +172,13 @@ static lwpb_err_t decode_varint(struct lwpb_buf *buf, uint64_t *varint)
     return LWPB_ERR_OK;
 }
 
+/**
+ * Decodes a 32 bit integer
+ * @param buf Memory buffer
+ * @param value Buffer to decode into
+ * @return Returns LWPB_ERR_OK if successful or LWPB_ERR_END_OF_BUF if there
+ * were not enough bytes in the memory buffer. 
+ */
 static lwpb_err_t decode_32bit(struct lwpb_buf *buf, uint32_t *value)
 {
     if (lwpb_buf_left(buf) < 4)
@@ -175,6 +191,13 @@ static lwpb_err_t decode_32bit(struct lwpb_buf *buf, uint32_t *value)
     return LWPB_ERR_OK;
 }
 
+/**
+ * Decodes a 64 bit integer
+ * @param buf Memory buffer
+ * @param value Buffer to decode into
+ * @return Returns LWPB_ERR_OK if successful or LWPB_ERR_END_OF_BUF if there
+ * were not enough bytes in the memory buffer. 
+ */
 static lwpb_err_t decode_64bit(struct lwpb_buf *buf, uint64_t *value)
 {
     uint32_t tmp;

@@ -31,6 +31,15 @@
 
 // Encoder utilities
 
+/**
+ * Encodes a variable integer in base-128 format.
+ * See http://code.google.com/apis/protocolbuffers/docs/encoding.html for more
+ * information.
+ * @param buf Memory buffer
+ * @param varint Value to encode
+ * @return Returns LWPB_ERR_OK if successful or LWPB_ERR_END_OF_BUF if there
+ * was not enough space left in the memory buffer. 
+ */
 static lwpb_err_t encode_varint(struct lwpb_buf *buf, uint64_t varint)
 {
     do {
@@ -48,6 +57,13 @@ static lwpb_err_t encode_varint(struct lwpb_buf *buf, uint64_t varint)
     return LWPB_ERR_OK;
 }
 
+/**
+ * Encodes a 32 bit integer.
+ * @param buf Memory buffer
+ * @param value Value to encode
+ * @return Returns LWPB_ERR_OK if successful or LWPB_ERR_END_OF_BUF if there
+ * was not enough space left in the memory buffer. 
+ */
 static lwpb_err_t encode_32bit(struct lwpb_buf *buf, uint32_t value)
 {
     if (lwpb_buf_left(buf) < 4)
@@ -60,6 +76,13 @@ static lwpb_err_t encode_32bit(struct lwpb_buf *buf, uint32_t value)
     buf->pos += 4;
 }
 
+/**
+ * Encodes a 64 bit integer.
+ * @param buf Memory buffer
+ * @param value Value to encode
+ * @return Returns LWPB_ERR_OK if successful or LWPB_ERR_END_OF_BUF if there
+ * was not enough space left in the memory buffer. 
+ */
 static lwpb_err_t encode_64bit(struct lwpb_buf *buf, uint64_t value)
 {
     if (lwpb_buf_left(buf) < 8)
@@ -252,10 +275,13 @@ lwpb_err_t lwpb_encoder_add_field(struct lwpb_encoder *encoder,
             return ret;
         if (lwpb_buf_left(&frame->buf) < wire_value.string.len)
             return LWPB_ERR_END_OF_BUF;
-        if (field_desc->opts.typ == LWPB_MESSAGE)
+        // Use memmove() when writing a message field as the memory areas are
+        // overlapping.
+        if (field_desc->opts.typ == LWPB_MESSAGE) {
             memmove(frame->buf.pos, wire_value.string.data, wire_value.string.len);
-        else
+        } else {
             memcpy(frame->buf.pos, wire_value.string.data, wire_value.string.len);
+        }
         frame->buf.pos += wire_value.string.len;
         break;
     case WT_32BIT:
