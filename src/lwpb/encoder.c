@@ -62,13 +62,16 @@ void lwpb_encoder_init(struct lwpb_encoder *encoder)
 {
 }
 
-void lwpb_encoder_start(struct lwpb_encoder *encoder, void *data, size_t len)
+void lwpb_encoder_start(struct lwpb_encoder *encoder,
+                        const struct lwpb_msg_desc *msg_desc,
+                        void *data, size_t len)
 {
     encoder->data = data;
     encoder->len = len;
-    encoder->depth = 0;
+    encoder->depth = 1;
     encoder->stack[0].buf = data;
     encoder->stack[0].buf_end = &encoder->stack[0].buf[len];
+    encoder->stack[0].msg_desc = msg_desc;
 }
 
 size_t lwpb_encoder_finish(struct lwpb_encoder *encoder)
@@ -76,25 +79,27 @@ size_t lwpb_encoder_finish(struct lwpb_encoder *encoder)
     return encoder->stack[0].buf - (char *) encoder->data;
 }
 
-void lwpb_encoder_msg_start(struct lwpb_encoder *encoder,
-                            const struct lwpb_msg_desc *msg_desc)
+lwpb_err_t lwpb_encoder_nested_start(struct lwpb_encoder *encoder,
+                                     const struct lwpb_field_desc *field_desc)
 {
     struct lwpb_encoder_stack_entry *entry;
     
     encoder->depth++;
-    LWPB_ASSERT(encoder->depth < LWPB_MAX_DEPTH, "Message stacking too deep");
+    LWPB_ASSERT(encoder->depth <= LWPB_MAX_DEPTH, "Message nesting too deep");
+    
+    // Reserve a few bytes for the field (which can only be written, once the
+    // nested message has been ended and it's length is known.
     
     entry = &encoder->stack[encoder->depth - 1];
-    entry->msg_desc = msg_desc;
-    
+    entry->msg_desc = field_desc->msg_desc;
 }
 
-void lwpb_encoder_msg_end(struct lwpb_encoder *encoder)
+lwpb_err_t lwpb_encoder_nested_end(struct lwpb_encoder *encoder)
 {
     struct lwpb_encoder_stack_entry *entry;
     
     encoder->depth--;
-    LWPB_ASSERT(encoder->depth >= 0, "Message stacking too shallow");
+    LWPB_ASSERT(encoder->depth > 0, "Message nesting too shallow");
     
     entry = &encoder->stack[encoder->depth - 1];
 }

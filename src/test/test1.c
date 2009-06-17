@@ -10,6 +10,7 @@ int main()
     FILE *f;
     char buf[4096];
     size_t len;
+    lwpb_err_t ret;
     
     struct lwpb_decoder decoder;
     struct lwpb_encoder encoder;
@@ -28,12 +29,16 @@ int main()
 */    
     
     lwpb_encoder_init(&encoder);
-    lwpb_encoder_start(&encoder, buf, sizeof(buf));
-    lwpb_encoder_msg_start(&encoder, test_Person);
+    lwpb_encoder_start(&encoder, test_Person, buf, sizeof(buf));
     lwpb_encoder_add_string(&encoder, test_Person_name, "Simon Kallweit");
     lwpb_encoder_add_int32(&encoder, test_Person_id, 123);
     lwpb_encoder_add_string(&encoder, test_Person_email, "simon.kallweit@intefo.ch");
-    lwpb_encoder_msg_end(&encoder);
+    /*
+    lwpb_encoder_nested_start(&encoder, test_Person_phone);
+    lwpb_encoder_add_string(&encoder, test_PhoneNumber_number, "123456789");
+    lwpb_encoder_add_enum(&encoder, test_PhoneNumber_type, TEST_PHONENUMBER_MOBILE);
+    lwpb_encoder_nested_end(&encoder);
+    */
     len = lwpb_encoder_finish(&encoder);
     
     printf("encoded message length = %d\n", len);
@@ -48,7 +53,9 @@ int main()
     
     lwpb_decoder_init(&decoder);
     lwpb_decoder_use_debug_handlers(&decoder);
-    lwpb_decoder_decode(&decoder, &buf, len, test_Person);
+    ret = lwpb_decoder_decode(&decoder, test_Person, &buf, len);
+    
+    printf("ret = %d\n", ret);
     
     return 0;
 }

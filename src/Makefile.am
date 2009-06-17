@@ -3,6 +3,7 @@ SUBDIRS = .
 lib_LTLIBRARIES = liblwpb.la
 
 liblwpb_la_SOURCES = \
+lwpb/buf.c \
 lwpb/decoder.c \
 lwpb/encoder.c
 

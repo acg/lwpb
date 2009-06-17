@@ -52,7 +52,7 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 liblwpb_la_LIBADD =
-am_liblwpb_la_OBJECTS = decoder.lo encoder.lo
+am_liblwpb_la_OBJECTS = buf.lo decoder.lo encoder.lo
 liblwpb_la_OBJECTS = $(am_liblwpb_la_OBJECTS)
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
@@ -197,6 +197,7 @@ top_srcdir = ..
 SUBDIRS = .
 lib_LTLIBRARIES = liblwpb.la
 liblwpb_la_SOURCES = \
+lwpb/buf.c \
 lwpb/decoder.c \
 lwpb/encoder.c
 
@@ -305,6 +306,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+include ./$(DEPDIR)/buf.Plo
 include ./$(DEPDIR)/decoder.Plo
 include ./$(DEPDIR)/encoder.Plo
 include ./$(DEPDIR)/test1.Po
@@ -330,6 +332,13 @@ include ./$(DEPDIR)/test1_pb2.Po
 #	source='$<' object='$@' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
 #	$(LTCOMPILE) -c -o $@ $<
+
+buf.lo: lwpb/buf.c
+	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT buf.lo -MD -MP -MF $(DEPDIR)/buf.Tpo -c -o buf.lo `test -f 'lwpb/buf.c' || echo '$(srcdir)/'`lwpb/buf.c
+	mv -f $(DEPDIR)/buf.Tpo $(DEPDIR)/buf.Plo
+#	source='lwpb/buf.c' object='buf.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o buf.lo `test -f 'lwpb/buf.c' || echo '$(srcdir)/'`lwpb/buf.c
 
 decoder.lo: lwpb/decoder.c
 	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT decoder.lo -MD -MP -MF $(DEPDIR)/decoder.Tpo -c -o decoder.lo `test -f 'lwpb/decoder.c' || echo '$(srcdir)/'`lwpb/decoder.c

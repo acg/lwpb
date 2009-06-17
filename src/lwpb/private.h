@@ -42,4 +42,8 @@ union wire_value {
     uint32_t int32;
 };
 
+void lwpb_buf_init(struct lwpb_buf *buf, void *data, size_t len);
+
+size_t lwpb_buf_left(struct lwpb_buf *buf);
+
 #endif // __LWPB_PRIVATE_H__

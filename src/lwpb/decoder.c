@@ -147,22 +147,52 @@ static void debug_field_handler(struct lwpb_decoder *decoder,
 
 // Decoder utilities
 
-static uint64_t decode_varint(char *buf, char **end)
+static lwpb_err_t decode_varint(struct lwpb_buf *buf, uint64_t *varint)
 {
-    uint64_t ret = 0;
+    int bitpos;
     
-    int bitpos = 0;
-    for (bitpos = 0; *buf & 0x80 && bitpos < 64; bitpos += 7, buf++)
-        ret |= (*buf & 0x7F) << bitpos;
-    ret |= (*buf & 0x7F) << bitpos;
-    *end = buf + 1;
-    return ret;
+    *varint = 0;
+    for (bitpos = 0; *buf->pos & 0x80 && bitpos < 64; bitpos += 7, buf->pos++) {
+        *varint |= (*buf->pos & 0x7f) << bitpos;
+        if (buf->end - buf->pos < 2)
+            return LWPB_ERR_END_OF_BUF;
+    }
+    *varint |= (*buf->pos & 0x7f) << bitpos;
+    buf->pos++;
+    
+    return LWPB_ERR_OK;
 }
 
-static uint32_t decode_32bit(char *buf, char **end)
+static lwpb_err_t decode_32bit(struct lwpb_buf *buf, uint32_t *value)
 {
-    *end = buf + 4;
-    return buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24);
+    if (lwpb_buf_left(buf) < 4)
+        return LWPB_ERR_END_OF_BUF;
+
+    *value = buf->pos[0] | (buf->pos[1] << 8) |
+             (buf->pos[2] << 16) | (buf->pos[3] << 24);
+    buf->pos += 4;
+    
+    return LWPB_ERR_OK;
+}
+
+static lwpb_err_t decode_64bit(struct lwpb_buf *buf, uint64_t *value)
+{
+    uint32_t tmp;
+    
+    if (lwpb_buf_left(buf) < 8)
+        return LWPB_ERR_END_OF_BUF;
+
+    *value = buf->pos[0] | (buf->pos[1] << 8) |
+    (buf->pos[2] << 16) | (buf->pos[3] << 24);
+    buf->pos += 4;
+
+    tmp = buf->pos[0] | (buf->pos[1] << 8) |
+    (buf->pos[2] << 16) | (buf->pos[3] << 24);
+    buf->pos += 4;
+    
+    *value |= (uint64_t) tmp << 32;
+    
+    return LWPB_ERR_OK;
 }
 
 // Decoder
@@ -229,30 +259,36 @@ void lwpb_decoder_use_debug_handlers(struct lwpb_decoder *decoder)
 /**
  * Decodes a protocol buffer.
  * @param decoder Decoder
+ * @param msg_desc Root message descriptor of the protocol buffer
  * @param data Data to decode
  * @param len Length of data to decode
- * @param msg_desc Root message descriptor of the protocol buffer
+ * @return Returns LWPB_ERR_OK when data was successfully decoded.
  */
-void lwpb_decoder_decode(struct lwpb_decoder *decoder,
-                         void *data, size_t len,
-                         const struct lwpb_msg_desc *msg_desc)
+lwpb_err_t lwpb_decoder_decode(struct lwpb_decoder *decoder,
+                               const struct lwpb_msg_desc *msg_desc,
+                               void *data, size_t len)
 {
+    lwpb_err_t ret;
     int i;
-    char *buf = data;
-    char *buf_end = &buf[len];
+    struct lwpb_buf buf;
     uint64_t key;
     int number;
     const struct lwpb_field_desc *field_desc = NULL;
     enum wire_type wire_type;
     union wire_value wire_value;
     union lwpb_value value;
+    
+    lwpb_buf_init(&buf, data, len);
 
     if (decoder->msg_start_handler)
         decoder->msg_start_handler(decoder, msg_desc, decoder->arg);
     
-    while(buf < buf_end)
-    {
-        key = decode_varint(buf, &buf);
+    while (lwpb_buf_left(&buf) > 0) {
+        // Decode the field key
+        ret = decode_varint(&buf, &key);
+        if (ret != LWPB_ERR_OK)
+            return ret;
+        
         number = key >> 3;
         wire_type = key & 0x07;
         
@@ -266,20 +302,28 @@ void lwpb_decoder_decode(struct lwpb_decoder *decoder,
         // Decode field's wire value
         switch(wire_type) {
         case WT_VARINT:
-            wire_value.varint = decode_varint(buf, &buf);
+            ret = decode_varint(&buf, &wire_value.varint);
+            if (ret != LWPB_ERR_OK)
+                return ret;
             break;
         case WT_64BIT:
-            wire_value.int64 = decode_32bit(buf, &buf);
-            wire_value.int64 |= (uint64_t) decode_32bit(buf, &buf) << 32;
+            ret = decode_64bit(&buf, &wire_value.int64);
+            if (ret != LWPB_ERR_OK)
+                return ret;
             break;
         case WT_STRING:
-            wire_value.string.len = decode_varint(buf, &buf);
-            wire_value.string.data = buf;
-            buf += wire_value.string.len;
+            ret = decode_varint(&buf, &wire_value.string.len);
+            if (ret != LWPB_ERR_OK)
+                return ret;
+            if (wire_value.string.len > lwpb_buf_left(&buf))
+                return LWPB_ERR_END_OF_BUF;
+            wire_value.string.data = buf.pos;
+            buf.pos += wire_value.string.len;
             break;
         case WT_32BIT:
-            wire_value.int32 = decode_32bit(buf, &buf);
-            buf += 4;
+            ret = decode_32bit(&buf, &wire_value.int32);
+            if (ret != LWPB_ERR_OK)
+                return ret;
             break;
         default:
             LWPB_ASSERT(1, "Unknown wire type");
@@ -346,7 +390,7 @@ void lwpb_decoder_decode(struct lwpb_decoder *decoder,
             if (decoder->field_handler)
                 decoder->field_handler(decoder, msg_desc, field_desc, NULL, decoder->arg);
             // Decode nested message
-            lwpb_decoder_decode(decoder, wire_value.string.data, wire_value.string.len, field_desc->msg_desc);
+            lwpb_decoder_decode(decoder, field_desc->msg_desc, wire_value.string.data, wire_value.string.len);
             break;
         }
         
@@ -357,4 +401,6 @@ void lwpb_decoder_decode(struct lwpb_decoder *decoder,
     
     if (decoder->msg_end_handler)
         decoder->msg_end_handler(decoder, msg_desc, decoder->arg);
+    
+    return LWPB_ERR_OK;
 }

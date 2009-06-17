@@ -59,6 +59,7 @@
 typedef enum {
     LWPB_ERR_OK,
     LWPB_ERR_UNKNOWN_FIELD,
+    LWPB_ERR_END_OF_BUF,
 } lwpb_err_t;
 
 /* Field labels */
@@ -143,9 +144,12 @@ struct lwpb_msg_desc {
 #endif
 };
 
-/** Protocol buffer dictionary */
-typedef const struct lwpb_msg_desc *lwpb_dict_t;
-
+/** Simple memory buffer */
+struct lwpb_buf {
+    char *base; /**< Buffers base address */
+    char *pos;  /**< Buffers current position */
+    char *end;  /**< Buffers end address (first invalid byte) */
+};
 
 /* Forward declaration */
 struct lwpb_decoder;
@@ -207,9 +211,10 @@ void lwpb_decoder_field_handler(struct lwpb_decoder *decoder,
 
 void lwpb_decoder_use_debug_handlers(struct lwpb_decoder *decoder);
 
-void lwpb_decoder_decode(struct lwpb_decoder *decoder,
-                         void *data, size_t len,
-                         const struct lwpb_msg_desc *desc);
+lwpb_err_t lwpb_decoder_decode(struct lwpb_decoder *decoder,
+                               const struct lwpb_msg_desc *msg_desc,
+                               void *data, size_t len);
+
 
 struct lwpb_encoder_stack_entry {
     char *buf;
@@ -227,7 +232,9 @@ struct lwpb_encoder {
 
 void lwpb_encoder_init(struct lwpb_encoder *encoder);
 
-void lwpb_encoder_start(struct lwpb_encoder *encoder, void *data, size_t len);
+void lwpb_encoder_start(struct lwpb_encoder *encoder,
+                        const struct lwpb_msg_desc *msg_desc,
+                        void *data, size_t len);
 
 size_t lwpb_encoder_finish(struct lwpb_encoder *encoder);
 
@@ -235,6 +242,11 @@ void lwpb_encoder_msg_start(struct lwpb_encoder *encoder,
                             const struct lwpb_msg_desc *msg_desc);
 
 void lwpb_encoder_msg_end(struct lwpb_encoder *encoder);
+
+lwpb_err_t lwpb_encoder_nested_start(struct lwpb_encoder *encoder,
+                                     const struct lwpb_field_desc *field_desc);
+
+lwpb_err_t lwpb_encoder_nested_end(struct lwpb_encoder *encoder);
 
 lwpb_err_t lwpb_encoder_add_field(struct lwpb_encoder *encoder,
                                   const struct lwpb_field_desc *field_desc,
