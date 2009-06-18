@@ -5,7 +5,8 @@ lib_LTLIBRARIES = liblwpb.la
 liblwpb_la_SOURCES = \
 lwpb/buf.c \
 lwpb/decoder.c \
-lwpb/encoder.c
+lwpb/encoder.c \
+lwpb/misc.c
 
 bin_PROGRAMS = test1 test2_generate test2_check
 

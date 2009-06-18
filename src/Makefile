@@ -53,7 +53,7 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 liblwpb_la_LIBADD =
-am_liblwpb_la_OBJECTS = buf.lo decoder.lo encoder.lo
+am_liblwpb_la_OBJECTS = buf.lo decoder.lo encoder.lo misc.lo
 liblwpb_la_OBJECTS = $(am_liblwpb_la_OBJECTS)
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
@@ -221,7 +221,8 @@ lib_LTLIBRARIES = liblwpb.la
 liblwpb_la_SOURCES = \
 lwpb/buf.c \
 lwpb/decoder.c \
-lwpb/encoder.c
+lwpb/encoder.c \
+lwpb/misc.c
 
 test1_SOURCES = \
 test/test1.c \
@@ -348,6 +349,7 @@ distclean-compile:
 include ./$(DEPDIR)/buf.Plo
 include ./$(DEPDIR)/decoder.Plo
 include ./$(DEPDIR)/encoder.Plo
+include ./$(DEPDIR)/misc.Plo
 include ./$(DEPDIR)/test1-test1.Po
 include ./$(DEPDIR)/test1-test1_pb2.Po
 include ./$(DEPDIR)/test2.pb.Po
@@ -396,6 +398,13 @@ encoder.lo: lwpb/encoder.c
 #	source='lwpb/encoder.c' object='encoder.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
 #	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o encoder.lo `test -f 'lwpb/encoder.c' || echo '$(srcdir)/'`lwpb/encoder.c
+
+misc.lo: lwpb/misc.c
+	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT misc.lo -MD -MP -MF $(DEPDIR)/misc.Tpo -c -o misc.lo `test -f 'lwpb/misc.c' || echo '$(srcdir)/'`lwpb/misc.c
+	mv -f $(DEPDIR)/misc.Tpo $(DEPDIR)/misc.Plo
+#	source='lwpb/misc.c' object='misc.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o misc.lo `test -f 'lwpb/misc.c' || echo '$(srcdir)/'`lwpb/misc.c
 
 test1-test1.o: test/test1.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(test1_CFLAGS) $(CFLAGS) -MT test1-test1.o -MD -MP -MF $(DEPDIR)/test1-test1.Tpo -c -o test1-test1.o `test -f 'test/test1.c' || echo '$(srcdir)/'`test/test1.c
