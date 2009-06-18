@@ -240,7 +240,7 @@ const struct lwpb_field_desc lwpb_fields_foo_testmess[] = {
     {
         .number = 7,
         .opts.label = LWPB_REPEATED,
-        .opts.typ = LWPB_UINT64,
+        .opts.typ = LWPB_UINT32,
         .opts.flags = 0,
         .msg_desc = 0,
 #if LWPB_FIELD_NAMES
@@ -478,7 +478,7 @@ const struct lwpb_field_desc lwpb_fields_foo_testmessoptional[] = {
     {
         .number = 7,
         .opts.label = LWPB_OPTIONAL,
-        .opts.typ = LWPB_UINT64,
+        .opts.typ = LWPB_UINT32,
         .opts.flags = 0,
         .msg_desc = 0,
 #if LWPB_FIELD_NAMES
@@ -740,7 +740,7 @@ const struct lwpb_field_desc lwpb_fields_foo_testmessrequireduint32[] = {
     {
         .number = 1,
         .opts.label = LWPB_REQUIRED,
-        .opts.typ = LWPB_UINT64,
+        .opts.typ = LWPB_UINT32,
         .opts.flags = 0,
         .msg_desc = 0,
 #if LWPB_FIELD_NAMES
@@ -961,7 +961,7 @@ const struct lwpb_field_desc lwpb_fields_foo_defaultrequiredvalues[] = {
     {
         .number = 2,
         .opts.label = LWPB_REQUIRED,
-        .opts.typ = LWPB_UINT64,
+        .opts.typ = LWPB_UINT32,
         .opts.flags = 0 | LWPB_HAS_DEFAULT,
         .msg_desc = 0,
 #if LWPB_FIELD_NAMES
@@ -987,7 +987,7 @@ const struct lwpb_field_desc lwpb_fields_foo_defaultrequiredvalues[] = {
     {
         .number = 4,
         .opts.label = LWPB_REQUIRED,
-        .opts.typ = LWPB_UINT64,
+        .opts.typ = LWPB_UINT32,
         .opts.flags = 0 | LWPB_HAS_DEFAULT,
         .msg_desc = 0,
 #if LWPB_FIELD_NAMES
@@ -1069,7 +1069,7 @@ const struct lwpb_field_desc lwpb_fields_foo_defaultoptionalvalues[] = {
     {
         .number = 2,
         .opts.label = LWPB_OPTIONAL,
-        .opts.typ = LWPB_UINT64,
+        .opts.typ = LWPB_UINT32,
         .opts.flags = 0 | LWPB_HAS_DEFAULT,
         .msg_desc = 0,
 #if LWPB_FIELD_NAMES
@@ -1095,7 +1095,7 @@ const struct lwpb_field_desc lwpb_fields_foo_defaultoptionalvalues[] = {
     {
         .number = 4,
         .opts.label = LWPB_OPTIONAL,
-        .opts.typ = LWPB_UINT64,
+        .opts.typ = LWPB_UINT32,
         .opts.flags = 0 | LWPB_HAS_DEFAULT,
         .msg_desc = 0,
 #if LWPB_FIELD_NAMES
