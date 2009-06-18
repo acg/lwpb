@@ -74,6 +74,8 @@ static lwpb_err_t encode_32bit(struct lwpb_buf *buf, uint32_t value)
     buf->pos[2] = (value >> 16) & 0xff;
     buf->pos[3] = (value >> 24) & 0xff;
     buf->pos += 4;
+    
+    return LWPB_ERR_OK;
 }
 
 /**
@@ -92,11 +94,14 @@ static lwpb_err_t encode_64bit(struct lwpb_buf *buf, uint64_t value)
     buf->pos[1] = (value >> 8) & 0xff;
     buf->pos[2] = (value >> 16) & 0xff;
     buf->pos[3] = (value >> 24) & 0xff;
-    buf->pos[4] = (value >> 32) & 0xff;
-    buf->pos[5] = (value >> 40) & 0xff;
-    buf->pos[6] = (value >> 48) & 0xff;
-    buf->pos[7] = (value >> 56) & 0xff;
+    value >>= 32;
+    buf->pos[4] = (value) & 0xff;
+    buf->pos[5] = (value >> 8) & 0xff;
+    buf->pos[6] = (value >> 16) & 0xff;
+    buf->pos[7] = (value >> 24) & 0xff;
     buf->pos += 8;
+    
+    return LWPB_ERR_OK;
 }
 
 // Encoder
@@ -201,16 +206,30 @@ lwpb_err_t lwpb_encoder_add_field(struct lwpb_encoder *encoder,
         wire_value.int32 = *((uint32_t *) &value->float_);
         break;
     case LWPB_INT32:
-    case LWPB_UINT32:
-    case LWPB_SINT32:
         wire_type = WT_VARINT;
         wire_value.varint = value->int32;
         break;
+    case LWPB_UINT32:
+        wire_type = WT_VARINT;
+        wire_value.varint = value->uint32;
+        break;
+    case LWPB_SINT32:
+        // Zig-zag encoding
+        wire_type = WT_VARINT;
+        wire_value.varint = (uint32_t) ((value->int32 << 1) ^ (value->int32 >> 31));
+        break;
     case LWPB_INT64:
-    case LWPB_UINT64:
-    case LWPB_SINT64:
         wire_type = WT_VARINT;
         wire_value.varint = value->int64;
+        break;
+    case LWPB_UINT64:
+        wire_type = WT_VARINT;
+        wire_value.varint = value->uint64;
+        break;
+    case LWPB_SINT64:
+        // Zig-zag encoding
+        wire_type = WT_VARINT;
+        wire_value.varint = (uint64_t) ((value->int64 << 1) ^ (value->int64 >> 63));
         break;
     case LWPB_FIXED32:
         wire_type = WT_32BIT;
@@ -218,7 +237,7 @@ lwpb_err_t lwpb_encoder_add_field(struct lwpb_encoder *encoder,
         break;
     case LWPB_FIXED64:
         wire_type = WT_64BIT;
-        wire_value.int32 = value->uint64;
+        wire_value.int64 = value->uint64;
         break;
     case LWPB_SFIXED32:
         wire_type = WT_32BIT;
@@ -226,7 +245,7 @@ lwpb_err_t lwpb_encoder_add_field(struct lwpb_encoder *encoder,
         break;
     case LWPB_SFIXED64:
         wire_type = WT_64BIT;
-        wire_value.int32 = value->int64;
+        wire_value.int64 = value->int64;
         break;
     case LWPB_BOOL:
         wire_type = WT_VARINT;

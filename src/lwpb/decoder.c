@@ -162,11 +162,11 @@ static lwpb_err_t decode_varint(struct lwpb_buf *buf, uint64_t *varint)
     
     *varint = 0;
     for (bitpos = 0; *buf->pos & 0x80 && bitpos < 64; bitpos += 7, buf->pos++) {
-        *varint |= (*buf->pos & 0x7f) << bitpos;
+        *varint |= (uint64_t) (*buf->pos & 0x7f) << bitpos;
         if (buf->end - buf->pos < 2)
             return LWPB_ERR_END_OF_BUF;
     }
-    *varint |= (*buf->pos & 0x7f) << bitpos;
+    *varint |= (uint64_t) (*buf->pos & 0x7f) << bitpos;
     buf->pos++;
     
     return LWPB_ERR_OK;
@@ -200,20 +200,15 @@ static lwpb_err_t decode_32bit(struct lwpb_buf *buf, uint32_t *value)
  */
 static lwpb_err_t decode_64bit(struct lwpb_buf *buf, uint64_t *value)
 {
-    uint32_t tmp;
+    int i;
     
     if (lwpb_buf_left(buf) < 8)
         return LWPB_ERR_END_OF_BUF;
-
-    *value = buf->pos[0] | (buf->pos[1] << 8) |
-    (buf->pos[2] << 16) | (buf->pos[3] << 24);
-    buf->pos += 4;
-
-    tmp = buf->pos[0] | (buf->pos[1] << 8) |
-    (buf->pos[2] << 16) | (buf->pos[3] << 24);
-    buf->pos += 4;
     
-    *value |= (uint64_t) tmp << 32;
+    *value = 0;
+    for (i = 7; i >= 0; i--)
+        *value = (*value << 8) | buf->pos[i];
+    buf->pos += 8;
     
     return LWPB_ERR_OK;
 }
@@ -377,10 +372,12 @@ lwpb_err_t lwpb_decoder_decode(struct lwpb_decoder *decoder,
             value.uint64 = wire_value.varint;
             break;
         case LWPB_SINT32:
-            value.int32 = wire_value.varint;
+            // Zig-zag encoding
+            value.int32 = (wire_value.varint >> 1) ^ -((int32_t) (wire_value.varint & 1));
             break;
         case LWPB_SINT64:
-            value.int64 = wire_value.varint;
+            // Zig-zag encoding
+            value.int64 = (wire_value.varint >> 1) ^ -((int64_t) (wire_value.varint & 1));
             break;
         case LWPB_FIXED32:
             value.uint32 = wire_value.int32;

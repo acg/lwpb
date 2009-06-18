@@ -156,9 +156,9 @@ struct lwpb_msg_desc {
 
 /** Simple memory buffer */
 struct lwpb_buf {
-    char *base; /**< Buffers base address */
-    char *pos;  /**< Buffers current position */
-    char *end;  /**< Buffers end address (first invalid byte) */
+    uint8_t *base;  /**< Buffers base address */
+    uint8_t *pos;   /**< Buffers current position */
+    uint8_t *end;   /**< Buffers end address (first invalid byte) */
 };
 
 /* Forward declaration */
