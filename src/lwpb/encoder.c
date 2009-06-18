@@ -353,7 +353,7 @@ lwpb_err_t lwpb_encoder_add_uint64(struct lwpb_encoder *encoder,
 
 lwpb_err_t lwpb_encoder_add_bool(struct lwpb_encoder *encoder,
                                  const struct lwpb_field_desc *field_desc,
-                                 int bool)
+                                 lwpb_bool_t bool)
 {
     union lwpb_value value;
     value.bool = bool;
@@ -362,7 +362,7 @@ lwpb_err_t lwpb_encoder_add_bool(struct lwpb_encoder *encoder,
 
 lwpb_err_t lwpb_encoder_add_enum(struct lwpb_encoder *encoder,
                                  const struct lwpb_field_desc *field_desc,
-                                 int enum_)
+                                 lwpb_enum_t enum_)
 {
     union lwpb_value value;
     value.enum_ = enum_;

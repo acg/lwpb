@@ -98,6 +98,12 @@ typedef struct {
     unsigned int flags : 8;
 } lwpb_field_opts_t;
 
+/** Protocol buffer bool type */
+typedef int lwpb_bool_t;
+
+/** Protocol buffer enum type */
+typedef int lwpb_enum_t;
+
 /** Protocol buffer value */
 union lwpb_value {
     double double_;
@@ -106,7 +112,7 @@ union lwpb_value {
     int64_t int64;
     uint32_t uint32;
     uint64_t uint64;
-    int bool;
+    lwpb_bool_t bool;
     struct {
         char *str;
         size_t len;
@@ -119,7 +125,7 @@ union lwpb_value {
         void *data;
         size_t len;
     } message;
-    int enum_;
+    lwpb_enum_t enum_;
     int null;
 } value;
 
@@ -277,11 +283,11 @@ lwpb_err_t lwpb_encoder_add_uint64(struct lwpb_encoder *encoder,
 
 lwpb_err_t lwpb_encoder_add_bool(struct lwpb_encoder *encoder,
                                  const struct lwpb_field_desc *field_desc,
-                                 int bool);
+                                 lwpb_bool_t bool);
 
 lwpb_err_t lwpb_encoder_add_enum(struct lwpb_encoder *encoder,
                                  const struct lwpb_field_desc *field_desc,
-                                 int enum_);
+                                 lwpb_enum_t enum_);
 
 lwpb_err_t lwpb_encoder_add_string(struct lwpb_encoder *encoder,
                                    const struct lwpb_field_desc *field_desc,
@@ -291,5 +297,7 @@ lwpb_err_t lwpb_encoder_add_bytes(struct lwpb_encoder *encoder,
                                   const struct lwpb_field_desc *field_desc,
                                   uint8_t *data, size_t len);
 
+
+const char *lwpb_err_text(lwpb_err_t err);
 
 #endif // __LWPB_H__
