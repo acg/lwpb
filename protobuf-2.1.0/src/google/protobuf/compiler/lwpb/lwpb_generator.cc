@@ -279,7 +279,7 @@ string Generator::FieldDescriptorOptTyp(const FieldDescriptor& field) const {
   case FieldDescriptor::TYPE_FLOAT:     return "LWPB_FLOAT";
   case FieldDescriptor::TYPE_INT32:     return "LWPB_INT32";
   case FieldDescriptor::TYPE_INT64:     return "LWPB_INT64";
-  case FieldDescriptor::TYPE_UINT32:    return "LWPB_UINT64";
+  case FieldDescriptor::TYPE_UINT32:    return "LWPB_UINT32";
   case FieldDescriptor::TYPE_UINT64:    return "LWPB_UINT64";
   case FieldDescriptor::TYPE_SINT32:    return "LWPB_SINT32";
   case FieldDescriptor::TYPE_SINT64:    return "LWPB_SINT64";
