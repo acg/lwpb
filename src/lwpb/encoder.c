@@ -118,8 +118,6 @@ void lwpb_encoder_start(struct lwpb_encoder *encoder,
                         const struct lwpb_msg_desc *msg_desc,
                         void *data, size_t len)
 {
-    encoder->data = data;
-    encoder->len = len;
     encoder->depth = 1;
     lwpb_buf_init(&encoder->stack[0].buf, data, len);
     encoder->stack[0].field_desc = NULL;

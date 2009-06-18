@@ -29,6 +29,11 @@
 #define LWPB_MAX_DEPTH 8
 #endif
 
+/* Maximum number of required fields in a message */
+#ifndef LWPB_MAX_REQUIRED_FIELDS
+#define LWPB_MAX_REQUIRED_FIELDS 16
+#endif
+
 /* Provide field names as strings */
 #ifndef LWPB_FIELD_NAMES
 #define LWPB_FIELD_NAMES 1
@@ -234,10 +239,9 @@ struct lwpb_encoder_stack_frame {
 
 /** Protocol buffer encoder */
 struct lwpb_encoder {
-    void *data;
-    size_t len;
     struct lwpb_encoder_stack_frame stack[LWPB_MAX_DEPTH];
     int depth;
+    
 };
 
 void lwpb_encoder_init(struct lwpb_encoder *encoder);
