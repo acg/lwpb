@@ -24,6 +24,7 @@
 #include <string.h>
 
 #include <lwpb/lwpb.h>
+#include <lwpb/decoder.h>
 
 #include "private.h"
 

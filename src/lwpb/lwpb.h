@@ -24,6 +24,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+
 /* Maximum depth of message embedding */
 #ifndef LWPB_MAX_DEPTH
 #define LWPB_MAX_DEPTH 8
@@ -198,140 +199,14 @@ struct lwpb_buf {
     uint8_t *end;   /**< Buffers end address (first invalid byte) */
 };
 
-/* Forward declaration */
-struct lwpb_decoder;
-
-// Event handlers
-
-/**
- * This handler is called when the decoder encountered a new message.
- * @param decoder Decoder
- * @param msg_desc Message descriptor
- * @param arg User argument
- */
-typedef void (*lwpb_decoder_msg_start_handler_t)
-    (struct lwpb_decoder *decoder,
-     const struct lwpb_msg_desc *msg_desc, void *arg);
-
-/**
- * This handler is called when the decoder finished decoding a message.
- * @param decoder Decoder
- * @param msg_desc Message descriptor
- * @param arg User argument
- */
-typedef void (*lwpb_decoder_msg_end_handler_t)
-    (struct lwpb_decoder *decoder,
-     const struct lwpb_msg_desc *msg_desc, void *arg);
-
-/**
- * This handler is called when the decoder has decoded a field.
- * @param decoder Decoder
- * @param msg_desc Message descriptor of the message containing the field
- * @param field_desc Field descriptor
- * @param value Field value
- * @param arg User argument
- */
-typedef void (*lwpb_decoder_field_handler_t)
-    (struct lwpb_decoder *decoder,
-     const struct lwpb_msg_desc *msg_desc,
-     const struct lwpb_field_desc *field_desc,
-     union lwpb_value *value, void *arg);
-
-/** Protocol buffer decoder */
-struct lwpb_decoder {
-    void *arg;
-    lwpb_decoder_msg_start_handler_t msg_start_handler;
-    lwpb_decoder_msg_end_handler_t msg_end_handler;
-    lwpb_decoder_field_handler_t field_handler;
-};
-
-void lwpb_decoder_init(struct lwpb_decoder *decoder);
-
-void lwpb_decoder_arg(struct lwpb_decoder *decoder, void *arg);
-
-void lwpb_decoder_msg_handler(struct lwpb_decoder *decoder,
-                            lwpb_decoder_msg_start_handler_t msg_start_handler,
-                            lwpb_decoder_msg_end_handler_t msg_end_handler);
-
-void lwpb_decoder_field_handler(struct lwpb_decoder *decoder,
-                              lwpb_decoder_field_handler_t field_handler);
-
-void lwpb_decoder_use_debug_handlers(struct lwpb_decoder *decoder);
-
-lwpb_err_t lwpb_decoder_decode(struct lwpb_decoder *decoder,
-                               const struct lwpb_msg_desc *msg_desc,
-                               void *data, size_t len);
-
-
-struct lwpb_encoder_stack_frame {
-    struct lwpb_buf buf;
-    const struct lwpb_field_desc *field_desc;
-    const struct lwpb_msg_desc *msg_desc;
-};
-
-/** Protocol buffer encoder */
-struct lwpb_encoder {
-    struct lwpb_encoder_stack_frame stack[LWPB_MAX_DEPTH];
-    int depth;
+struct lwpb_client {
     
 };
 
-void lwpb_encoder_init(struct lwpb_encoder *encoder);
+lwpb_err_t lwpb_client_init(struct lwpb_client *client);
 
-void lwpb_encoder_start(struct lwpb_encoder *encoder,
-                        const struct lwpb_msg_desc *msg_desc,
-                        void *data, size_t len);
-
-size_t lwpb_encoder_finish(struct lwpb_encoder *encoder);
-
-lwpb_err_t lwpb_encoder_nested_start(struct lwpb_encoder *encoder,
-                                     const struct lwpb_field_desc *field_desc);
-
-lwpb_err_t lwpb_encoder_nested_end(struct lwpb_encoder *encoder);
-
-lwpb_err_t lwpb_encoder_add_field(struct lwpb_encoder *encoder,
-                                  const struct lwpb_field_desc *field_desc,
-                                  union lwpb_value *value);
-
-lwpb_err_t lwpb_encoder_add_double(struct lwpb_encoder *encoder,
-                                   const struct lwpb_field_desc *field_desc,
-                                   double double_);
-
-lwpb_err_t lwpb_encoder_add_float(struct lwpb_encoder *encoder,
-                                  const struct lwpb_field_desc *field_desc,
-                                  float float_);
-
-lwpb_err_t lwpb_encoder_add_int32(struct lwpb_encoder *encoder,
-                                  const struct lwpb_field_desc *field_desc,
-                                  int32_t int32);
-
-lwpb_err_t lwpb_encoder_add_uint32(struct lwpb_encoder *encoder,
-                                   const struct lwpb_field_desc *field_desc,
-                                   uint32_t uint32);
-
-lwpb_err_t lwpb_encoder_add_int64(struct lwpb_encoder *encoder,
-                                  const struct lwpb_field_desc *field_desc,
-                                  int64_t int64);
-
-lwpb_err_t lwpb_encoder_add_uint64(struct lwpb_encoder *encoder,
-                                   const struct lwpb_field_desc *field_desc,
-                                   uint64_t uint64);
-
-lwpb_err_t lwpb_encoder_add_bool(struct lwpb_encoder *encoder,
-                                 const struct lwpb_field_desc *field_desc,
-                                 lwpb_bool_t bool);
-
-lwpb_err_t lwpb_encoder_add_enum(struct lwpb_encoder *encoder,
-                                 const struct lwpb_field_desc *field_desc,
-                                 lwpb_enum_t enum_);
-
-lwpb_err_t lwpb_encoder_add_string(struct lwpb_encoder *encoder,
-                                   const struct lwpb_field_desc *field_desc,
-                                   char *str);
-
-lwpb_err_t lwpb_encoder_add_bytes(struct lwpb_encoder *encoder,
-                                  const struct lwpb_field_desc *field_desc,
-                                  uint8_t *data, size_t len);
+lwpb_err_t lwpb_client_call(struct lwpb_client *client,
+                            const struct lwpb_method_desc *method_desc);
 
 
 const char *lwpb_err_text(lwpb_err_t err);
