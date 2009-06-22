@@ -43,7 +43,7 @@ static void debug_msg_start_handler(struct lwpb_decoder *decoder,
                                     const struct lwpb_msg_desc *msg_desc,
                                     void *arg)
 {
-    char *name;
+    const char *name;
 
 #if LWPB_MESSAGE_NAMES
     name = msg_desc->name;
@@ -88,7 +88,7 @@ static void debug_field_handler(struct lwpb_decoder *decoder,
         "(message)",
     };
     
-    char *name;
+    const char *name;
     
 #if LWPB_FIELD_NAMES
     name = field_desc->name;

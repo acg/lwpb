@@ -156,3 +156,26 @@ const struct lwpb_msg_desc lwpb_messages_test[] = {
     },
 };
 
+// 'Search' method descriptors
+const struct lwpb_method_desc lwpb_methods_test_search[] = {
+    {
+        .service = test_Search,
+        .input = test_Name,
+        .output = test_LookupResult,
+#if LWPB_METHOD_NAMES
+        .name = "search_by_name",
+#endif
+    },
+};
+
+// Service descriptors
+const struct lwpb_service_desc lwpb_services_test[] = {
+    {
+        .num_methods = 1,
+        .methods = lwpb_methods_test_search,
+#if LWPB_SERVICE_NAMES
+        .name = "Search",
+#endif
+    },
+};
+

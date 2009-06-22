@@ -43,4 +43,14 @@ extern const struct lwpb_field_desc lwpb_fields_test_name[];
 // 'Name' field descriptor pointers
 #define test_Name_name (&lwpb_fields_test_name[0])
 
+extern const struct lwpb_service_desc lwpb_services_test[];
+
+// Service descriptor pointers
+#define test_Search (&lwpb_services_test[0])
+
+extern const struct lwpb_method_desc lwpb_methods_test_search[];
+
+// 'Search' method descriptor pointers
+#define test_Search_search_by_name (&lwpb_methods_test_search[0])
+
 #endif // __TEST1_PB2_H__

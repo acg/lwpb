@@ -29,6 +29,6 @@ message Name {
   optional string name = 1;
 };
 
-service DirLookup {
-  rpc ByName (Name) returns (LookupResult);
+service Search {
+  rpc search_by_name (Name) returns (LookupResult);
 }

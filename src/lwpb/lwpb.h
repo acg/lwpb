@@ -49,6 +49,16 @@
 #define LWPB_MESSAGE_NAMES 1
 #endif
 
+/* Provide method names as strings */
+#ifndef LWPB_METHOD_NAMES
+#define LWPB_METHOD_NAMES 1
+#endif
+
+/* Provide service names as strings */
+#ifndef LWPB_SERVICE_NAMES
+#define LWPB_SERVICE_NAMES 1
+#endif
+
 /* Simple assert macro */
 #ifndef LWPB_ASSERT
 #define LWPB_ASSERT(expr, msg)                                              \
@@ -143,7 +153,7 @@ struct lwpb_field_desc {
     lwpb_field_opts_t opts;     /**< Field options (label, value type, flags) */
     const struct lwpb_msg_desc *msg_desc; /**< Message descriptor, if field is message */
 #if LWPB_FIELD_NAMES
-    char *name;                 /**< Field name */
+    const char *name;           /**< Field name */
 #endif
 #if LWPB_FIELD_DEFAULTS
     union lwpb_value def;       /**< Field default value */
@@ -155,7 +165,29 @@ struct lwpb_msg_desc {
     uint32_t num_fields;        /**< Number of fields */
     const struct lwpb_field_desc *fields; /**< Array of field descriptors */
 #if LWPB_MESSAGE_NAMES
-    char *name;
+    const char *name;
+#endif
+};
+
+/* Forward declaration */
+struct lwpb_service_desc;
+
+/** Protocol buffer method descriptor */
+struct lwpb_method_desc {
+    const struct lwpb_service_desc *service; /**< Service descriptor */
+    const struct lwpb_msg_desc *input; /**< Input message descriptor */ 
+    const struct lwpb_msg_desc *output; /**< Output message descriptor */
+#if LWPB_METHOD_NAMES
+    const char *name;           /**< Method name */
+#endif
+};
+
+/** Protocol buffer service descriptor */
+struct lwpb_service_desc {
+    const uint32_t num_methods; /**< Number of methods */
+    const struct lwpb_method_desc *methods; /**< Array of method descriptors */
+#if LWPB_SERVICE_NAMES
+    const char *name;           /**< Service name */
 #endif
 };
 

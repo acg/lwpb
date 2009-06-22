@@ -191,6 +191,7 @@ bool Generator::Generate(const FileDescriptor* file,
   
   PrintEnumDescriptors();
   PrintMessageDescriptors();
+  PrintServiceDescriptors();
   
   PrintFooter();
   
@@ -215,6 +216,16 @@ string Generator::FileDescriptorMessageArray(
   string name = descriptor.package();    
   name = StringReplace(name, ".", "_", true);
   name = "lwpb_messages_" + name;
+  LowerString(&name);
+  return name;
+}
+
+// Returns the name of the service array.
+string Generator::FileDescriptorServiceArray(
+    const FileDescriptor& descriptor) const {
+  string name = descriptor.package();    
+  name = StringReplace(name, ".", "_", true);
+  name = "lwpb_services_" + name;
   LowerString(&name);
   return name;
 }
@@ -310,6 +321,46 @@ string Generator::FieldDescriptorOptFlags(const FieldDescriptor& field) const {
     flags += " | LWPB_IS_DEPRECATED";
   
   return flags;
+}
+
+// Returns the name of the field descriptor.
+string Generator::ServiceDescriptorId(
+    const ServiceDescriptor& descriptor) const {
+  string name = descriptor.full_name();
+  name = StringReplace(name, ".", "_", true);
+  return name;
+}
+
+// Returns the name of the service descriptor pointer.
+string Generator::ServiceDescriptorPtr(
+    const ServiceDescriptor& descriptor) const {
+  string array = FileDescriptorServiceArray(*descriptor.file());
+  string ptr = "(&" + array + "[" + SimpleItoa(descriptor.index()) + "])";
+  return ptr;
+}
+
+// Returns the name of the service's method array.
+string Generator::ServiceDescriptorMethodArray(
+    const ServiceDescriptor& descriptor) const {
+  string name = descriptor.full_name();
+  name = StringReplace(name, ".", "_", true);
+  name = "lwpb_methods_" + name;
+  LowerString(&name);
+  return name;
+}
+
+string Generator::MethodDescriptorId(
+    const MethodDescriptor& descriptor) const {
+  string name = descriptor.full_name();
+  name = StringReplace(name, ".", "_", true);
+  return name;
+}
+
+string Generator::MethodDescriptorPtr(
+    const MethodDescriptor& descriptor) const {
+  string array = ServiceDescriptorMethodArray(*descriptor.service());
+  string ptr = "(&" + array + "[" + SimpleItoa(descriptor.index()) + "])";
+  return ptr;
 }
 
 // Creates a flat vector |enums| of all enum descriptors.
@@ -412,7 +463,6 @@ void Generator::PrintEnumDescriptor(
   string enum_name = NamePrefixedWithNestedTypes(enum_descriptor, ".");
   h_printer_->Print("// '$name$' enumeration values\n", "name", enum_name);
 
-  string descriptor_name = ModuleLevelDescriptorName(enum_descriptor);
   for (int i = 0; i < enum_descriptor.value_count(); ++i) {
     const EnumValueDescriptor &value_descriptor = *enum_descriptor.value(i);
     string name = value_descriptor.full_name();
@@ -450,10 +500,9 @@ void Generator::PrintMessageDescriptors() const {
   c_printer_->Print("const struct lwpb_msg_desc $name$[] = {\n", "name", array_name);
   for (int i = 0; i < messages_.size(); ++i) {
     map<string, string> m;
-    m["name"] = NamePrefixedWithNestedTypes(*messages_[i], ".");
     m["num_fields"] = SimpleItoa(messages_[i]->field_count());
     m["fields"] = MessageDescriptorFieldArray(*messages_[i]);
-    LowerString(&m["fields"]);
+    m["name"] = messages_[i]->name();
     c_printer_->Print(m,
         "    {\n"
         "        .num_fields = $num_fields$,\n"
@@ -476,10 +525,9 @@ void Generator::PrintDescriptorFields(
   h_printer_->Print("\n");
     
   // Print field id's
-  string message_name = NamePrefixedWithNestedTypes(message_descriptor, ".");
+  string message_name = message_descriptor.name();
   h_printer_->Print("// '$name$' field descriptor pointers\n", "name", message_name);
   
-  string descriptor_name = ModuleLevelDescriptorName(message_descriptor);
   for (int i = 0; i < message_descriptor.field_count(); ++i) {
     const FieldDescriptor &field_descriptor = *message_descriptor.field(i);
     string id = FieldDescriptorId(field_descriptor);
@@ -493,8 +541,6 @@ void Generator::PrintDescriptorFields(
   c_printer_->Print("const struct lwpb_field_desc $name$[] = {\n", "name", array_name);
   for (int i = 0; i < message_descriptor.field_count(); ++i) {
     const FieldDescriptor &field_descriptor = *message_descriptor.field(i);
-    string name = FieldDescriptorId(field_descriptor);
-    
     map <string, string> m;
     m["number"] = SimpleItoa(field_descriptor.number());
     m["label"] = FieldDescriptorOptLabel(field_descriptor);
@@ -516,6 +562,93 @@ void Generator::PrintDescriptorFields(
         "#endif\n"
         "#if LWPB_FIELD_DEFAULTS\n"
         "        $default$,\n"
+        "#endif\n"
+        "    },\n");
+  }
+  c_printer_->Print("};\n");
+  c_printer_->Print("\n");
+}
+
+void Generator::PrintServiceDescriptors() const {
+  // Print reference to serivce array
+  string array_name = FileDescriptorServiceArray(*file_);
+  h_printer_->Print("extern const struct lwpb_service_desc $array$[];\n",
+                    "array", array_name);
+  h_printer_->Print("\n");
+      
+  // Print service id's
+  h_printer_->Print("// Service descriptor pointers\n");
+  for (int i = 0; i < file_->service_count(); ++i) {
+    const ServiceDescriptor &descriptor = *file_->service(i);
+    string id = ServiceDescriptorId(descriptor);
+    string ptr = ServiceDescriptorPtr(descriptor);
+    h_printer_->Print("#define $id$ $ptr$\n", "id", id, "ptr", ptr);
+  }
+  h_printer_->Print("\n");
+  
+  // Print method descriptions
+  for (int i = 0; i < file_->service_count(); ++i)
+    PrintServiceMethods(*file_->service(i));
+  
+  // Print service descriptions
+  c_printer_->Print("// Service descriptors\n");
+  c_printer_->Print("const struct lwpb_service_desc $name$[] = {\n", "name", array_name);
+  for (int i = 0; i < file_->service_count(); ++i) {
+    const ServiceDescriptor &descriptor = *file_->service(i);
+    map<string, string> m;
+    m["num_methods"] = SimpleItoa(descriptor.method_count());
+    m["methods"] = ServiceDescriptorMethodArray(descriptor);
+    m["name"] = descriptor.name();
+    c_printer_->Print(m,
+        "    {\n"
+        "        .num_methods = $num_methods$,\n"
+        "        .methods = $methods$,\n"
+        "#if LWPB_SERVICE_NAMES\n"
+        "        .name = \"$name$\",\n"
+        "#endif\n"
+        "    },\n");
+  }
+  c_printer_->Print("};\n");
+  c_printer_->Print("\n");
+}
+
+void Generator::PrintServiceMethods(
+    const ServiceDescriptor& service_descriptor) const {
+  // Print reference to method array
+  string array_name = ServiceDescriptorMethodArray(service_descriptor);
+  h_printer_->Print("extern const struct lwpb_method_desc $array$[];\n",
+                    "array", array_name);
+  h_printer_->Print("\n");
+      
+  // Print method id's
+  string service_name = service_descriptor.name();
+  h_printer_->Print("// '$name$' method descriptor pointers\n", "name", service_name);
+    
+  for (int i = 0; i < service_descriptor.method_count(); ++i) {
+    const MethodDescriptor &method_descriptor = *service_descriptor.method(i);
+    string id = MethodDescriptorId(method_descriptor);
+    string ptr = MethodDescriptorPtr(method_descriptor);
+    h_printer_->Print("#define $id$ $ptr$\n", "id", id, "ptr", ptr);
+  }
+  h_printer_->Print("\n");
+    
+  // Print method descriptor array
+  c_printer_->Print("// '$name$' method descriptors\n", "name", service_name);
+  c_printer_->Print("const struct lwpb_method_desc $name$[] = {\n", "name", array_name);
+  for (int i = 0; i < service_descriptor.method_count(); ++i) {
+    const MethodDescriptor &method_descriptor = *service_descriptor.method(i);
+    map <string, string> m;
+    m["service"] = ServiceDescriptorId(service_descriptor);
+    m["input"] = MessageDescriptorId(*method_descriptor.input_type());
+    m["output"] = MessageDescriptorId(*method_descriptor.output_type());
+    m["name"] = method_descriptor.name();
+    c_printer_->Print(m,
+        "    {\n"
+        "        .service = $service$,\n"
+        "        .input = $input$,\n"
+        "        .output = $output$,\n"
+        "#if LWPB_METHOD_NAMES\n"
+        "        .name = \"$name$\",\n"
         "#endif\n"
         "    },\n");
   }
