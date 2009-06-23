@@ -35,6 +35,8 @@
     } while (0)
 #endif
 
-#define LWPB_ERR(format, args...) printf("ERR: " format, ##args)
+#define LWPB_DEBUG(format, args...) printf("DBG: " format "\n", ##args)
+#define LWPB_INFO(format, args...) printf("INF: " format "\n", ##args)
+#define LWPB_ERR(format, args...) printf("ERR: " format "\n", ##args)
 
 #endif // __LWPB_CORE_DEBUG_H__

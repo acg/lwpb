@@ -34,7 +34,8 @@ POST_UNINSTALL = :
 build_triplet = i686-pc-linux-gnu
 host_triplet = i686-pc-linux-gnu
 bin_PROGRAMS = test_simple$(EXEEXT) test_full$(EXEEXT) \
-	test_full_generate$(EXEEXT) test_rpc_direct$(EXEEXT)
+	test_full_generate$(EXEEXT) test_rpc_direct$(EXEEXT) \
+	test_rpc_socket_server$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -74,6 +75,10 @@ am_test_rpc_direct_OBJECTS = test_rpc_direct.$(OBJEXT) \
 	test_simple_pb2.$(OBJEXT)
 test_rpc_direct_OBJECTS = $(am_test_rpc_direct_OBJECTS)
 test_rpc_direct_DEPENDENCIES = liblwpb.la
+am_test_rpc_socket_server_OBJECTS = test_rpc_socket_server.$(OBJEXT) \
+	test_simple_pb2.$(OBJEXT)
+test_rpc_socket_server_OBJECTS = $(am_test_rpc_socket_server_OBJECTS)
+test_rpc_socket_server_DEPENDENCIES = liblwpb.la
 am_test_simple_OBJECTS = test_simple.$(OBJEXT) \
 	test_simple_pb2.$(OBJEXT)
 test_simple_OBJECTS = $(am_test_simple_OBJECTS)
@@ -101,10 +106,10 @@ CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(liblwpb_la_SOURCES) $(test_full_SOURCES) \
 	$(test_full_generate_SOURCES) $(test_rpc_direct_SOURCES) \
-	$(test_simple_SOURCES)
+	$(test_rpc_socket_server_SOURCES) $(test_simple_SOURCES)
 DIST_SOURCES = $(liblwpb_la_SOURCES) $(test_full_SOURCES) \
 	$(test_full_generate_SOURCES) $(test_rpc_direct_SOURCES) \
-	$(test_simple_SOURCES)
+	$(test_rpc_socket_server_SOURCES) $(test_simple_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -260,6 +265,11 @@ test/test_rpc_direct.c \
 test/generated/test_simple_pb2.c
 
 test_rpc_direct_LDADD = liblwpb.la
+test_rpc_socket_server_SOURCES = \
+test/test_rpc_socket_server.c \
+test/generated/test_simple_pb2.c
+
+test_rpc_socket_server_LDADD = liblwpb.la
 all: all-recursive
 
 .SUFFIXES:
@@ -359,6 +369,9 @@ test_full_generate$(EXEEXT): $(test_full_generate_OBJECTS) $(test_full_generate_
 test_rpc_direct$(EXEEXT): $(test_rpc_direct_OBJECTS) $(test_rpc_direct_DEPENDENCIES) 
 	@rm -f test_rpc_direct$(EXEEXT)
 	$(LINK) $(test_rpc_direct_OBJECTS) $(test_rpc_direct_LDADD) $(LIBS)
+test_rpc_socket_server$(EXEEXT): $(test_rpc_socket_server_OBJECTS) $(test_rpc_socket_server_DEPENDENCIES) 
+	@rm -f test_rpc_socket_server$(EXEEXT)
+	$(LINK) $(test_rpc_socket_server_OBJECTS) $(test_rpc_socket_server_LDADD) $(LIBS)
 test_simple$(EXEEXT): $(test_simple_OBJECTS) $(test_simple_DEPENDENCIES) 
 	@rm -f test_simple$(EXEEXT)
 	$(LINK) $(test_simple_OBJECTS) $(test_simple_LDADD) $(LIBS)
@@ -383,6 +396,7 @@ include ./$(DEPDIR)/test_full.pb.Po
 include ./$(DEPDIR)/test_full_generate.Po
 include ./$(DEPDIR)/test_full_pb2.Po
 include ./$(DEPDIR)/test_rpc_direct.Po
+include ./$(DEPDIR)/test_rpc_socket_server.Po
 include ./$(DEPDIR)/test_simple.Po
 include ./$(DEPDIR)/test_simple_pb2.Po
 
@@ -525,6 +539,20 @@ test_simple_pb2.obj: test/generated/test_simple_pb2.c
 #	source='test/generated/test_simple_pb2.c' object='test_simple_pb2.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
 #	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_simple_pb2.obj `if test -f 'test/generated/test_simple_pb2.c'; then $(CYGPATH_W) 'test/generated/test_simple_pb2.c'; else $(CYGPATH_W) '$(srcdir)/test/generated/test_simple_pb2.c'; fi`
+
+test_rpc_socket_server.o: test/test_rpc_socket_server.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_rpc_socket_server.o -MD -MP -MF $(DEPDIR)/test_rpc_socket_server.Tpo -c -o test_rpc_socket_server.o `test -f 'test/test_rpc_socket_server.c' || echo '$(srcdir)/'`test/test_rpc_socket_server.c
+	mv -f $(DEPDIR)/test_rpc_socket_server.Tpo $(DEPDIR)/test_rpc_socket_server.Po
+#	source='test/test_rpc_socket_server.c' object='test_rpc_socket_server.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_rpc_socket_server.o `test -f 'test/test_rpc_socket_server.c' || echo '$(srcdir)/'`test/test_rpc_socket_server.c
+
+test_rpc_socket_server.obj: test/test_rpc_socket_server.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_rpc_socket_server.obj -MD -MP -MF $(DEPDIR)/test_rpc_socket_server.Tpo -c -o test_rpc_socket_server.obj `if test -f 'test/test_rpc_socket_server.c'; then $(CYGPATH_W) 'test/test_rpc_socket_server.c'; else $(CYGPATH_W) '$(srcdir)/test/test_rpc_socket_server.c'; fi`
+	mv -f $(DEPDIR)/test_rpc_socket_server.Tpo $(DEPDIR)/test_rpc_socket_server.Po
+#	source='test/test_rpc_socket_server.c' object='test_rpc_socket_server.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_rpc_socket_server.obj `if test -f 'test/test_rpc_socket_server.c'; then $(CYGPATH_W) 'test/test_rpc_socket_server.c'; else $(CYGPATH_W) '$(srcdir)/test/test_rpc_socket_server.c'; fi`
 
 test_simple.o: test/test_simple.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_simple.o -MD -MP -MF $(DEPDIR)/test_simple.Tpo -c -o test_simple.o `test -f 'test/test_simple.c' || echo '$(srcdir)/'`test/test_simple.c

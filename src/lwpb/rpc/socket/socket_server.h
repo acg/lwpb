@@ -30,6 +30,7 @@ struct lwpb_service_socket_server {
     struct lwpb_service super;
     struct lwpb_client *client;
     struct lwpb_server *server;
+    int socket;
 };
 
 lwpb_service_t lwpb_service_socket_server_init(
@@ -37,6 +38,8 @@ lwpb_service_t lwpb_service_socket_server_init(
 
 lwpb_err_t lwpb_service_socket_server_bind(lwpb_service_t service,
                                            const char *host, uint16_t port);
+
+lwpb_err_t lwpb_service_socket_server_run(lwpb_service_t service);
 
 
 #endif // __LWPB_RPC_SOCKET_SERVER_H__

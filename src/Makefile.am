@@ -15,7 +15,12 @@ lwpb/rpc/socket/socket_server.c
 
 liblwpb_la_CFLAGS = -I./lwpb/core -I./lwpb/rpc
 
-bin_PROGRAMS = test_simple test_full test_full_generate test_rpc_direct
+bin_PROGRAMS = \
+test_simple \
+test_full \
+test_full_generate \
+test_rpc_direct \
+test_rpc_socket_server
 
 test_simple_SOURCES = \
 test/test_simple.c \
@@ -40,3 +45,9 @@ test/test_rpc_direct.c \
 test/generated/test_simple_pb2.c
 
 test_rpc_direct_LDADD = liblwpb.la
+
+test_rpc_socket_server_SOURCES = \
+test/test_rpc_socket_server.c \
+test/generated/test_simple_pb2.c
+
+test_rpc_socket_server_LDADD = liblwpb.la
