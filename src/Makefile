@@ -56,7 +56,7 @@ liblwpb_la_LIBADD =
 am_liblwpb_la_OBJECTS = liblwpb_la-buf.lo liblwpb_la-decoder.lo \
 	liblwpb_la-encoder.lo liblwpb_la-misc.lo liblwpb_la-client.lo \
 	liblwpb_la-server.lo liblwpb_la-service.lo \
-	liblwpb_la-tcp_server.lo
+	liblwpb_la-tcp_server.lo liblwpb_la-direct.lo
 liblwpb_la_OBJECTS = $(am_liblwpb_la_OBJECTS)
 liblwpb_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(liblwpb_la_CFLAGS) \
@@ -234,7 +234,8 @@ lwpb/core/misc.c \
 lwpb/rpc/client.c \
 lwpb/rpc/server.c \
 lwpb/rpc/service.c \
-lwpb/rpc/tcp_server.c
+lwpb/rpc/tcp_server.c \
+lwpb/rpc/direct/direct.c
 
 liblwpb_la_CFLAGS = -I./lwpb/core -I./lwpb/rpc
 test_simple_SOURCES = \
@@ -369,6 +370,7 @@ distclean-compile:
 include ./$(DEPDIR)/liblwpb_la-buf.Plo
 include ./$(DEPDIR)/liblwpb_la-client.Plo
 include ./$(DEPDIR)/liblwpb_la-decoder.Plo
+include ./$(DEPDIR)/liblwpb_la-direct.Plo
 include ./$(DEPDIR)/liblwpb_la-encoder.Plo
 include ./$(DEPDIR)/liblwpb_la-misc.Plo
 include ./$(DEPDIR)/liblwpb_la-server.Plo
@@ -458,6 +460,13 @@ liblwpb_la-tcp_server.lo: lwpb/rpc/tcp_server.c
 #	source='lwpb/rpc/tcp_server.c' object='liblwpb_la-tcp_server.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
 #	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -c -o liblwpb_la-tcp_server.lo `test -f 'lwpb/rpc/tcp_server.c' || echo '$(srcdir)/'`lwpb/rpc/tcp_server.c
+
+liblwpb_la-direct.lo: lwpb/rpc/direct/direct.c
+	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -MT liblwpb_la-direct.lo -MD -MP -MF $(DEPDIR)/liblwpb_la-direct.Tpo -c -o liblwpb_la-direct.lo `test -f 'lwpb/rpc/direct/direct.c' || echo '$(srcdir)/'`lwpb/rpc/direct/direct.c
+	mv -f $(DEPDIR)/liblwpb_la-direct.Tpo $(DEPDIR)/liblwpb_la-direct.Plo
+#	source='lwpb/rpc/direct/direct.c' object='liblwpb_la-direct.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -c -o liblwpb_la-direct.lo `test -f 'lwpb/rpc/direct/direct.c' || echo '$(srcdir)/'`lwpb/rpc/direct/direct.c
 
 test3.o: test/test3.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test3.o -MD -MP -MF $(DEPDIR)/test3.Tpo -c -o test3.o `test -f 'test/test3.c' || echo '$(srcdir)/'`test/test3.c

@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include <lwpb/lwpb.h>
+#include <lwpb/rpc/direct/direct.h>
 
 #include "generated/test_simple_pb2.h"
 
@@ -45,9 +46,13 @@ static lwpb_err_t client_response_handler(
 
 static void client_call_done_handler(
     struct lwpb_client *client, const struct lwpb_method_desc *method_desc,
-    lwpb_call_result_t result, void *arg)
+    lwpb_rpc_result_t result, void *arg)
 {
-    
+    switch (result) {
+    case LWPB_RPC_OK: printf("Client: Result = OK\n"); break;
+    case LWPB_RPC_NOT_CONNECTED: printf("Client: Result = Not connected\n"); break;
+    case LWPB_RPC_FAILED: printf("Client: Result = Failed\n"); break;
+    }
 }
 
 // Server handlers
@@ -94,21 +99,20 @@ int main()
 {
     lwpb_err_t ret;
     
-    struct lwpb_service service;
+    struct lwpb_service_direct service_direct;
+    lwpb_service_t service;
     struct lwpb_client client;
     struct lwpb_server server;
-
-    lwpb_service_init(&service, NULL,
-                      &client, NULL,
-                      &server, NULL);
     
-    lwpb_client_init(&client, &service);
+    service = lwpb_service_direct_init(&service_direct);
+    
+    lwpb_client_init(&client, service);
     lwpb_client_handler(&client,
                         client_request_handler,
                         client_response_handler,
                         client_call_done_handler);
     
-    lwpb_server_init(&server, &service);
+    lwpb_server_init(&server, service);
     lwpb_server_handler(&server, server_request_handler);
     
     lwpb_client_call(&client, test_Search_search_by_name);
