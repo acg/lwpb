@@ -2,8 +2,6 @@
 #include <stdio.h>
 
 #include <lwpb/lwpb.h>
-#include <lwpb/client.h>
-#include <lwpb/server.h>
 #include <lwpb/service.h>
 
 #include "generated/test_simple_pb2.h"

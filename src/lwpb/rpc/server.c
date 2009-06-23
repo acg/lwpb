@@ -24,7 +24,6 @@
 #include <string.h>
 
 #include <lwpb/lwpb.h>
-#include <lwpb/server.h>
 
 /**
  * Initializes the server.

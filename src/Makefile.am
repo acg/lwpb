@@ -7,12 +7,12 @@ lwpb/core/buf.c \
 lwpb/core/decoder.c \
 lwpb/core/encoder.c \
 lwpb/core/misc.c \
-lwpb/client.c \
-lwpb/server.c \
+lwpb/rpc/client.c \
+lwpb/rpc/server.c \
 lwpb/service.c \
 lwpb/service/tcp_server.c
 
-liblwpb_la_CFLAGS = -I${top_dir}/lwpb/core
+liblwpb_la_CFLAGS = -I./lwpb/core -I./lwpb/rpc
 
 bin_PROGRAMS = test_simple test_full test_full_generate test3
 

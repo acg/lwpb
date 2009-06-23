@@ -18,8 +18,8 @@
  * limitations under the License.
  */
 
-#ifndef __LWPB_CLIENT_H__
-#define __LWPB_CLIENT_H__
+#ifndef __LWPB_RPC_CLIENT_H__
+#define __LWPB_RPC_CLIENT_H__
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -93,4 +93,4 @@ void lwpb_client_handler(struct lwpb_client *client,
 lwpb_err_t lwpb_client_call(struct lwpb_client *client,
                             const struct lwpb_method_desc *method_desc);
 
-#endif // __LWPB_CLIENT_H__
+#endif // __LWPB_RPC_CLIENT_H__

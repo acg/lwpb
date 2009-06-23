@@ -231,12 +231,12 @@ lwpb/core/buf.c \
 lwpb/core/decoder.c \
 lwpb/core/encoder.c \
 lwpb/core/misc.c \
-lwpb/client.c \
-lwpb/server.c \
+lwpb/rpc/client.c \
+lwpb/rpc/server.c \
 lwpb/service.c \
 lwpb/service/tcp_server.c
 
-liblwpb_la_CFLAGS = -I${top_dir}/lwpb/core
+liblwpb_la_CFLAGS = -I./lwpb/core -I./lwpb/rpc
 test_simple_SOURCES = \
 test/test_simple.c \
 test/generated/test_simple_pb2.c
@@ -431,19 +431,19 @@ liblwpb_la-misc.lo: lwpb/core/misc.c
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
 #	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -c -o liblwpb_la-misc.lo `test -f 'lwpb/core/misc.c' || echo '$(srcdir)/'`lwpb/core/misc.c
 
-liblwpb_la-client.lo: lwpb/client.c
-	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -MT liblwpb_la-client.lo -MD -MP -MF $(DEPDIR)/liblwpb_la-client.Tpo -c -o liblwpb_la-client.lo `test -f 'lwpb/client.c' || echo '$(srcdir)/'`lwpb/client.c
+liblwpb_la-client.lo: lwpb/rpc/client.c
+	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -MT liblwpb_la-client.lo -MD -MP -MF $(DEPDIR)/liblwpb_la-client.Tpo -c -o liblwpb_la-client.lo `test -f 'lwpb/rpc/client.c' || echo '$(srcdir)/'`lwpb/rpc/client.c
 	mv -f $(DEPDIR)/liblwpb_la-client.Tpo $(DEPDIR)/liblwpb_la-client.Plo
-#	source='lwpb/client.c' object='liblwpb_la-client.lo' libtool=yes \
+#	source='lwpb/rpc/client.c' object='liblwpb_la-client.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -c -o liblwpb_la-client.lo `test -f 'lwpb/client.c' || echo '$(srcdir)/'`lwpb/client.c
+#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -c -o liblwpb_la-client.lo `test -f 'lwpb/rpc/client.c' || echo '$(srcdir)/'`lwpb/rpc/client.c
 
-liblwpb_la-server.lo: lwpb/server.c
-	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -MT liblwpb_la-server.lo -MD -MP -MF $(DEPDIR)/liblwpb_la-server.Tpo -c -o liblwpb_la-server.lo `test -f 'lwpb/server.c' || echo '$(srcdir)/'`lwpb/server.c
+liblwpb_la-server.lo: lwpb/rpc/server.c
+	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -MT liblwpb_la-server.lo -MD -MP -MF $(DEPDIR)/liblwpb_la-server.Tpo -c -o liblwpb_la-server.lo `test -f 'lwpb/rpc/server.c' || echo '$(srcdir)/'`lwpb/rpc/server.c
 	mv -f $(DEPDIR)/liblwpb_la-server.Tpo $(DEPDIR)/liblwpb_la-server.Plo
-#	source='lwpb/server.c' object='liblwpb_la-server.lo' libtool=yes \
+#	source='lwpb/rpc/server.c' object='liblwpb_la-server.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -c -o liblwpb_la-server.lo `test -f 'lwpb/server.c' || echo '$(srcdir)/'`lwpb/server.c
+#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -c -o liblwpb_la-server.lo `test -f 'lwpb/rpc/server.c' || echo '$(srcdir)/'`lwpb/rpc/server.c
 
 liblwpb_la-service.lo: lwpb/service.c
 	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -MT liblwpb_la-service.lo -MD -MP -MF $(DEPDIR)/liblwpb_la-service.Tpo -c -o liblwpb_la-service.lo `test -f 'lwpb/service.c' || echo '$(srcdir)/'`lwpb/service.c

@@ -25,8 +25,6 @@
 #include <stdlib.h>
 
 #include <lwpb/lwpb.h>
-#include <lwpb/client.h>
-#include <lwpb/server.h>
 
 /* Forward declaration */
 struct lwpb_client;

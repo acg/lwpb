@@ -18,8 +18,8 @@
  * limitations under the License.
  */
 
-#ifndef __LWPB_SERVER_H__
-#define __LWPB_SERVER_H__
+#ifndef __LWPB_RPC_SERVER_H__
+#define __LWPB_RPC_SERVER_H__
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -63,4 +63,4 @@ void lwpb_server_arg(struct lwpb_server *server, void *arg);
 void lwpb_server_handler(struct lwpb_server *server,
                          lwpb_server_request_handler_t request_handler);
 
-#endif // __LWPB_SERVER_H__
+#endif // __LWPB_RPC_SERVER_H__

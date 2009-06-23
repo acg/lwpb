@@ -25,5 +25,7 @@
 #include <lwpb/core/decoder.h>
 #include <lwpb/core/encoder.h>
 #include <lwpb/core/misc.h>
+#include <lwpb/rpc/client.h>
+#include <lwpb/rpc/server.h>
 
 #endif // __LWPB_H__
