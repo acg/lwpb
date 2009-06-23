@@ -10,8 +10,8 @@ lwpb/core/misc.c \
 lwpb/rpc/client.c \
 lwpb/rpc/server.c \
 lwpb/rpc/service.c \
-lwpb/rpc/tcp_server.c \
-lwpb/rpc/direct/direct.c
+lwpb/rpc/direct/direct.c \
+lwpb/rpc/socket/socket_server.c
 
 liblwpb_la_CFLAGS = -I./lwpb/core -I./lwpb/rpc
 

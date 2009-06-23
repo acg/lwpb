@@ -21,6 +21,7 @@
 #ifndef __LWPB_H__
 #define __LWPB_H__
 
+#include <lwpb/core/debug.h>
 #include <lwpb/core/types.h>
 #include <lwpb/core/decoder.h>
 #include <lwpb/core/encoder.h>

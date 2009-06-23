@@ -60,17 +60,6 @@
 #define LWPB_SERVICE_NAMES 1
 #endif
 
-/* Simple assert macro */
-#ifndef LWPB_ASSERT
-#define LWPB_ASSERT(expr, msg)                                              \
-    do {                                                                    \
-        if (!(expr)) {                                                      \
-            printf(msg);                                                    \
-            exit(0);                                                        \
-        }                                                                   \
-    } while (0)
-#endif
-
 /** Protocol buffer error codes */
 typedef enum {
     LWPB_ERR_OK,

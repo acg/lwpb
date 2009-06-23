@@ -1,7 +1,7 @@
 /**
- * @file direct.h
+ * @file socket_server.h
  * 
- * Direct RPC service implementation.
+ * Socket server RPC service implementation.
  * 
  * Copyright 2009 Simon Kallweit
  * 
@@ -18,20 +18,25 @@
  * limitations under the License.
  */
 
-#ifndef __LWPB_RPC_DIRECT_DIRECT_H__
-#define __LWPB_RPC_DIRECT_DIRECT_H__
+#ifndef __LWPB_RPC_SOCKET_SERVER_H__
+#define __LWPB_RPC_SOCKET_SERVER_H__
 
 #include <stdint.h>
 
 #include <lwpb/lwpb.h>
 
-/** Direct RPC service implementation */
-struct lwpb_service_direct {
+/** Socket server RPC service implementation */
+struct lwpb_service_socket_server {
     struct lwpb_service super;
     struct lwpb_client *client;
     struct lwpb_server *server;
 };
 
-lwpb_service_t lwpb_service_direct_init(struct lwpb_service_direct *service_direct);
+lwpb_service_t lwpb_service_socket_server_init(
+        struct lwpb_service_socket_server *service_socket_server);
 
-#endif // __LWPB_RPC_DIRECT_DIRECT_H__
+lwpb_err_t lwpb_service_socket_server_bind(lwpb_service_t service,
+                                           const char *host, uint16_t port);
+
+
+#endif // __LWPB_RPC_SOCKET_SERVER_H__
