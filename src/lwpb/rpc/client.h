@@ -1,7 +1,7 @@
 /**
  * @file client.h
  * 
- * Lightweight protocol buffers service client interface.
+ * Lightweight protocol buffers RPC client interface.
  * 
  * Copyright 2009 Simon Kallweit
  * 
@@ -27,12 +27,6 @@
 #include <lwpb/lwpb.h>
 #include <lwpb/service.h>
 
-/** RPC call results. */
-typedef enum {
-    LWPB_CALL_OK,
-    LWPB_CALL_FAILED,
-} lwpb_call_result_t;
-
 /* Forward declaration */
 struct lwpb_client;
 
@@ -42,8 +36,8 @@ struct lwpb_client;
  * @param client Client
  * @param method_desc Method descriptor
  * @param msg_desc Request message descriptor
- * @param buf Message buffer
- * @param len Length of message buffer
+ * @param buf Request message buffer
+ * @param len Length of request message buffer
  * @param arg User argument
  * @return Return LWPB_ERR_OK when message was successfully encoded.
  */
@@ -57,8 +51,8 @@ typedef lwpb_err_t (*lwpb_client_request_handler_t)
  * @param client Client
  * @param method_desc Method descriptor
  * @param msg_desc Response message descriptor
- * @param buf Message buffer
- * @param len Length of message buffer
+ * @param buf Response message buffer
+ * @param len Length of response message buffer
  * @param arg User argument
  * @return Return LWPB_ERR_OK when message was successfully decoded.
  */
@@ -66,19 +60,25 @@ typedef lwpb_err_t (*lwpb_client_response_handler_t)
     (struct lwpb_client *client, const struct lwpb_method_desc *method_desc,
      const struct lwpb_msg_desc *msg_desc, void *buf, size_t len, void *arg);
 
-
-typedef void (*lwpb_client_call_done_handler_t)
+/**
+ * This handler is called when the execution of an RPC call is done.
+ * @param client Client
+ * @param method_desc Method descriptor
+ * @param result Result code
+ * @param arg User argument
+ */
+typedef void (*lwpb_client_done_handler_t)
     (struct lwpb_client *client, const struct lwpb_method_desc *method_desc,
      lwpb_call_result_t result, void *arg);
 
 
-/** Protocol buffer service client */
+/** Protocol buffer RPC client */
 struct lwpb_client {
     struct lwpb_service *service;
     void *arg;
     lwpb_client_request_handler_t request_handler;
     lwpb_client_response_handler_t response_handler;
-    lwpb_client_call_done_handler_t call_done_handler;
+    lwpb_client_done_handler_t done_handler;
 };
 
 void lwpb_client_init(struct lwpb_client *client, struct lwpb_service *service);
@@ -88,9 +88,11 @@ void lwpb_client_arg(struct lwpb_client *client, void *arg);
 void lwpb_client_handler(struct lwpb_client *client,
                          lwpb_client_request_handler_t request_handler,
                          lwpb_client_response_handler_t response_handler,
-                         lwpb_client_call_done_handler_t call_done_handler);
+                         lwpb_client_done_handler_t done_handler);
 
 lwpb_err_t lwpb_client_call(struct lwpb_client *client,
                             const struct lwpb_method_desc *method_desc);
+
+void lwpb_client_cancel(struct lwpb_client *client);
 
 #endif // __LWPB_RPC_CLIENT_H__

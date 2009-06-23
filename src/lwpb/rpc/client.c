@@ -1,7 +1,7 @@
 /**
  * @file client.c
  * 
- * Implementation of the protocol buffers service client.
+ * Implementation of the protocol buffers RPC client.
  * 
  * Copyright 2009 Simon Kallweit
  * 
@@ -36,7 +36,7 @@ void lwpb_client_init(struct lwpb_client *client, struct lwpb_service *service)
     client->arg = NULL;
     client->request_handler = NULL;
     client->response_handler = NULL;
-    client->call_done_handler = NULL;
+    client->done_handler = NULL;
 }
 
 /**
@@ -50,32 +50,45 @@ void lwpb_client_arg(struct lwpb_client *client, void *arg)
 }
 
 /**
- * Sets the request and response message handlers.
+ * Sets the handlers.
  * @param client Client
  * @param request_handler Request message handler
  * @param response_handler Response message handler
- * @param call_done_handler_t Call done handler 
+ * @param done_handler Call done handler 
  */
 void lwpb_client_handler(struct lwpb_client *client,
                          lwpb_client_request_handler_t request_handler,
                          lwpb_client_response_handler_t response_handler,
-                         lwpb_client_call_done_handler_t call_done_handler)
+                         lwpb_client_done_handler_t done_handler)
 {
     client->request_handler = request_handler;
     client->response_handler = response_handler;
-    client->call_done_handler = call_done_handler;
+    client->done_handler = done_handler;
 }
 
-
-
+/**
+ * Starts an RPC call.
+ * @param client Client
+ * @param method_desc Method descriptor
+ * @return Returns LWPB_ERR_OK if successful.
+ */
 lwpb_err_t lwpb_client_call(struct lwpb_client *client,
                             const struct lwpb_method_desc *method_desc)
 {
     LWPB_ASSERT(client->service, "Service implementation missing");
     LWPB_ASSERT(client->request_handler, "Request handler missing");
     LWPB_ASSERT(client->response_handler, "Response handler missing");
-    LWPB_ASSERT(client->call_done_handler, "Call done handler missing");
+    LWPB_ASSERT(client->done_handler, "Call done handler missing");
     
     // Dispatch the call to the service implementation
     return client->service->client_funs->call(client->service, client, method_desc);
+}
+
+/**
+ * Cancels the currently running RPC call.
+ * @param client Client
+ */
+void lwpb_client_cancel(struct lwpb_client *client)
+{
+    
 }

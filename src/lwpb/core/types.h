@@ -176,8 +176,8 @@ struct lwpb_service_desc;
 /** Protocol buffer method descriptor */
 struct lwpb_method_desc {
     const struct lwpb_service_desc *service; /**< Service descriptor */
-    const struct lwpb_msg_desc *input; /**< Input message descriptor */ 
-    const struct lwpb_msg_desc *output; /**< Output message descriptor */
+    const struct lwpb_msg_desc *req_desc; /**< Request message descriptor */ 
+    const struct lwpb_msg_desc *res_desc; /**< Response message descriptor */
 #if LWPB_METHOD_NAMES
     const char *name;           /**< Method name */
 #endif
@@ -191,6 +191,12 @@ struct lwpb_service_desc {
     const char *name;           /**< Service name */
 #endif
 };
+
+/** RPC call results. */
+typedef enum {
+    LWPB_CALL_OK,
+    LWPB_CALL_FAILED,
+} lwpb_call_result_t;
 
 /** Simple memory buffer */
 struct lwpb_buf {

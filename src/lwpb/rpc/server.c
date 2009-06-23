@@ -1,7 +1,7 @@
 /**
  * @file server.c
  * 
- * Implementation of the protocol buffers service server.
+ * Implementation of the protocol buffers RPC server.
  * 
  * Copyright 2009 Simon Kallweit
  * 
@@ -34,7 +34,7 @@ void lwpb_server_init(struct lwpb_server *server, struct lwpb_service *service)
 {
     server->service = service;
     server->arg = NULL;
-    server->request_handler = NULL;
+    server->call_handler = NULL;
 }
 
 /**
@@ -50,10 +50,10 @@ void lwpb_server_arg(struct lwpb_server *server, void *arg)
 /**
  * Sets the request and response message handlers.
  * @param server Server
- * @param request_handler Request message handler
+ * @param call_handler RPC call handler
  */
 void lwpb_server_handler(struct lwpb_server *server,
-                         lwpb_server_request_handler_t request_handler)
+                         lwpb_server_call_handler_t call_handler)
 {
-    server->request_handler = request_handler;
+    server->call_handler = call_handler;
 }

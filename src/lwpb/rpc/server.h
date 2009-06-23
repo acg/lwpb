@@ -1,7 +1,7 @@
 /**
  * @file server.h
  * 
- * Lightweight protocol buffers service server interface.
+ * Lightweight protocol buffers RPC server interface.
  * 
  * Copyright 2009 Simon Kallweit
  * 
@@ -43,17 +43,17 @@ struct lwpb_server;
  * @param arg User argument
  * @return Return LWPB_ERR_OK when message was successfully encoded.
  */
-typedef lwpb_err_t (*lwpb_server_request_handler_t)
+typedef lwpb_err_t (*lwpb_server_call_handler_t)
     (struct lwpb_server *server, const struct lwpb_method_desc *method_desc,
      const struct lwpb_msg_desc *req_desc, void *req_buf, size_t req_len,
      const struct lwpb_msg_desc *res_desc, void *res_buf, size_t *res_len,
      void *arg);
 
-/** Protocol buffer service server */
+/** Protocol buffer RPC server */
 struct lwpb_server {
     struct lwpb_service *service;
     void *arg;
-    lwpb_server_request_handler_t request_handler;
+    lwpb_server_call_handler_t call_handler;
 };
 
 void lwpb_server_init(struct lwpb_server *server, struct lwpb_service *service);
@@ -61,6 +61,6 @@ void lwpb_server_init(struct lwpb_server *server, struct lwpb_service *service);
 void lwpb_server_arg(struct lwpb_server *server, void *arg);
 
 void lwpb_server_handler(struct lwpb_server *server,
-                         lwpb_server_request_handler_t request_handler);
+                         lwpb_server_call_handler_t call_handler);
 
 #endif // __LWPB_RPC_SERVER_H__

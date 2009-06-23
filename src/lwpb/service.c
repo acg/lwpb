@@ -62,7 +62,7 @@ static lwpb_err_t generic_client_call(struct lwpb_service *service,
         return ret;
 
     // Encode the request message
-    ret = client->request_handler(client, method_desc, method_desc->input,
+    ret = client->request_handler(client, method_desc, method_desc->req_desc,
                                   buf, &len, client->arg);
     if (ret != LWPB_ERR_OK) {
         // Free the data buffer
@@ -91,10 +91,10 @@ static lwpb_err_t generic_client_send_request(struct lwpb_service *service,
         return ret;
     
     // Process the request on the server
-    ret = service->server->request_handler(service->server, method_desc,
-                                           method_desc->input, buf, len,
-                                           method_desc->output, res_buf, &res_len,
-                                           service->server->arg);
+    ret = service->server->call_handler(service->server, method_desc,
+                                        method_desc->req_desc, buf, len,
+                                        method_desc->res_desc, res_buf, &res_len,
+                                        service->server->arg);
     if (ret != LWPB_ERR_OK) {
         lwpb_service_free_buf(service, res_buf);
         return ret;
@@ -102,7 +102,7 @@ static lwpb_err_t generic_client_send_request(struct lwpb_service *service,
     
     // Handle the response in the client
     ret = client->response_handler(client, method_desc,
-                                   method_desc->output, res_buf, res_len,
+                                   method_desc->res_desc, res_buf, res_len,
                                    client->arg);
     lwpb_service_free_buf(service, res_buf);
     return ret;
