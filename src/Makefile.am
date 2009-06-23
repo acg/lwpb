@@ -15,7 +15,7 @@ lwpb/rpc/direct/direct.c
 
 liblwpb_la_CFLAGS = -I./lwpb/core -I./lwpb/rpc
 
-bin_PROGRAMS = test_simple test_full test_full_generate test3
+bin_PROGRAMS = test_simple test_full test_full_generate test_rpc_direct
 
 test_simple_SOURCES = \
 test/test_simple.c \
@@ -35,8 +35,8 @@ test/generated/test_full.pb.cc
 
 test_full_generate_LDADD = /usr/lib/libprotobuf.la -lpthread
 
-test3_SOURCES = \
-test/test3.c \
+test_rpc_direct_SOURCES = \
+test/test_rpc_direct.c \
 test/generated/test_simple_pb2.c
 
-test3_LDADD = liblwpb.la
+test_rpc_direct_LDADD = liblwpb.la

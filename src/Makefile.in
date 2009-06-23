@@ -34,7 +34,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = test_simple$(EXEEXT) test_full$(EXEEXT) \
-	test_full_generate$(EXEEXT) test3$(EXEEXT)
+	test_full_generate$(EXEEXT) test_rpc_direct$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -63,9 +63,6 @@ liblwpb_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_test3_OBJECTS = test3.$(OBJEXT) test_simple_pb2.$(OBJEXT)
-test3_OBJECTS = $(am_test3_OBJECTS)
-test3_DEPENDENCIES = liblwpb.la
 am_test_full_OBJECTS = test_full.$(OBJEXT) test_full_pb2.$(OBJEXT)
 test_full_OBJECTS = $(am_test_full_OBJECTS)
 test_full_DEPENDENCIES = liblwpb.la
@@ -73,6 +70,10 @@ am_test_full_generate_OBJECTS = test_full_generate.$(OBJEXT) \
 	test_full.pb.$(OBJEXT)
 test_full_generate_OBJECTS = $(am_test_full_generate_OBJECTS)
 test_full_generate_DEPENDENCIES = /usr/lib/libprotobuf.la
+am_test_rpc_direct_OBJECTS = test_rpc_direct.$(OBJEXT) \
+	test_simple_pb2.$(OBJEXT)
+test_rpc_direct_OBJECTS = $(am_test_rpc_direct_OBJECTS)
+test_rpc_direct_DEPENDENCIES = liblwpb.la
 am_test_simple_OBJECTS = test_simple.$(OBJEXT) \
 	test_simple_pb2.$(OBJEXT)
 test_simple_OBJECTS = $(am_test_simple_OBJECTS)
@@ -98,10 +99,11 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(liblwpb_la_SOURCES) $(test3_SOURCES) $(test_full_SOURCES) \
-	$(test_full_generate_SOURCES) $(test_simple_SOURCES)
-DIST_SOURCES = $(liblwpb_la_SOURCES) $(test3_SOURCES) \
-	$(test_full_SOURCES) $(test_full_generate_SOURCES) \
+SOURCES = $(liblwpb_la_SOURCES) $(test_full_SOURCES) \
+	$(test_full_generate_SOURCES) $(test_rpc_direct_SOURCES) \
+	$(test_simple_SOURCES)
+DIST_SOURCES = $(liblwpb_la_SOURCES) $(test_full_SOURCES) \
+	$(test_full_generate_SOURCES) $(test_rpc_direct_SOURCES) \
 	$(test_simple_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
@@ -253,11 +255,11 @@ test/test_full_generate.cc \
 test/generated/test_full.pb.cc
 
 test_full_generate_LDADD = /usr/lib/libprotobuf.la -lpthread
-test3_SOURCES = \
-test/test3.c \
+test_rpc_direct_SOURCES = \
+test/test_rpc_direct.c \
 test/generated/test_simple_pb2.c
 
-test3_LDADD = liblwpb.la
+test_rpc_direct_LDADD = liblwpb.la
 all: all-recursive
 
 .SUFFIXES:
@@ -348,15 +350,15 @@ clean-binPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
-test3$(EXEEXT): $(test3_OBJECTS) $(test3_DEPENDENCIES) 
-	@rm -f test3$(EXEEXT)
-	$(LINK) $(test3_OBJECTS) $(test3_LDADD) $(LIBS)
 test_full$(EXEEXT): $(test_full_OBJECTS) $(test_full_DEPENDENCIES) 
 	@rm -f test_full$(EXEEXT)
 	$(LINK) $(test_full_OBJECTS) $(test_full_LDADD) $(LIBS)
 test_full_generate$(EXEEXT): $(test_full_generate_OBJECTS) $(test_full_generate_DEPENDENCIES) 
 	@rm -f test_full_generate$(EXEEXT)
 	$(CXXLINK) $(test_full_generate_OBJECTS) $(test_full_generate_LDADD) $(LIBS)
+test_rpc_direct$(EXEEXT): $(test_rpc_direct_OBJECTS) $(test_rpc_direct_DEPENDENCIES) 
+	@rm -f test_rpc_direct$(EXEEXT)
+	$(LINK) $(test_rpc_direct_OBJECTS) $(test_rpc_direct_LDADD) $(LIBS)
 test_simple$(EXEEXT): $(test_simple_OBJECTS) $(test_simple_DEPENDENCIES) 
 	@rm -f test_simple$(EXEEXT)
 	$(LINK) $(test_simple_OBJECTS) $(test_simple_LDADD) $(LIBS)
@@ -376,11 +378,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblwpb_la-server.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblwpb_la-service.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblwpb_la-tcp_server.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test3.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_full.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_full.pb.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_full_generate.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_full_pb2.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_rpc_direct.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_simple.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_simple_pb2.Po@am__quote@
 
@@ -468,34 +470,6 @@ liblwpb_la-direct.lo: lwpb/rpc/direct/direct.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -c -o liblwpb_la-direct.lo `test -f 'lwpb/rpc/direct/direct.c' || echo '$(srcdir)/'`lwpb/rpc/direct/direct.c
 
-test3.o: test/test3.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test3.o -MD -MP -MF $(DEPDIR)/test3.Tpo -c -o test3.o `test -f 'test/test3.c' || echo '$(srcdir)/'`test/test3.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/test3.Tpo $(DEPDIR)/test3.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='test/test3.c' object='test3.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test3.o `test -f 'test/test3.c' || echo '$(srcdir)/'`test/test3.c
-
-test3.obj: test/test3.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test3.obj -MD -MP -MF $(DEPDIR)/test3.Tpo -c -o test3.obj `if test -f 'test/test3.c'; then $(CYGPATH_W) 'test/test3.c'; else $(CYGPATH_W) '$(srcdir)/test/test3.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/test3.Tpo $(DEPDIR)/test3.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='test/test3.c' object='test3.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test3.obj `if test -f 'test/test3.c'; then $(CYGPATH_W) 'test/test3.c'; else $(CYGPATH_W) '$(srcdir)/test/test3.c'; fi`
-
-test_simple_pb2.o: test/generated/test_simple_pb2.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_simple_pb2.o -MD -MP -MF $(DEPDIR)/test_simple_pb2.Tpo -c -o test_simple_pb2.o `test -f 'test/generated/test_simple_pb2.c' || echo '$(srcdir)/'`test/generated/test_simple_pb2.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/test_simple_pb2.Tpo $(DEPDIR)/test_simple_pb2.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='test/generated/test_simple_pb2.c' object='test_simple_pb2.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_simple_pb2.o `test -f 'test/generated/test_simple_pb2.c' || echo '$(srcdir)/'`test/generated/test_simple_pb2.c
-
-test_simple_pb2.obj: test/generated/test_simple_pb2.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_simple_pb2.obj -MD -MP -MF $(DEPDIR)/test_simple_pb2.Tpo -c -o test_simple_pb2.obj `if test -f 'test/generated/test_simple_pb2.c'; then $(CYGPATH_W) 'test/generated/test_simple_pb2.c'; else $(CYGPATH_W) '$(srcdir)/test/generated/test_simple_pb2.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/test_simple_pb2.Tpo $(DEPDIR)/test_simple_pb2.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='test/generated/test_simple_pb2.c' object='test_simple_pb2.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_simple_pb2.obj `if test -f 'test/generated/test_simple_pb2.c'; then $(CYGPATH_W) 'test/generated/test_simple_pb2.c'; else $(CYGPATH_W) '$(srcdir)/test/generated/test_simple_pb2.c'; fi`
-
 test_full.o: test/test_full.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_full.o -MD -MP -MF $(DEPDIR)/test_full.Tpo -c -o test_full.o `test -f 'test/test_full.c' || echo '$(srcdir)/'`test/test_full.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/test_full.Tpo $(DEPDIR)/test_full.Po
@@ -523,6 +497,34 @@ test_full_pb2.obj: test/generated/test_full_pb2.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='test/generated/test_full_pb2.c' object='test_full_pb2.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_full_pb2.obj `if test -f 'test/generated/test_full_pb2.c'; then $(CYGPATH_W) 'test/generated/test_full_pb2.c'; else $(CYGPATH_W) '$(srcdir)/test/generated/test_full_pb2.c'; fi`
+
+test_rpc_direct.o: test/test_rpc_direct.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_rpc_direct.o -MD -MP -MF $(DEPDIR)/test_rpc_direct.Tpo -c -o test_rpc_direct.o `test -f 'test/test_rpc_direct.c' || echo '$(srcdir)/'`test/test_rpc_direct.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/test_rpc_direct.Tpo $(DEPDIR)/test_rpc_direct.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='test/test_rpc_direct.c' object='test_rpc_direct.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_rpc_direct.o `test -f 'test/test_rpc_direct.c' || echo '$(srcdir)/'`test/test_rpc_direct.c
+
+test_rpc_direct.obj: test/test_rpc_direct.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_rpc_direct.obj -MD -MP -MF $(DEPDIR)/test_rpc_direct.Tpo -c -o test_rpc_direct.obj `if test -f 'test/test_rpc_direct.c'; then $(CYGPATH_W) 'test/test_rpc_direct.c'; else $(CYGPATH_W) '$(srcdir)/test/test_rpc_direct.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/test_rpc_direct.Tpo $(DEPDIR)/test_rpc_direct.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='test/test_rpc_direct.c' object='test_rpc_direct.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_rpc_direct.obj `if test -f 'test/test_rpc_direct.c'; then $(CYGPATH_W) 'test/test_rpc_direct.c'; else $(CYGPATH_W) '$(srcdir)/test/test_rpc_direct.c'; fi`
+
+test_simple_pb2.o: test/generated/test_simple_pb2.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_simple_pb2.o -MD -MP -MF $(DEPDIR)/test_simple_pb2.Tpo -c -o test_simple_pb2.o `test -f 'test/generated/test_simple_pb2.c' || echo '$(srcdir)/'`test/generated/test_simple_pb2.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/test_simple_pb2.Tpo $(DEPDIR)/test_simple_pb2.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='test/generated/test_simple_pb2.c' object='test_simple_pb2.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_simple_pb2.o `test -f 'test/generated/test_simple_pb2.c' || echo '$(srcdir)/'`test/generated/test_simple_pb2.c
+
+test_simple_pb2.obj: test/generated/test_simple_pb2.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_simple_pb2.obj -MD -MP -MF $(DEPDIR)/test_simple_pb2.Tpo -c -o test_simple_pb2.obj `if test -f 'test/generated/test_simple_pb2.c'; then $(CYGPATH_W) 'test/generated/test_simple_pb2.c'; else $(CYGPATH_W) '$(srcdir)/test/generated/test_simple_pb2.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/test_simple_pb2.Tpo $(DEPDIR)/test_simple_pb2.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='test/generated/test_simple_pb2.c' object='test_simple_pb2.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_simple_pb2.obj `if test -f 'test/generated/test_simple_pb2.c'; then $(CYGPATH_W) 'test/generated/test_simple_pb2.c'; else $(CYGPATH_W) '$(srcdir)/test/generated/test_simple_pb2.c'; fi`
 
 test_simple.o: test/test_simple.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_simple.o -MD -MP -MF $(DEPDIR)/test_simple.Tpo -c -o test_simple.o `test -f 'test/test_simple.c' || echo '$(srcdir)/'`test/test_simple.c
