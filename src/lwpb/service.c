@@ -38,7 +38,6 @@ static lwpb_err_t generic_alloc_buf(void **buf, size_t *len)
     return LWPB_ERR_OK;
 }
 
-
 static void generic_free_buf(void *buf)
 {
     free(buf);

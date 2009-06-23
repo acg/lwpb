@@ -46,11 +46,6 @@ struct lwpb_client_funs {
                                struct lwpb_client *client,
                                const struct lwpb_method_desc *method_desc,
                                void *buf, size_t len);
-    
-    lwpb_err_t (*request)(struct lwpb_service *service,
-                          const struct lwpb_method_desc *method_desc,
-                          const struct lwpb_msg_desc *msg_desc,
-                          void *buf, size_t len);
 };
 
 struct lwpb_server_funs {
