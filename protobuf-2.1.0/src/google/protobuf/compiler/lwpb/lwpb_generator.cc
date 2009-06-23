@@ -645,8 +645,8 @@ void Generator::PrintServiceMethods(
     c_printer_->Print(m,
         "    {\n"
         "        .service = $service$,\n"
-        "        .input = $input$,\n"
-        "        .output = $output$,\n"
+        "        .req_desc = $input$,\n"
+        "        .res_desc = $output$,\n"
         "#if LWPB_METHOD_NAMES\n"
         "        .name = \"$name$\",\n"
         "#endif\n"
