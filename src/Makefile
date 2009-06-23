@@ -233,8 +233,8 @@ lwpb/core/encoder.c \
 lwpb/core/misc.c \
 lwpb/rpc/client.c \
 lwpb/rpc/server.c \
-lwpb/service.c \
-lwpb/service/tcp_server.c
+lwpb/rpc/service.c \
+lwpb/rpc/tcp_server.c
 
 liblwpb_la_CFLAGS = -I./lwpb/core -I./lwpb/rpc
 test_simple_SOURCES = \
@@ -445,19 +445,19 @@ liblwpb_la-server.lo: lwpb/rpc/server.c
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
 #	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -c -o liblwpb_la-server.lo `test -f 'lwpb/rpc/server.c' || echo '$(srcdir)/'`lwpb/rpc/server.c
 
-liblwpb_la-service.lo: lwpb/service.c
-	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -MT liblwpb_la-service.lo -MD -MP -MF $(DEPDIR)/liblwpb_la-service.Tpo -c -o liblwpb_la-service.lo `test -f 'lwpb/service.c' || echo '$(srcdir)/'`lwpb/service.c
+liblwpb_la-service.lo: lwpb/rpc/service.c
+	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -MT liblwpb_la-service.lo -MD -MP -MF $(DEPDIR)/liblwpb_la-service.Tpo -c -o liblwpb_la-service.lo `test -f 'lwpb/rpc/service.c' || echo '$(srcdir)/'`lwpb/rpc/service.c
 	mv -f $(DEPDIR)/liblwpb_la-service.Tpo $(DEPDIR)/liblwpb_la-service.Plo
-#	source='lwpb/service.c' object='liblwpb_la-service.lo' libtool=yes \
+#	source='lwpb/rpc/service.c' object='liblwpb_la-service.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -c -o liblwpb_la-service.lo `test -f 'lwpb/service.c' || echo '$(srcdir)/'`lwpb/service.c
+#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -c -o liblwpb_la-service.lo `test -f 'lwpb/rpc/service.c' || echo '$(srcdir)/'`lwpb/rpc/service.c
 
-liblwpb_la-tcp_server.lo: lwpb/service/tcp_server.c
-	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -MT liblwpb_la-tcp_server.lo -MD -MP -MF $(DEPDIR)/liblwpb_la-tcp_server.Tpo -c -o liblwpb_la-tcp_server.lo `test -f 'lwpb/service/tcp_server.c' || echo '$(srcdir)/'`lwpb/service/tcp_server.c
+liblwpb_la-tcp_server.lo: lwpb/rpc/tcp_server.c
+	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -MT liblwpb_la-tcp_server.lo -MD -MP -MF $(DEPDIR)/liblwpb_la-tcp_server.Tpo -c -o liblwpb_la-tcp_server.lo `test -f 'lwpb/rpc/tcp_server.c' || echo '$(srcdir)/'`lwpb/rpc/tcp_server.c
 	mv -f $(DEPDIR)/liblwpb_la-tcp_server.Tpo $(DEPDIR)/liblwpb_la-tcp_server.Plo
-#	source='lwpb/service/tcp_server.c' object='liblwpb_la-tcp_server.lo' libtool=yes \
+#	source='lwpb/rpc/tcp_server.c' object='liblwpb_la-tcp_server.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -c -o liblwpb_la-tcp_server.lo `test -f 'lwpb/service/tcp_server.c' || echo '$(srcdir)/'`lwpb/service/tcp_server.c
+#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -c -o liblwpb_la-tcp_server.lo `test -f 'lwpb/rpc/tcp_server.c' || echo '$(srcdir)/'`lwpb/rpc/tcp_server.c
 
 test3.o: test/test3.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test3.o -MD -MP -MF $(DEPDIR)/test3.Tpo -c -o test3.o `test -f 'test/test3.c' || echo '$(srcdir)/'`test/test3.c

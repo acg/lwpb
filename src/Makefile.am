@@ -9,8 +9,8 @@ lwpb/core/encoder.c \
 lwpb/core/misc.c \
 lwpb/rpc/client.c \
 lwpb/rpc/server.c \
-lwpb/service.c \
-lwpb/service/tcp_server.c
+lwpb/rpc/service.c \
+lwpb/rpc/tcp_server.c
 
 liblwpb_la_CFLAGS = -I./lwpb/core -I./lwpb/rpc
 

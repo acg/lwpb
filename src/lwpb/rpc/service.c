@@ -1,7 +1,7 @@
 /**
  * @file service.c
  * 
- * Implementation of the protocol buffers service.
+ * Implementation of the protocol buffers RPC service.
  * 
  * Copyright 2009 Simon Kallweit
  * 
@@ -24,7 +24,6 @@
 #include <string.h>
 
 #include <lwpb/lwpb.h>
-#include <lwpb/service.h>
 
 // Generic allocator implementation
 

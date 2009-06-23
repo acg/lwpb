@@ -160,8 +160,8 @@ const struct lwpb_msg_desc lwpb_messages_test[] = {
 const struct lwpb_method_desc lwpb_methods_test_search[] = {
     {
         .service = test_Search,
-        .input = test_Name,
-        .output = test_LookupResult,
+        .req_desc = test_Name,
+        .res_desc = test_LookupResult,
 #if LWPB_METHOD_NAMES
         .name = "search_by_name",
 #endif

@@ -27,5 +27,6 @@
 #include <lwpb/core/misc.h>
 #include <lwpb/rpc/client.h>
 #include <lwpb/rpc/server.h>
+#include <lwpb/rpc/service.h>
 
 #endif // __LWPB_H__

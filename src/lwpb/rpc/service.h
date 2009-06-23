@@ -1,7 +1,7 @@
 /**
- * @file service_impl.h
+ * @file service.h
  * 
- * Lightweight protocol buffers service interface.
+ * Lightweight protocol buffers RPC service interface.
  * 
  * Copyright 2009 Simon Kallweit
  * 
@@ -18,8 +18,8 @@
  * limitations under the License.
  */
 
-#ifndef __LWPB_SERVICE_IMPL_H__
-#define __LWPB_SERVICE_IMPL_H__
+#ifndef __LWPB_RPC_SERVICE_H__
+#define __LWPB_RPC_SERVICE_H__
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -53,6 +53,7 @@ struct lwpb_server_funs {
                            void *buf, size_t len);
 };
 
+/** Protocol buffer RPC service */
 struct lwpb_service {
     const struct lwpb_allocator_funs *allocator_funs;
     struct lwpb_client *client;
@@ -73,4 +74,4 @@ lwpb_err_t lwpb_service_alloc_buf(struct lwpb_service *service,
 
 void lwpb_service_free_buf(struct lwpb_service *service, void *buf);
 
-#endif // __LWPB_SERVICE_IMPL_H__
+#endif // __LWPB_RPC_SERVICE_H__
