@@ -32,9 +32,14 @@
  */
 void lwpb_server_init(struct lwpb_server *server, struct lwpb_service *service)
 {
+    LWPB_ASSERT(service, "Service implementation missing");
+
     server->service = service;
     server->arg = NULL;
     server->call_handler = NULL;
+    
+    // Register the server in the service implementation
+    service->service_funs->register_server(service, server);
 }
 
 /**

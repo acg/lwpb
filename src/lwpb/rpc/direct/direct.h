@@ -1,7 +1,7 @@
 /**
- * @file lwpb.h
+ * @file direct.h
  * 
- * Lightweight protocol buffers.
+ * Direct RPC service implementation.
  * 
  * Copyright 2009 Simon Kallweit
  * 
@@ -18,15 +18,19 @@
  * limitations under the License.
  */
 
-#ifndef __LWPB_H__
-#define __LWPB_H__
+#ifndef __LWPB_RPC_DIRECT_DIRECT_H__
+#define __LWPB_RPC_DIRECT_DIRECT_H__
 
-#include <lwpb/core/types.h>
-#include <lwpb/core/decoder.h>
-#include <lwpb/core/encoder.h>
-#include <lwpb/core/misc.h>
-#include <lwpb/rpc/service.h>
-#include <lwpb/rpc/client.h>
-#include <lwpb/rpc/server.h>
+#include <stdint.h>
 
-#endif // __LWPB_H__
+#include <lwpb/lwpb.h>
+
+struct lwpb_service_direct {
+    struct lwpb_service super;
+    struct lwpb_client *client;
+    struct lwpb_server *server;
+};
+
+lwpb_service_t lwpb_service_direct_init(struct lwpb_service_direct *service_direct);
+
+#endif // __LWPB_RPC_DIRECT_DIRECT_H__

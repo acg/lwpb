@@ -76,6 +76,7 @@ typedef enum {
     LWPB_ERR_OK,
     LWPB_ERR_UNKNOWN_FIELD,
     LWPB_ERR_END_OF_BUF,
+    LWPB_ERR_MEM,
 } lwpb_err_t;
 
 /* Field labels */
@@ -192,11 +193,12 @@ struct lwpb_service_desc {
 #endif
 };
 
-/** RPC call results. */
+/** RPC result codes. */
 typedef enum {
-    LWPB_CALL_OK,
-    LWPB_CALL_FAILED,
-} lwpb_call_result_t;
+    LWPB_RPC_OK,                /**< Call was successfully processed on the server */
+    LWPB_RPC_NOT_CONNECTED,     /**< Not connected to the server */
+    LWPB_RPC_FAILED,            /**< Call failed to execute on the server */
+} lwpb_rpc_result_t;
 
 /** Simple memory buffer */
 struct lwpb_buf {

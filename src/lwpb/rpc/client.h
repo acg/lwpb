@@ -68,19 +68,19 @@ typedef lwpb_err_t (*lwpb_client_response_handler_t)
  */
 typedef void (*lwpb_client_done_handler_t)
     (struct lwpb_client *client, const struct lwpb_method_desc *method_desc,
-     lwpb_call_result_t result, void *arg);
+     lwpb_rpc_result_t result, void *arg);
 
 
 /** Protocol buffer RPC client */
 struct lwpb_client {
-    struct lwpb_service *service;
+    lwpb_service_t service;
     void *arg;
     lwpb_client_request_handler_t request_handler;
     lwpb_client_response_handler_t response_handler;
     lwpb_client_done_handler_t done_handler;
 };
 
-void lwpb_client_init(struct lwpb_client *client, struct lwpb_service *service);
+void lwpb_client_init(struct lwpb_client *client, lwpb_service_t service);
 
 void lwpb_client_arg(struct lwpb_client *client, void *arg);
 
