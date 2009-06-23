@@ -199,15 +199,6 @@ struct lwpb_buf {
     uint8_t *end;   /**< Buffers end address (first invalid byte) */
 };
 
-struct lwpb_client {
-    
-};
-
-lwpb_err_t lwpb_client_init(struct lwpb_client *client);
-
-lwpb_err_t lwpb_client_call(struct lwpb_client *client,
-                            const struct lwpb_method_desc *method_desc);
-
 
 const char *lwpb_err_text(lwpb_err_t err);
 
