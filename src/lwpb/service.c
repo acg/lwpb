@@ -26,8 +26,6 @@
 #include <lwpb/lwpb.h>
 #include <lwpb/service.h>
 
-#include "core/private.h"
-
 // Generic allocator implementation
 
 static lwpb_err_t generic_alloc_buf(void **buf, size_t *len)

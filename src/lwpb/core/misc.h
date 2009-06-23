@@ -1,7 +1,7 @@
 /**
- * @file lwpb.h
+ * @file misc.h
  * 
- * Lightweight protocol buffers.
+ * Misc functions.
  * 
  * Copyright 2009 Simon Kallweit
  * 
@@ -18,12 +18,11 @@
  * limitations under the License.
  */
 
-#ifndef __LWPB_H__
-#define __LWPB_H__
+#ifndef __LWPB_CORE_MISC_H__
+#define __LWPB_CORE_MISC_H__
 
-#include <lwpb/core/types.h>
-#include <lwpb/core/decoder.h>
-#include <lwpb/core/encoder.h>
-#include <lwpb/core/misc.h>
+#include <lwpb/lwpb.h>
 
-#endif // __LWPB_H__
+const char *lwpb_err_text(lwpb_err_t err);
+
+#endif // __LWPB_CORE_MISC_H__

@@ -26,8 +26,6 @@
 #include <lwpb/lwpb.h>
 #include <lwpb/client.h>
 
-#include "core/private.h"
-
 /**
  * Initializes the client.
  * @param client Client

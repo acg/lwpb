@@ -26,8 +26,6 @@
 #include <lwpb/lwpb.h>
 #include <lwpb/server.h>
 
-#include "core/private.h"
-
 /**
  * Initializes the server.
  * @param server Server

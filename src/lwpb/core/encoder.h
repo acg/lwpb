@@ -18,8 +18,8 @@
  * limitations under the License.
  */
 
-#ifndef __LWPB_ENCODER_H__
-#define __LWPB_ENCODER_H__
+#ifndef __LWPB_CORE_ENCODER_H__
+#define __LWPB_CORE_ENCODER_H__
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -98,4 +98,4 @@ lwpb_err_t lwpb_encoder_add_bytes(struct lwpb_encoder *encoder,
                                   uint8_t *data, size_t len);
 
 
-#endif // __LWPB_ENCODER_H__
+#endif // __LWPB_CORE_ENCODER_H__

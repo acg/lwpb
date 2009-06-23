@@ -3,8 +3,6 @@
 #include <string.h>
 
 #include <lwpb/lwpb.h>
-#include <lwpb/core/decoder.h>
-#include <lwpb/core/encoder.h>
 
 #include "generated/test2_pb2.h"
 #include "generated/test2_vectors.inc"

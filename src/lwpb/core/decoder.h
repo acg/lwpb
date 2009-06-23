@@ -18,8 +18,8 @@
  * limitations under the License.
  */
 
-#ifndef __LWPB_DECODER_H__
-#define __LWPB_DECODER_H__
+#ifndef __LWPB_CORE_DECODER_H__
+#define __LWPB_CORE_DECODER_H__
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -90,4 +90,4 @@ lwpb_err_t lwpb_decoder_decode(struct lwpb_decoder *decoder,
                                void *data, size_t len);
 
 
-#endif // __LWPB_DECODER_H__
+#endif // __LWPB_CORE_DECODER_H__

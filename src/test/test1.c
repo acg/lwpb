@@ -2,8 +2,6 @@
 #include <stdio.h>
 
 #include <lwpb/lwpb.h>
-#include <lwpb/core/decoder.h>
-#include <lwpb/core/encoder.h>
 
 #include "generated/test1_pb2.h"
 
