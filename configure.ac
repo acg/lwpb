@@ -1,4 +1,4 @@
-AC_INIT(src/lwpb/encoder.c)
+AC_INIT(src/lwpb/core/encoder.c)
 
 PACKAGE=lwpb
 VERSION=0.0.1

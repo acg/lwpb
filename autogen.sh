@@ -5,7 +5,7 @@
 # are automatically generated.
 
 # Check that we're being run from the right directory.
-if test ! -f src/lwpb/encoder.c; then
+if test ! -f src/lwpb/core/encoder.c; then
   cat >&2 << __EOF__
 Could not find source code.  Make sure you are running this script from the
 root of the distribution tree.
