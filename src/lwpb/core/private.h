@@ -18,8 +18,8 @@
  * limitations under the License.
  */
 
-#ifndef __PRIVATE_H__
-#define __PRIVATE_H__
+#ifndef __LWPB_CORE_PRIVATE_H__
+#define __LWPB_CORE_PRIVATE_H__
 
 #include <stdint.h>
 
@@ -48,4 +48,4 @@ size_t lwpb_buf_used(struct lwpb_buf *buf);
 
 size_t lwpb_buf_left(struct lwpb_buf *buf);
 
-#endif // __LWPB_PRIVATE_H__
+#endif // __LWPB_CORE_PRIVATE_H__
