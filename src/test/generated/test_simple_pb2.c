@@ -2,7 +2,7 @@
 
 #include <lwpb/lwpb.h>
 
-#include "test1_pb2.h"
+#include "test_simple_pb2.h"
 
 // 'PhoneNumber' field descriptors
 const struct lwpb_field_desc lwpb_fields_test_phonenumber[] = {

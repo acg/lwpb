@@ -14,14 +14,14 @@ lwpb/service/tcp_server.c
 
 liblwpb_la_CFLAGS = -I${top_dir}/lwpb/core
 
-bin_PROGRAMS = test1 test2 test2_generate test3
+bin_PROGRAMS = test_simple test2 test2_generate test3
 
-test1_SOURCES = \
-test/test1.c \
-test/generated/test1_pb2.c
+test_simple_SOURCES = \
+test/test_simple.c \
+test/generated/test_simple_pb2.c
 
-test1_CFLAGS = -I${top_dir}/test/generated
-test1_LDADD = liblwpb.la
+test_simple_CFLAGS = -I${top_dir}/test/generated
+test_simple_LDADD = liblwpb.la
 
 
 test2_SOURCES = \

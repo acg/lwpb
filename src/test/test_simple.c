@@ -3,7 +3,7 @@
 
 #include <lwpb/lwpb.h>
 
-#include "generated/test1_pb2.h"
+#include "generated/test_simple_pb2.h"
 
 int main()
 {
