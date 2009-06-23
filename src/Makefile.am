@@ -3,13 +3,16 @@ SUBDIRS = .
 lib_LTLIBRARIES = liblwpb.la
 
 liblwpb_la_SOURCES = \
-lwpb/buf.c \
+lwpb/core/buf.c \
+lwpb/core/decoder.c \
+lwpb/core/encoder.c \
+lwpb/core/misc.c \
 lwpb/client.c \
-lwpb/decoder.c \
-lwpb/encoder.c \
-lwpb/misc.c \
 lwpb/server.c \
-lwpb/service.c
+lwpb/service.c \
+lwpb/service/tcp_server.c
+
+liblwpb_la_CFLAGS = -I${top_dir}/lwpb/core
 
 bin_PROGRAMS = test1 test2 test2_generate test3
 

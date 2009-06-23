@@ -2,8 +2,8 @@
 #include <stdio.h>
 
 #include <lwpb/lwpb.h>
-#include <lwpb/decoder.h>
-#include <lwpb/encoder.h>
+#include <lwpb/core/decoder.h>
+#include <lwpb/core/encoder.h>
 #include <lwpb/client.h>
 #include <lwpb/server.h>
 #include <lwpb/service.h>

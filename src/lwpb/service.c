@@ -26,7 +26,7 @@
 #include <lwpb/lwpb.h>
 #include <lwpb/service.h>
 
-#include "private.h"
+#include "core/private.h"
 
 // Generic allocator implementation
 
