@@ -4,9 +4,8 @@
 
 #include <lwpb/lwpb.h>
 
-#include "generated/test2_pb2.h"
-#include "generated/test2_vectors.inc"
-
+#include "generated/test_full_pb2.h"
+#include "generated/test_full_vectors.inc"
 
 #define protobuf_c_boolean int
 #define TEST_ENUM_SMALL_TYPE_NAME  int
@@ -14,8 +13,7 @@
 #define TEST_ENUM_TYPE_NAME        int
 #define TEST_ENUM(NAME)            FOO_##NAME
 
-
-#include "test2_test_arrays.h"
+#include "test_full_arrays.h"
 
 #define ARRAY_SIZE(array) (sizeof(array) / sizeof((array)[0]))
 

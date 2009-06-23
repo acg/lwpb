@@ -6,7 +6,7 @@
 #include <lwpb/server.h>
 #include <lwpb/service.h>
 
-#include "generated/test1_pb2.h"
+#include "generated/test_simple_pb2.h"
 
 // Client handlers
 

@@ -2,7 +2,7 @@
 
 #include <lwpb/lwpb.h>
 
-#include "test2_pb2.h"
+#include "test_full_pb2.h"
 
 // 'SubMess' field descriptors
 const struct lwpb_field_desc lwpb_fields_foo_submess[] = {
@@ -1461,5 +1461,9 @@ const struct lwpb_msg_desc lwpb_messages_foo[] = {
         .name = "AllocValues",
 #endif
     },
+};
+
+// Service descriptors
+const struct lwpb_service_desc lwpb_services_foo[] = {
 };
 

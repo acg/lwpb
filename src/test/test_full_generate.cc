@@ -2,7 +2,7 @@
  * these are tested against eachother to make sure the c and c++ agree. */
 
 #define __STDC_LIMIT_MACROS
-#include "generated/test2.pb.h"
+#include "generated/test_full.pb.h"
 #include <inttypes.h>
 
 using namespace foo;
@@ -12,7 +12,7 @@ using namespace foo;
 #define TEST_ENUM_SMALL(NAME)      foo::NAME
 #define TEST_ENUM_TYPE_NAME        TestEnum
 #define TEST_ENUM(NAME)            foo::NAME
-#include "test2_test_arrays.h"
+#include "test_full_arrays.h"
 #define N_ELEMENTS(arr)   (sizeof(arr)/sizeof((arr)[0]))
 
 static void
