@@ -12,6 +12,8 @@ lwpb/rpc/server.c \
 lwpb/rpc/service.c \
 lwpb/rpc/direct/direct.c \
 lwpb/rpc/socket/socket_client.c \
+lwpb/rpc/socket/socket_header_pb2.c \
+lwpb/rpc/socket/socket_protocol.c \
 lwpb/rpc/socket/socket_server.c
 
 liblwpb_la_CFLAGS = -I./lwpb/core -I./lwpb/rpc
@@ -44,18 +46,18 @@ test_full_generate_LDADD = /usr/lib/libprotobuf.la -lpthread
 
 test_rpc_direct_SOURCES = \
 test/test_rpc_direct.c \
-test/generated/test_simple_pb2.c
+test/generated/test_rpc_pb2.c
 
 test_rpc_direct_LDADD = liblwpb.la
 
 test_rpc_socket_client_SOURCES = \
 test/test_rpc_socket_client.c \
-test/generated/test_simple_pb2.c
+test/generated/test_rpc_pb2.c
 
 test_rpc_socket_client_LDADD = liblwpb.la
 
 test_rpc_socket_server_SOURCES = \
 test/test_rpc_socket_server.c \
-test/generated/test_simple_pb2.c
+test/generated/test_rpc_pb2.c
 
 test_rpc_socket_server_LDADD = liblwpb.la
