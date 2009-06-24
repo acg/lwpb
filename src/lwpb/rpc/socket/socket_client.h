@@ -1,5 +1,5 @@
 /**
- * @file socket_server.h
+ * @file socket_client.h
  * 
  * Socket client RPC service implementation.
  * 
@@ -30,18 +30,15 @@ struct lwpb_service_socket_client {
     struct lwpb_service super;
     struct lwpb_client *client;
     int socket;
-    int terminate;
 };
 
-lwpb_service_t lwpb_service_socket_client_init(
-        struct lwpb_service_socket_client *service_socket_client);
+lwpb_service_t lwpb_service_socket_client_init(struct lwpb_service_socket_client *socket_client);
 
 lwpb_err_t lwpb_service_socket_client_open(lwpb_service_t service,
                                            const char *host, uint16_t port);
 
-lwpb_err_t lwpb_service_socket_client_run(lwpb_service_t service);
+void lwpb_service_socket_client_close(lwpb_service_t service);
 
-void lwpb_service_socket_client_terminate(lwpb_service_t service);
-
+lwpb_err_t lwpb_service_socket_client_update(lwpb_service_t service);
 
 #endif // __LWPB_RPC_SOCKET_CLIENT_H__

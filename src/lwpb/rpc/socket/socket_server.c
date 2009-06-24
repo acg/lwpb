@@ -407,10 +407,8 @@ lwpb_err_t lwpb_service_socket_server_update(lwpb_service_t service)
     i = select(high + 1, &read_fds, NULL, NULL, &timeout);
     if (i < 0)
         LWPB_FAIL("select() failed");
-    if (i == 0) {
-        LWPB_DEBUG("no activity");
+    if (i == 0)
         return LWPB_ERR_OK;
-    }
     
     // Accept new connections
     if (FD_ISSET(socket_server->socket, &read_fds))

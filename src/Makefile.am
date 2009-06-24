@@ -11,6 +11,7 @@ lwpb/rpc/client.c \
 lwpb/rpc/server.c \
 lwpb/rpc/service.c \
 lwpb/rpc/direct/direct.c \
+lwpb/rpc/socket/socket_client.c \
 lwpb/rpc/socket/socket_server.c
 
 liblwpb_la_CFLAGS = -I./lwpb/core -I./lwpb/rpc
@@ -20,6 +21,7 @@ test_simple \
 test_full \
 test_full_generate \
 test_rpc_direct \
+test_rpc_socket_client \
 test_rpc_socket_server
 
 test_simple_SOURCES = \
@@ -45,6 +47,12 @@ test/test_rpc_direct.c \
 test/generated/test_simple_pb2.c
 
 test_rpc_direct_LDADD = liblwpb.la
+
+test_rpc_socket_client_SOURCES = \
+test/test_rpc_socket_client.c \
+test/generated/test_simple_pb2.c
+
+test_rpc_socket_client_LDADD = liblwpb.la
 
 test_rpc_socket_server_SOURCES = \
 test/test_rpc_socket_server.c \
