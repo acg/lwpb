@@ -26,10 +26,106 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
+#include <fcntl.h>
 
 #include <lwpb/lwpb.h>
 #include <lwpb/rpc/socket/socket_server.h>
 
+#include "protocol.h"
+
+
+/**
+ * Makes a socket non-blocking.
+ * @param sock
+ */
+static void make_nonblock(int sock)
+{
+    int opts;
+
+    opts = fcntl(sock, F_GETFL);
+    if (opts < 0)
+        LWPB_FAIL("fcntl(F_GETFL)");
+    opts = (opts | O_NONBLOCK);
+    if (fcntl(sock, F_SETFL,opts) < 0)
+        LWPB_FAIL("fcntl(F_SETFL)");
+}
+
+/**
+ * Accepts new connections on the listen socket.
+ * @param socket_server Socket server
+ */
+static void handle_new_connection(struct lwpb_service_socket_server *socket_server)
+{
+    int socket;
+    struct sockaddr_storage addr;
+    socklen_t len = sizeof(addr);
+    char tmp[16];
+    struct sockaddr_in *addr_in;
+    int i;
+    const char msg[] = "No more connections allowed\n";
+    
+    socket = accept(socket_server->socket, (struct sockaddr *) &addr, &len);
+    if (socket < 0) {
+        LWPB_ERR("Accepting new socket failed (errno: %d)", errno);
+        return;
+    }
+    
+    make_nonblock(socket);
+    
+    for (i = 0; i < LWPB_SERVICE_SOCKET_SERVER_CONNECTIONS; i++)
+        if (socket_server->client_sockets[i] == -1) {
+            addr_in = (struct sockaddr_in *) &addr;
+            inet_ntop(addr.ss_family, &addr_in->sin_addr, tmp, sizeof(tmp));
+            LWPB_DEBUG("Client(%d) accepted conncetion from %s", i, tmp);
+            socket_server->client_sockets[i] = socket;
+            socket_server->num_clients++;
+            return;
+        }
+    
+    // No more connections allowed
+    LWPB_DEBUG("No more connections allowed");
+    send(socket, msg, sizeof(msg), 0);
+    close(socket);
+}
+
+/**
+ * Closes a client connection.
+ * @param socket_server Socket server
+ * @param index Client index
+ */
+static void close_connection(struct lwpb_service_socket_server *socket_server,
+                             int index)
+{
+    int socket = socket_server->client_sockets[index];
+
+    LWPB_DEBUG("Client(%d) disconnected", index);
+    close(socket);
+    socket_server->client_sockets[index] = -1;
+    socket_server->num_clients--;
+}
+
+/**
+ * Handles incoming data on a client connection.
+ * @param socket_server Socket server
+ * @param index Client index
+ */
+static void handle_connection(struct lwpb_service_socket_server *socket_server,
+                              int index)
+{
+    int socket = socket_server->client_sockets[index];
+    uint8_t buf[1024];
+    ssize_t len;
+    
+    len = recv(socket, buf, sizeof(buf), 0);
+    if (len <= 0) {
+        close_connection(socket_server, index);
+        return;
+    }
+    
+    LWPB_DEBUG("Client(%d) received %d bytes", index, len);
+    
+    send(socket, buf, len, 0);
+}
 
 /**
  * This method is called from the client when it is registered with the
@@ -40,12 +136,7 @@
 static void service_register_client(lwpb_service_t service,
                                     struct lwpb_client *client)
 {
-    struct lwpb_service_socket_server *socket_server =
-        (struct lwpb_service_socket_server *) service;
-    
-    LWPB_ASSERT(!socket_server->client, "Only one client can be registered");
-    
-    socket_server->client = client;
+    LWPB_FAIL("No clients can be registered");
 }
 
 /**
@@ -162,12 +253,16 @@ static const struct lwpb_service_funs service_funs = {
 lwpb_service_t lwpb_service_socket_server_init(
         struct lwpb_service_socket_server *service_socket_server)
 {
+    int i;
+    
     LWPB_DEBUG("Initializing socket server");
     
     lwpb_service_init(&service_socket_server->super, &service_funs);
     
-    service_socket_server->client = NULL;
     service_socket_server->server = NULL;
+    service_socket_server->num_clients = 0;
+    for (i = 0; i < LWPB_SERVICE_SOCKET_SERVER_CONNECTIONS; i++)
+        service_socket_server->client_sockets[i] = -1;
     
     return &service_socket_server->super;
 }
@@ -217,7 +312,10 @@ lwpb_err_t lwpb_service_socket_server_bind(lwpb_service_t service,
     if (setsockopt(socket_server->socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) == -1) {
         LWPB_ERR("Cannot set SO_REUSEADDR (error: %d)", errno);
         return -1; // TODO memory leak
-    } 
+    }
+    
+    // Make non-blocking
+    make_nonblock(socket_server->socket);
     
     LWPB_DEBUG("Binding server socket to %s:%d", tmp, port);
     if (bind(socket_server->socket, res->ai_addr, res->ai_addrlen) == -1) {
@@ -237,23 +335,66 @@ lwpb_err_t lwpb_service_socket_server_run(lwpb_service_t service)
     char tmp[16];
     struct sockaddr_in *addr_in;
     int socket;
+    struct timeval timeout;
+    fd_set read_fds;
+    int i;
+    int high;
     
     LWPB_DEBUG("Start listening on server socket");
-    if (listen(socket_server->socket, 8) == -1) {
+    if (listen(socket_server->socket, LWPB_SERVICE_SOCKET_SERVER_CONNECTIONS) == -1) {
         LWPB_ERR("Cannot listen on server socket (errno: %d)", errno);
         return -1;
     }
     
-    LWPB_DEBUG("Waiting for connections");
-    while (1) {
-        if ((socket = accept(socket_server->socket, (struct sockaddr *) &addr, &len)) == -1) {
-            LWPB_ERR("Accepting socket failed (errno: %d)", errno);
-            return -1;
+    socket_server->terminate = 0;
+    while (!socket_server->terminate) {
+        timeout.tv_sec = 1;
+        timeout.tv_usec = 0;
+        
+        // Create set of active sockets
+        high = socket_server->socket;
+        FD_ZERO(&read_fds);
+        FD_SET(socket_server->socket, &read_fds);
+        for (i = 0; i < LWPB_SERVICE_SOCKET_SERVER_CONNECTIONS; i++)
+            if (socket_server->client_sockets[i] != -1) {
+                FD_SET(socket_server->client_sockets[i], &read_fds);
+                high = socket_server->client_sockets[i];
+            }
+        
+        // Wait for a socket to get active
+        i = select(high + 1, &read_fds, NULL, NULL, &timeout);
+        if (i < 0)
+            LWPB_FAIL("select() failed");
+        if (i == 0) {
+            LWPB_DEBUG("no activity");
+            continue;
         }
-        addr_in = (struct sockaddr_in *) &addr;
-        inet_ntop(addr.ss_family, &addr_in->sin_addr, tmp, sizeof(tmp));
-        LWPB_DEBUG("New connection from %s", tmp);
+        
+        // Accept new connections
+        if (FD_ISSET(socket_server->socket, &read_fds))
+            handle_new_connection(socket_server);
+        
+        // Handle active connections
+        for (i = 0; i < LWPB_SERVICE_SOCKET_SERVER_CONNECTIONS; i++) {
+            if (socket_server->client_sockets[i] != -1 &&
+                FD_ISSET(socket_server->client_sockets[i], &read_fds))
+                handle_connection(socket_server, i);
+        }
     }
-
     
+    // Close active connections
+    for (i = 0; i < LWPB_SERVICE_SOCKET_SERVER_CONNECTIONS; i++)
+        if (socket_server->client_sockets[i] != -1)
+            close_connection(socket_server, i);
+        
+    // Close listen socket
+    close(socket_server->socket);
+}
+
+void lwpb_service_socket_server_terminate(lwpb_service_t service)
+{
+    struct lwpb_service_socket_server *socket_server =
+        (struct lwpb_service_socket_server *) service;
+
+    socket_server->terminate = 1;
 }
