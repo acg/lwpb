@@ -78,13 +78,14 @@ int main()
         return 1;
     }
     
+    lwpb_client_call(&client, test_Search_search_by_name);
+    
     while (1) {
         ret = lwpb_service_socket_client_update(service);
         if (ret != LWPB_ERR_OK) {
             printf("Socket client failed\n");
             return 1;
         }
-        break;
     }
     
     lwpb_service_socket_client_close(service);
