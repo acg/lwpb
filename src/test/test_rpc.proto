@@ -1,0 +1,34 @@
+// Test protocol buffer definition.
+
+package test;
+
+message PhoneNumber {
+  enum PhoneType {
+    MOBILE = 0;
+    HOME = 1;
+    WORK = 2;
+  }
+  required string number = 1;
+  optional PhoneType type = 2 [default = HOME];
+}
+
+message Person {
+  required string name = 1;
+  required int32 id = 2;
+  optional string email = 3 [deprecated=true];
+
+  repeated PhoneNumber phone = 4;
+}
+
+message LookupResult
+{
+  optional Person person = 1;
+}
+
+message Name {
+  optional string name = 1;
+};
+
+service Search {
+  rpc search_by_name (Name) returns (LookupResult);
+}

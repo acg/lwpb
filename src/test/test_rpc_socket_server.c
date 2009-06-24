@@ -4,7 +4,7 @@
 #include <lwpb/lwpb.h>
 #include <lwpb/rpc/socket/socket_server.h>
 
-#include "generated/test_simple_pb2.h"
+#include "generated/test_rpc_pb2.h"
 
 // Server handlers
 

@@ -4,7 +4,7 @@
 #include <lwpb/lwpb.h>
 #include <lwpb/rpc/direct/direct.h>
 
-#include "generated/test_simple_pb2.h"
+#include "generated/test_rpc_pb2.h"
 
 // Client handlers
 
