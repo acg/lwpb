@@ -25,16 +25,22 @@
 #include <stdlib.h>
 
 /* Simple assert macro */
-#ifndef LWPB_ASSERT
 #define LWPB_ASSERT(expr, msg)                                              \
     do {                                                                    \
         if (!(expr)) {                                                      \
-            printf(msg);                                                    \
+            printf(msg "\n");                                               \
             exit(0);                                                        \
         }                                                                   \
     } while (0)
-#endif
 
+/* Simple failure macro */
+#define LWPB_FAIL(msg)                                                      \
+    do {                                                                    \
+        printf(msg "\n");                                                   \
+        exit(0);                                                            \
+    } while(0)
+
+/* Logging macros */
 #define LWPB_DEBUG(format, args...) printf("DBG: " format "\n", ##args)
 #define LWPB_INFO(format, args...) printf("INF: " format "\n", ##args)
 #define LWPB_ERR(format, args...) printf("ERR: " format "\n", ##args)
