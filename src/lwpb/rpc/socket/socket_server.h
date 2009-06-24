@@ -35,18 +35,15 @@ struct lwpb_service_socket_server {
     int num_clients;
     struct lwpb_client clients[LWPB_SERVICE_SOCKET_SERVER_CONNECTIONS];
     int client_sockets[LWPB_SERVICE_SOCKET_SERVER_CONNECTIONS];
-    int terminate;
 };
 
-lwpb_service_t lwpb_service_socket_server_init(
-        struct lwpb_service_socket_server *service_socket_server);
+lwpb_service_t lwpb_service_socket_server_init(struct lwpb_service_socket_server *socket_server);
 
-lwpb_err_t lwpb_service_socket_server_bind(lwpb_service_t service,
+lwpb_err_t lwpb_service_socket_server_open(lwpb_service_t service,
                                            const char *host, uint16_t port);
 
-lwpb_err_t lwpb_service_socket_server_run(lwpb_service_t service);
+void lwpb_service_socket_server_close(lwpb_service_t service);
 
-void lwpb_service_socket_server_terminate(lwpb_service_t service);
-
+lwpb_err_t lwpb_service_socket_server_update(lwpb_service_t service);
 
 #endif // __LWPB_RPC_SOCKET_SERVER_H__

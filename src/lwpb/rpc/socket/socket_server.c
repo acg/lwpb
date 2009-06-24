@@ -246,48 +246,55 @@ static const struct lwpb_service_funs service_funs = {
 };
 
 /**
- * Initializes the socket service service implementation.
- * @param service_socket_server Socket service data
- * @return Returns the service implementation handle.
+ * Initializes the socket server service implementation.
+ * @param socket_server Socket server service data
+ * @return Returns the service handle.
  */
 lwpb_service_t lwpb_service_socket_server_init(
-        struct lwpb_service_socket_server *service_socket_server)
+        struct lwpb_service_socket_server *socket_server)
 {
     int i;
     
     LWPB_DEBUG("Initializing socket server");
     
-    lwpb_service_init(&service_socket_server->super, &service_funs);
+    lwpb_service_init(&socket_server->super, &service_funs);
     
-    service_socket_server->server = NULL;
-    service_socket_server->num_clients = 0;
+    socket_server->server = NULL;
+    socket_server->socket = -1;
+    socket_server->num_clients = 0;
     for (i = 0; i < LWPB_SERVICE_SOCKET_SERVER_CONNECTIONS; i++)
-        service_socket_server->client_sockets[i] = -1;
+        socket_server->client_sockets[i] = -1;
     
-    return &service_socket_server->super;
+    return &socket_server->super;
 }
 
 /**
- * Binds the socket server to a TCP socket.
- * @param service Service implementation
+ * Opens the socket server for communication.
+ * @param service Service handle
  * @param host Hostname or IP address (using local address if NULL)
- * @param port Port number
+ * @param port Port number for listen port
+ * @return Returns LWPB_ERR_OK if successful.
  */
-lwpb_err_t lwpb_service_socket_server_bind(lwpb_service_t service,
+lwpb_err_t lwpb_service_socket_server_open(lwpb_service_t service,
                                            const char *host, uint16_t port)
 {
     struct lwpb_service_socket_server *socket_server =
         (struct lwpb_service_socket_server *) service;
+    lwpb_err_t ret = LWPB_ERR_OK;
     int status;
     struct addrinfo hints;
     struct addrinfo *res;
     struct sockaddr_in *addr;
     char tmp[16];
-    int yes=1;
-    //char yes='1'; // Solaris people use this TODO
+    int yes = 1;
     
+    if (socket_server->socket != -1) {
+        LWPB_INFO("Socket server already opened");
+        return LWPB_ERR_OK;
+    }
+
+    // Resolve hostname
     LWPB_DEBUG("Resolving hostname '%s'", host);
-    
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_INET;          // IPv4
     hints.ai_socktype = SOCK_STREAM;    // TCP stream sockets
@@ -295,92 +302,66 @@ lwpb_err_t lwpb_service_socket_server_bind(lwpb_service_t service,
     snprintf(tmp, sizeof(tmp), "%d", port);
     if ((status = getaddrinfo(host, tmp, &hints, &res)) != 0) {
         LWPB_ERR("getaddrinfo error: %s\n", gai_strerror(status));
-        return -1; // TODO memory leak
+        ret = LWPB_ERR_NET_INIT;
+        goto out;
     }
     addr = (struct sockaddr_in *) res->ai_addr;
     inet_ntop(res->ai_family, &addr->sin_addr, tmp, sizeof(tmp));
     
+    // Create server socket
     LWPB_DEBUG("Creating server socket");
-    
     socket_server->socket = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
     if (socket_server->socket == -1) {
         LWPB_ERR("Cannot create server socket");
-        return -1; // TODO memory leak
+        ret = LWPB_ERR_NET_INIT;
+        goto out;
     }
     
     // Reuse address if necessary
     if (setsockopt(socket_server->socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) == -1) {
         LWPB_ERR("Cannot set SO_REUSEADDR (error: %d)", errno);
-        return -1; // TODO memory leak
+        ret = LWPB_ERR_NET_INIT;
+        goto out;
     }
     
     // Make non-blocking
     make_nonblock(socket_server->socket);
     
+    // Bind listen socket
     LWPB_DEBUG("Binding server socket to %s:%d", tmp, port);
     if (bind(socket_server->socket, res->ai_addr, res->ai_addrlen) == -1) {
         LWPB_ERR("Cannot bind server socket (errno: %d)", errno);
-        return -1; // TODO memory leak
+        ret = LWPB_ERR_NET_INIT;
+        goto out;
     }
-    
-    freeaddrinfo(res);
-}
 
-lwpb_err_t lwpb_service_socket_server_run(lwpb_service_t service)
-{
-    struct lwpb_service_socket_server *socket_server =
-        (struct lwpb_service_socket_server *) service;
-    struct sockaddr_storage addr;
-    socklen_t len = sizeof(addr);
-    char tmp[16];
-    struct sockaddr_in *addr_in;
-    int socket;
-    struct timeval timeout;
-    fd_set read_fds;
-    int i;
-    int high;
-    
+    // Start listening
     LWPB_DEBUG("Start listening on server socket");
     if (listen(socket_server->socket, LWPB_SERVICE_SOCKET_SERVER_CONNECTIONS) == -1) {
         LWPB_ERR("Cannot listen on server socket (errno: %d)", errno);
-        return -1;
+        close(socket_server->socket);
+        ret = LWPB_ERR_NET_INIT;
+        goto out;
     }
     
-    socket_server->terminate = 0;
-    while (!socket_server->terminate) {
-        timeout.tv_sec = 1;
-        timeout.tv_usec = 0;
-        
-        // Create set of active sockets
-        high = socket_server->socket;
-        FD_ZERO(&read_fds);
-        FD_SET(socket_server->socket, &read_fds);
-        for (i = 0; i < LWPB_SERVICE_SOCKET_SERVER_CONNECTIONS; i++)
-            if (socket_server->client_sockets[i] != -1) {
-                FD_SET(socket_server->client_sockets[i], &read_fds);
-                high = socket_server->client_sockets[i];
-            }
-        
-        // Wait for a socket to get active
-        i = select(high + 1, &read_fds, NULL, NULL, &timeout);
-        if (i < 0)
-            LWPB_FAIL("select() failed");
-        if (i == 0) {
-            LWPB_DEBUG("no activity");
-            continue;
-        }
-        
-        // Accept new connections
-        if (FD_ISSET(socket_server->socket, &read_fds))
-            handle_new_connection(socket_server);
-        
-        // Handle active connections
-        for (i = 0; i < LWPB_SERVICE_SOCKET_SERVER_CONNECTIONS; i++) {
-            if (socket_server->client_sockets[i] != -1 &&
-                FD_ISSET(socket_server->client_sockets[i], &read_fds))
-                handle_connection(socket_server, i);
-        }
-    }
+out:
+    freeaddrinfo(res);
+    
+    return ret;
+}
+
+/**
+ * Closes the socket server.
+ * @param service Service handle
+ */
+void lwpb_service_socket_server_close(lwpb_service_t service)
+{
+    struct lwpb_service_socket_server *socket_server =
+        (struct lwpb_service_socket_server *) service;
+    int i;
+    
+    if (socket_server->socket == -1)
+        return;
     
     // Close active connections
     for (i = 0; i < LWPB_SERVICE_SOCKET_SERVER_CONNECTIONS; i++)
@@ -389,12 +370,58 @@ lwpb_err_t lwpb_service_socket_server_run(lwpb_service_t service)
         
     // Close listen socket
     close(socket_server->socket);
+    socket_server->socket == -1;
 }
 
-void lwpb_service_socket_server_terminate(lwpb_service_t service)
+/**
+ * Updates the socket server. This method needs to be called periodically.
+ * @param service Service handle
+ */
+lwpb_err_t lwpb_service_socket_server_update(lwpb_service_t service)
 {
     struct lwpb_service_socket_server *socket_server =
         (struct lwpb_service_socket_server *) service;
-
-    socket_server->terminate = 1;
+    int i;
+    int socket;
+    struct timeval timeout;
+    fd_set read_fds;
+    int high;
+    
+    if (socket_server->socket == -1)
+        return;
+    
+    timeout.tv_sec = 1;
+    timeout.tv_usec = 0;
+    
+    // Create set of active sockets
+    high = socket_server->socket;
+    FD_ZERO(&read_fds);
+    FD_SET(socket_server->socket, &read_fds);
+    for (i = 0; i < LWPB_SERVICE_SOCKET_SERVER_CONNECTIONS; i++)
+        if (socket_server->client_sockets[i] != -1) {
+            FD_SET(socket_server->client_sockets[i], &read_fds);
+            high = socket_server->client_sockets[i];
+        }
+    
+    // Wait for a socket to get active
+    i = select(high + 1, &read_fds, NULL, NULL, &timeout);
+    if (i < 0)
+        LWPB_FAIL("select() failed");
+    if (i == 0) {
+        LWPB_DEBUG("no activity");
+        return LWPB_ERR_OK;
+    }
+    
+    // Accept new connections
+    if (FD_ISSET(socket_server->socket, &read_fds))
+        handle_new_connection(socket_server);
+    
+    // Handle active connections
+    for (i = 0; i < LWPB_SERVICE_SOCKET_SERVER_CONNECTIONS; i++) {
+        if (socket_server->client_sockets[i] != -1 &&
+            FD_ISSET(socket_server->client_sockets[i], &read_fds))
+            handle_connection(socket_server, i);
+    }
+    
+    return LWPB_ERR_OK;
 }

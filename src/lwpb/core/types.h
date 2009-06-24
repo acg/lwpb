@@ -66,6 +66,8 @@ typedef enum {
     LWPB_ERR_UNKNOWN_FIELD,
     LWPB_ERR_END_OF_BUF,
     LWPB_ERR_MEM,
+    // Socket service error codes
+    LWPB_ERR_NET_INIT,
 } lwpb_err_t;
 
 /* Field labels */
