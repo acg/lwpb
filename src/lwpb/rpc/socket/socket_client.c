@@ -31,7 +31,7 @@
 #include <lwpb/lwpb.h>
 #include <lwpb/rpc/socket/socket_client.h>
 
-#include "protocol.h"
+#include "socket_protocol.h"
 
 
 /**
@@ -84,6 +84,13 @@ static lwpb_err_t service_call(lwpb_service_t service,
     void *req_buf = NULL;
     size_t req_len;
     
+    // Only continue if connected to server
+    if (socket_client->socket == -1) {
+        client->done_handler(client, method_desc,
+                             LWPB_RPC_NOT_CONNECTED, client->arg);
+        goto out;
+    }
+    
     // Allocate a buffer for the request message
     ret = lwpb_service_alloc_buf(service, &req_buf, &req_len);
     if (ret != LWPB_ERR_OK)
@@ -95,15 +102,10 @@ static lwpb_err_t service_call(lwpb_service_t service,
     if (ret != LWPB_ERR_OK)
         goto out;
     
-    // Only continue if connected to server
-    if (socket_client->socket == -1) {
-        client->done_handler(client, method_desc,
-                             LWPB_RPC_NOT_CONNECTED, client->arg);
-        goto out;
-    }
-    
     // Send the request to the server
-    // TODO
+    // TODO check result
+    send_request(socket_client->socket, method_desc, req_buf, req_len);
+    
 out:
     // Free allocated requiest message buffer
     if (req_buf)

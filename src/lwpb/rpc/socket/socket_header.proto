@@ -1,0 +1,14 @@
+
+package socket.header;
+
+enum MessageType {
+  REQUEST = 0;
+  RESPONSE = 1;   
+}
+
+message Header {
+  required MessageType type = 1;
+  required string service = 2;
+  required string method = 3;
+  required uint32 length = 4;
+};

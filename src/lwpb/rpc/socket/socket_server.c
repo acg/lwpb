@@ -31,7 +31,7 @@
 #include <lwpb/lwpb.h>
 #include <lwpb/rpc/socket/socket_server.h>
 
-#include "protocol.h"
+#include "socket_protocol.h"
 
 
 /**

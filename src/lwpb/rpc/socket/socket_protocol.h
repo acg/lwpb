@@ -1,5 +1,5 @@
 /**
- * @file protocol.h
+ * @file socket_protocol.h
  * 
  * Definitions for the socket RPC protocol.
  * 
@@ -25,15 +25,7 @@
 
 #include <lwpb/lwpb.h>
 
-typedef enum {
-    MSG_REQUEST,
-    MSG_RESPONSE,
-} rpc_message_t;
-
-struct rpc_header {
-    rpc_message_t msg;  /**< Message typ */
-    uint32_t method;    /**< Method id */
-    uint32_t len;       /**< Payload length */
-};
+int send_request(int socket, const struct lwpb_method_desc *method_desc,
+                 void *req_buf, size_t req_len);
 
 #endif // __LWPB_RPC_SOCKET_PROTOCOL_H__
