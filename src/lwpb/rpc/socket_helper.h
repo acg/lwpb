@@ -18,8 +18,8 @@
  * limitations under the License.
  */
 
-#ifndef __LWPB_RPC_SOCKET_PROTOCOL_H__
-#define __LWPB_RPC_SOCKET_PROTOCOL_H__
+#ifndef __LWPB_RPC_SOCKET_HELPER_H__
+#define __LWPB_RPC_SOCKET_HELPER_H__
 
 #include <stdint.h>
 
@@ -55,4 +55,4 @@ protocol_parse_err_t parse_request(void *buf, size_t len,
                                    struct protocol_header_info *info,
                                    const struct lwpb_service_desc **service_list);
 
-#endif // __LWPB_RPC_SOCKET_PROTOCOL_H__
+#endif // __LWPB_RPC_SOCKET_HELPER_H__
