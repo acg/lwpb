@@ -56,7 +56,7 @@ static void make_nonblock(int sock)
  * @param service Service implementation
  * @param client Client
  */
-static void service_register_client(lwpb_service_t service,
+static void service_register_client(lwpb_transport_t service,
                                     struct lwpb_client *client)
 {
     struct lwpb_service_socket_client *socket_client =
@@ -74,7 +74,7 @@ static void service_register_client(lwpb_service_t service,
  * @param method_desc Method descriptor
  * @return Returns LWPB_ERR_OK if successful.
  */
-static lwpb_err_t service_call(lwpb_service_t service,
+static lwpb_err_t service_call(lwpb_transport_t service,
                                struct lwpb_client *client,
                                const struct lwpb_method_desc *method_desc)
 {
@@ -92,7 +92,7 @@ static lwpb_err_t service_call(lwpb_service_t service,
     }
     
     // Allocate a buffer for the request message
-    ret = lwpb_service_alloc_buf(service, &req_buf, &req_len);
+    ret = lwpb_transport_alloc_buf(service, &req_buf, &req_len);
     if (ret != LWPB_ERR_OK)
         goto out;
     
@@ -109,7 +109,7 @@ static lwpb_err_t service_call(lwpb_service_t service,
 out:
     // Free allocated requiest message buffer
     if (req_buf)
-        lwpb_service_free_buf(service, req_buf);
+        lwpb_transport_free_buf(service, req_buf);
     
     return ret;
 }
@@ -120,7 +120,7 @@ out:
  * @param service Service implementation
  * @param client Client
  */
-static void service_cancel(lwpb_service_t service,
+static void service_cancel(lwpb_transport_t service,
                            struct lwpb_client *client)
 {
     // Cancel is not supported in this service implementation.
@@ -132,13 +132,13 @@ static void service_cancel(lwpb_service_t service,
  * @param service Service implementation
  * @param server Server
  */
-static void service_register_server(lwpb_service_t service,
+static void service_register_server(lwpb_transport_t service,
                                     struct lwpb_server *server)
 {
     LWPB_FAIL("No servers can be registered");
 }
 
-static const struct lwpb_service_funs service_funs = {
+static const struct lwpb_transport_funs service_funs = {
         .register_client = service_register_client,
         .call = service_call,
         .cancel = service_cancel,
@@ -154,14 +154,14 @@ static const struct lwpb_service_funs service_funs = {
  * @param socket_client Socket client service data
  * @return Returns the service handle.
  */
-lwpb_service_t lwpb_service_socket_client_init(
+lwpb_transport_t lwpb_service_socket_client_init(
         struct lwpb_service_socket_client *socket_client)
 {
     int i;
     
     LWPB_DEBUG("Initializing socket client");
     
-    lwpb_service_init(&socket_client->super, &service_funs);
+    lwpb_transport_init(&socket_client->super, &service_funs);
     
     socket_client->client = NULL;
     socket_client->socket = -1;
@@ -176,7 +176,7 @@ lwpb_service_t lwpb_service_socket_client_init(
  * @param port Port number for listen port
  * @return Returns LWPB_ERR_OK if successful.
  */
-lwpb_err_t lwpb_service_socket_client_open(lwpb_service_t service,
+lwpb_err_t lwpb_service_socket_client_open(lwpb_transport_t service,
                                            const char *host, uint16_t port)
 {
     struct lwpb_service_socket_client *socket_client =
@@ -246,7 +246,7 @@ out:
  * Closes the socket client.
  * @param service Service handle
  */
-void lwpb_service_socket_client_close(lwpb_service_t service)
+void lwpb_service_socket_client_close(lwpb_transport_t service)
 {
     struct lwpb_service_socket_client *socket_client =
         (struct lwpb_service_socket_client *) service;
@@ -264,7 +264,7 @@ void lwpb_service_socket_client_close(lwpb_service_t service)
  * Updates the socket client. This method needs to be called periodically.
  * @param service Service handle
  */
-lwpb_err_t lwpb_service_socket_client_update(lwpb_service_t service)
+lwpb_err_t lwpb_service_socket_client_update(lwpb_transport_t service)
 {
     struct lwpb_service_socket_client *socket_client =
         (struct lwpb_service_socket_client *) service;

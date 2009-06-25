@@ -50,7 +50,7 @@ int main()
 {
     lwpb_err_t ret;
     struct lwpb_service_socket_server service_socket_server;
-    lwpb_service_t service;
+    lwpb_transport_t service;
     struct lwpb_server server;
     
     service = lwpb_service_socket_server_init(&service_socket_server);

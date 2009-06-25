@@ -1,7 +1,7 @@
 /**
- * @file service.h
+ * @file transport.h
  * 
- * Lightweight protocol buffers RPC service interface.
+ * Lightweight protocol buffers RPC transport interface.
  * 
  * Copyright 2009 Simon Kallweit
  * 
@@ -18,8 +18,8 @@
  * limitations under the License.
  */
 
-#ifndef __LWPB_RPC_SERVICE_H__
-#define __LWPB_RPC_SERVICE_H__
+#ifndef __LWPB_RPC_TRANSPORT_H__
+#define __LWPB_RPC_TRANSPORT_H__
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -29,82 +29,82 @@
 /* Forward declaration */
 struct lwpb_client;
 struct lwpb_server;
-struct lwpb_service;
+struct lwpb_transport;
 
-/** RPC service implementation handle */
-typedef struct lwpb_service *lwpb_service_t;
+/** RPC transport implementation handle */
+typedef struct lwpb_transport *lwpb_transport_t;
 
-/** RPC service allocator functions */
+/** RPC transport allocator functions */
 struct lwpb_allocator_funs {
     /**
      * This method is called to allocate a new buffer.
-     * @param service Service implementation
+     * @param transport Transport implementation
      * @param buf Pointer to buffer
      * @param buf Pointer to length of buffer
      * @return Returns LWPB_ERR_OK when successful or LWPB_ERR_MEM if memory
      * could not be allocated.
      */
-    lwpb_err_t (*alloc_buf)(lwpb_service_t service, void **buf, size_t *len);
+    lwpb_err_t (*alloc_buf)(lwpb_transport_t transport, void **buf, size_t *len);
     
     /**
      * This method is called to free a buffer.
-     * @param service Service implementation
+     * @param transport Transport implementation
      * @param buf Buffer
      */
-    void (*free_buf)(lwpb_service_t service, void *buf);
+    void (*free_buf)(lwpb_transport_t transport, void *buf);
 };
 
-/** RPC service functions */
-struct lwpb_service_funs {
+/** RPC transport functions */
+struct lwpb_transport_funs {
     /**
      * This method is called from the client when it is registered with the
-     * service.
-     * @param service Service implementation
+     * transport.
+     * @param transport Transport implementation
      * @param client Client
      */
-    void (*register_client)(lwpb_service_t service, struct lwpb_client *client);
+    void (*register_client)(lwpb_transport_t transport, struct lwpb_client *client);
     /**
      * This method is called from the client to start an RPC call.
-     * @param service Service implementation
+     * @param transport Transport implementation
      * @param client Client
      * @param method_desc Method descriptor
      * @return Returns LWPB_ERR_OK if successful.
      */
-    lwpb_err_t (*call)(lwpb_service_t service,
+    lwpb_err_t (*call)(lwpb_transport_t transport,
                        struct lwpb_client *client,
                        const struct lwpb_method_desc *method_desc);
     /**
      * This method is called from the client when the current RPC call should
      * be cancelled.
-     * @param service Service implementation
+     * @param transport Transport implementation
      * @param client Client
      */
-    void (*cancel)(lwpb_service_t service,
+    void (*cancel)(lwpb_transport_t transport,
                    struct lwpb_client *client);
     /**
      * This method is called from the server when it is registered with the
-     * service.
-     * @param service Service implementation
+     * transport.
+     * @param transport Transport implementation
      * @param server Server
      */
-    void (*register_server)(lwpb_service_t service, struct lwpb_server *server);
+    void (*register_server)(lwpb_transport_t transport, struct lwpb_server *server);
 };
 
-/** RPC service base structure */
-struct lwpb_service {
+/** RPC transport base structure */
+struct lwpb_transport {
     const struct lwpb_allocator_funs *allocator_funs;
-    const struct lwpb_service_funs *service_funs;
+    const struct lwpb_transport_funs *transport_funs;
 };
 
-void lwpb_service_init(lwpb_service_t service,
-                       const struct lwpb_service_funs *service_funs);
+void lwpb_transport_init(lwpb_transport_t transport,
+                         const struct lwpb_transport_funs *transport_funs);
 
-void lwpb_service_set_allocator(lwpb_service_t service,
-                                const struct lwpb_allocator_funs *allocator_funs);
+void lwpb_transport_set_allocator(lwpb_transport_t transport,
+                                  const struct lwpb_allocator_funs *allocator_funs);
 
-lwpb_err_t lwpb_service_alloc_buf(lwpb_service_t service,
-                                  void **buf, size_t *len);
+lwpb_err_t lwpb_transport_alloc_buf(lwpb_transport_t transport,
+                                    void **buf, size_t *len);
 
-void lwpb_service_free_buf(lwpb_service_t service, void *buf);
+void lwpb_transport_free_buf(lwpb_transport_t transport, void *buf);
 
-#endif // __LWPB_RPC_SERVICE_H__
+#endif // __LWPB_RPC_TRANSPORT_H__

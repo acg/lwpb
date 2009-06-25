@@ -50,12 +50,12 @@ typedef lwpb_err_t (*lwpb_server_call_handler_t)
 
 /** Protocol buffer RPC server */
 struct lwpb_server {
-    struct lwpb_service *service;
+    struct lwpb_transport *service;
     void *arg;
     lwpb_server_call_handler_t call_handler;
 };
 
-void lwpb_server_init(struct lwpb_server *server, struct lwpb_service *service);
+void lwpb_server_init(struct lwpb_server *server, struct lwpb_transport *service);
 
 void lwpb_server_arg(struct lwpb_server *server, void *arg);
 

@@ -1,7 +1,7 @@
 /**
- * @file service.c
+ * @file transport.c
  * 
- * Implementation of the protocol buffers RPC service.
+ * Implementation of the protocol buffers RPC transport.
  * 
  * Copyright 2009 Simon Kallweit
  * 
@@ -27,7 +27,7 @@
 
 // Default allocator implementation
 
-static lwpb_err_t default_alloc_buf(lwpb_service_t service,
+static lwpb_err_t default_alloc_buf(lwpb_transport_t transport,
                                     void **buf, size_t *len)
 {
     *len = 1024;
@@ -36,7 +36,7 @@ static lwpb_err_t default_alloc_buf(lwpb_service_t service,
     return LWPB_ERR_OK;
 }
 
-static void default_free_buf(lwpb_service_t service, void *buf)
+static void default_free_buf(lwpb_transport_t transport, void *buf)
 {
     free(buf);
 };
@@ -48,26 +48,26 @@ static const struct lwpb_allocator_funs default_allocator_funs = {
 
 
 
-void lwpb_service_init(lwpb_service_t service,
-                       const struct lwpb_service_funs *service_funs)
+void lwpb_transport_init(lwpb_transport_t transport,
+                         const struct lwpb_transport_funs *transport_funs)
 {
-    service->allocator_funs = &default_allocator_funs;
-    service->service_funs = service_funs;
+    transport->allocator_funs = &default_allocator_funs;
+    transport->transport_funs = transport_funs;
 }
 
-void lwpb_service_set_allocator(lwpb_service_t service,
-                                const struct lwpb_allocator_funs *allocator_funs)
+void lwpb_transport_set_allocator(lwpb_transport_t transport,
+                                  const struct lwpb_allocator_funs *allocator_funs)
 {
-    service->allocator_funs = allocator_funs;
+    transport->allocator_funs = allocator_funs;
 }
 
-lwpb_err_t lwpb_service_alloc_buf(lwpb_service_t service,
-                                  void **buf, size_t *len)
+lwpb_err_t lwpb_transport_alloc_buf(lwpb_transport_t transport,
+                                    void **buf, size_t *len)
 {
-    return service->allocator_funs->alloc_buf(service, buf, len);
+    return transport->allocator_funs->alloc_buf(transport, buf, len);
 }
 
-void lwpb_service_free_buf(lwpb_service_t service, void *buf)
+void lwpb_transport_free_buf(lwpb_transport_t transport, void *buf)
 {
-    service->allocator_funs->free_buf(service, buf);
+    transport->allocator_funs->free_buf(transport, buf);
 }

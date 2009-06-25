@@ -80,7 +80,7 @@ static void handle_new_connection(struct lwpb_service_socket_server *socket_serv
             LWPB_DEBUG("Client(%d) accepted conncetion from %s", conn->index, tmp);
             conn->socket = socket;
             if (!conn->buf)
-                lwpb_service_alloc_buf(&socket_server->super, &conn->buf, &conn->len);
+                lwpb_transport_alloc_buf(&socket_server->super, &conn->buf, &conn->len);
             conn->pos = conn->buf;
             socket_server->num_conns++;
             return;
@@ -140,7 +140,7 @@ static void handle_connection(struct lwpb_service_socket_server *socket_server,
  * @param service Service implementation
  * @param client Client
  */
-static void service_register_client(lwpb_service_t service,
+static void service_register_client(lwpb_transport_t service,
                                     struct lwpb_client *client)
 {
     LWPB_FAIL("No clients can be registered");
@@ -153,7 +153,7 @@ static void service_register_client(lwpb_service_t service,
  * @param method_desc Method descriptor
  * @return Returns LWPB_ERR_OK if successful.
  */
-static lwpb_err_t service_call(lwpb_service_t service,
+static lwpb_err_t service_call(lwpb_transport_t service,
                                struct lwpb_client *client,
                                const struct lwpb_method_desc *method_desc)
 {
@@ -166,12 +166,12 @@ static lwpb_err_t service_call(lwpb_service_t service,
     size_t res_len;
     
     // Allocate a buffer for the request message
-    ret = lwpb_service_alloc_buf(service, &req_buf, &req_len);
+    ret = lwpb_transport_alloc_buf(service, &req_buf, &req_len);
     if (ret != LWPB_ERR_OK)
         goto out;
     
     // Allocate a buffer for the response message
-    ret = lwpb_service_alloc_buf(service, &res_buf, &res_len);
+    ret = lwpb_transport_alloc_buf(service, &res_buf, &res_len);
     if (ret != LWPB_ERR_OK)
         goto out;
 
@@ -209,9 +209,9 @@ static lwpb_err_t service_call(lwpb_service_t service,
 out:
     // Free allocated message buffers
     if (req_buf)
-        lwpb_service_free_buf(service, req_buf);
+        lwpb_transport_free_buf(service, req_buf);
     if (res_buf)
-        lwpb_service_free_buf(service, res_buf);
+        lwpb_transport_free_buf(service, res_buf);
     
     return ret;
 }
@@ -222,7 +222,7 @@ out:
  * @param service Service implementation
  * @param client Client
  */
-static void service_cancel(lwpb_service_t service,
+static void service_cancel(lwpb_transport_t service,
                            struct lwpb_client *client)
 {
     // Cancel is not supported in this service implementation.
@@ -234,7 +234,7 @@ static void service_cancel(lwpb_service_t service,
  * @param service Service implementation
  * @param server Server
  */
-static void service_register_server(lwpb_service_t service,
+static void service_register_server(lwpb_transport_t service,
                                     struct lwpb_server *server)
 {
     struct lwpb_service_socket_server *socket_server =
@@ -245,7 +245,7 @@ static void service_register_server(lwpb_service_t service,
     socket_server->server = server;
 }
 
-static const struct lwpb_service_funs service_funs = {
+static const struct lwpb_transport_funs service_funs = {
         .register_client = service_register_client,
         .call = service_call,
         .cancel = service_cancel,
@@ -257,14 +257,14 @@ static const struct lwpb_service_funs service_funs = {
  * @param socket_server Socket server service data
  * @return Returns the service handle.
  */
-lwpb_service_t lwpb_service_socket_server_init(
+lwpb_transport_t lwpb_service_socket_server_init(
         struct lwpb_service_socket_server *socket_server)
 {
     int i;
     
     LWPB_DEBUG("Initializing socket server");
     
-    lwpb_service_init(&socket_server->super, &service_funs);
+    lwpb_transport_init(&socket_server->super, &service_funs);
     
     socket_server->server = NULL;
     socket_server->socket = -1;
@@ -286,7 +286,7 @@ lwpb_service_t lwpb_service_socket_server_init(
  * @param port Port number for listen port
  * @return Returns LWPB_ERR_OK if successful.
  */
-lwpb_err_t lwpb_service_socket_server_open(lwpb_service_t service,
+lwpb_err_t lwpb_service_socket_server_open(lwpb_transport_t service,
                                            const char *host, uint16_t port)
 {
     struct lwpb_service_socket_server *socket_server =
@@ -365,7 +365,7 @@ out:
  * Closes the socket server.
  * @param service Service handle
  */
-void lwpb_service_socket_server_close(lwpb_service_t service)
+void lwpb_service_socket_server_close(lwpb_transport_t service)
 {
     struct lwpb_service_socket_server *socket_server =
         (struct lwpb_service_socket_server *) service;
@@ -390,7 +390,7 @@ void lwpb_service_socket_server_close(lwpb_service_t service)
  * Updates the socket server. This method needs to be called periodically.
  * @param service Service handle
  */
-lwpb_err_t lwpb_service_socket_server_update(lwpb_service_t service)
+lwpb_err_t lwpb_service_socket_server_update(lwpb_transport_t service)
 {
     struct lwpb_service_socket_server *socket_server =
         (struct lwpb_service_socket_server *) service;

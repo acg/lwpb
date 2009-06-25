@@ -27,18 +27,18 @@
 
 /** Socket client RPC service implementation */
 struct lwpb_service_socket_client {
-    struct lwpb_service super;
+    struct lwpb_transport super;
     struct lwpb_client *client;
     int socket;
 };
 
-lwpb_service_t lwpb_service_socket_client_init(struct lwpb_service_socket_client *socket_client);
+lwpb_transport_t lwpb_service_socket_client_init(struct lwpb_service_socket_client *socket_client);
 
-lwpb_err_t lwpb_service_socket_client_open(lwpb_service_t service,
+lwpb_err_t lwpb_service_socket_client_open(lwpb_transport_t service,
                                            const char *host, uint16_t port);
 
-void lwpb_service_socket_client_close(lwpb_service_t service);
+void lwpb_service_socket_client_close(lwpb_transport_t service);
 
-lwpb_err_t lwpb_service_socket_client_update(lwpb_service_t service);
+lwpb_err_t lwpb_service_socket_client_update(lwpb_transport_t service);
 
 #endif // __LWPB_RPC_SOCKET_CLIENT_H__

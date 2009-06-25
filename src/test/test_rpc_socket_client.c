@@ -61,7 +61,7 @@ int main()
     lwpb_err_t ret;
     
     struct lwpb_service_socket_client service_socket_client;
-    lwpb_service_t service;
+    lwpb_transport_t service;
     struct lwpb_client client;
     
     service = lwpb_service_socket_client_init(&service_socket_client);

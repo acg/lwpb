@@ -30,7 +30,7 @@
  * @param server Server
  * @param service Service implementation
  */
-void lwpb_server_init(struct lwpb_server *server, struct lwpb_service *service)
+void lwpb_server_init(struct lwpb_server *server, struct lwpb_transport *service)
 {
     LWPB_ASSERT(service, "Service implementation missing");
 
@@ -39,7 +39,7 @@ void lwpb_server_init(struct lwpb_server *server, struct lwpb_service *service)
     server->call_handler = NULL;
     
     // Register the server in the service implementation
-    service->service_funs->register_server(service, server);
+    service->transport_funs->register_server(service, server);
 }
 
 /**

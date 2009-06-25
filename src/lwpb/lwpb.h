@@ -26,7 +26,7 @@
 #include <lwpb/core/decoder.h>
 #include <lwpb/core/encoder.h>
 #include <lwpb/core/misc.h>
-#include <lwpb/rpc/service.h>
+#include <lwpb/rpc/transport.h>
 #include <lwpb/rpc/client.h>
 #include <lwpb/rpc/server.h>
 

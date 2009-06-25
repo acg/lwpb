@@ -1,7 +1,7 @@
 /**
  * @file direct.c
  * 
- * Direct RPC service implementation.
+ * Direct RPC transport implementation.
  * 
  * Copyright 2009 Simon Kallweit
  * 
@@ -27,14 +27,14 @@
 
 /**
  * This method is called from the client when it is registered with the
- * service.
- * @param service Service implementation
+ * transport.
+ * @param transport Transport implementation
  * @param client Client
  */
-static void service_register_client(lwpb_service_t service,
+static void transport_register_client(lwpb_transport_t transport,
                                     struct lwpb_client *client)
 {
-    struct lwpb_service_direct *direct = (struct lwpb_service_direct *) service;
+    struct lwpb_transport_direct *direct = (struct lwpb_transport_direct *) transport;
     
     LWPB_ASSERT(!direct->client, "Only one client can be registered");
     
@@ -43,16 +43,16 @@ static void service_register_client(lwpb_service_t service,
 
 /**
  * This method is called from the client to start an RPC call.
- * @param service Service implementation
+ * @param transport Transport implementation
  * @param client Client
  * @param method_desc Method descriptor
  * @return Returns LWPB_ERR_OK if successful.
  */
-static lwpb_err_t service_call(lwpb_service_t service,
+static lwpb_err_t transport_call(lwpb_transport_t transport,
                                struct lwpb_client *client,
                                const struct lwpb_method_desc *method_desc)
 {
-    struct lwpb_service_direct *direct = (struct lwpb_service_direct *) service;
+    struct lwpb_transport_direct *direct = (struct lwpb_transport_direct *) transport;
     lwpb_err_t ret = LWPB_ERR_OK;
     void *req_buf = NULL;
     size_t req_len;
@@ -60,12 +60,12 @@ static lwpb_err_t service_call(lwpb_service_t service,
     size_t res_len;
     
     // Allocate a buffer for the request message
-    ret = lwpb_service_alloc_buf(service, &req_buf, &req_len);
+    ret = lwpb_transport_alloc_buf(transport, &req_buf, &req_len);
     if (ret != LWPB_ERR_OK)
         goto out;
     
     // Allocate a buffer for the response message
-    ret = lwpb_service_alloc_buf(service, &res_buf, &res_len);
+    ret = lwpb_transport_alloc_buf(transport, &res_buf, &res_len);
     if (ret != LWPB_ERR_OK)
         goto out;
 
@@ -103,9 +103,9 @@ static lwpb_err_t service_call(lwpb_service_t service,
 out:
     // Free allocated message buffers
     if (req_buf)
-        lwpb_service_free_buf(service, req_buf);
+        lwpb_transport_free_buf(transport, req_buf);
     if (res_buf)
-        lwpb_service_free_buf(service, res_buf);
+        lwpb_transport_free_buf(transport, res_buf);
     
     return ret;
 }
@@ -113,49 +113,49 @@ out:
 /**
  * This method is called from the client when the current RPC call should
  * be cancelled.
- * @param service Service implementation
+ * @param transport Transport implementation
  * @param client Client
  */
-static void service_cancel(lwpb_service_t service,
+static void transport_cancel(lwpb_transport_t transport,
                            struct lwpb_client *client)
 {
-    // Cancel is not supported in this service implementation.
+    // Cancel is not supported in this transport implementation.
 }
 
 /**
  * This method is called from the server when it is registered with the
- * service.
- * @param service Service implementation
+ * transport.
+ * @param transport Transport implementation
  * @param server Server
  */
-static void service_register_server(lwpb_service_t service,
+static void transport_register_server(lwpb_transport_t transport,
                                     struct lwpb_server *server)
 {
-    struct lwpb_service_direct *direct = (struct lwpb_service_direct *) service;
+    struct lwpb_transport_direct *direct = (struct lwpb_transport_direct *) transport;
     
     LWPB_ASSERT(!direct->server, "Only one server can be registered");
     
     direct->server = server;
 }
 
-static const struct lwpb_service_funs service_funs = {
-        .register_client = service_register_client,
-        .call = service_call,
-        .cancel = service_cancel,
-        .register_server = service_register_server,
+static const struct lwpb_transport_funs transport_funs = {
+        .register_client = transport_register_client,
+        .call = transport_call,
+        .cancel = transport_cancel,
+        .register_server = transport_register_server,
 };
 
 /**
- * Initializes the direct service implementation.
- * @param service_direct Direct service data
- * @return Returns the service implementation handle.
+ * Initializes the direct transport implementation.
+ * @param transport_direct Direct transport data
+ * @return Returns the transport implementation handle.
  */
-lwpb_service_t lwpb_service_direct_init(struct lwpb_service_direct *service_direct)
+lwpb_transport_t lwpb_transport_direct_init(struct lwpb_transport_direct *transport_direct)
 {
-    lwpb_service_init(&service_direct->super, &service_funs);
+    lwpb_transport_init(&transport_direct->super, &transport_funs);
     
-    service_direct->client = NULL;
-    service_direct->server = NULL;
+    transport_direct->client = NULL;
+    transport_direct->server = NULL;
     
-    return &service_direct->super;
+    return &transport_direct->super;
 }

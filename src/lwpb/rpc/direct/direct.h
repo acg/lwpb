@@ -1,7 +1,7 @@
 /**
  * @file direct.h
  * 
- * Direct RPC service implementation.
+ * Direct RPC transport implementation.
  * 
  * Copyright 2009 Simon Kallweit
  * 
@@ -18,20 +18,20 @@
  * limitations under the License.
  */
 
-#ifndef __LWPB_RPC_DIRECT_DIRECT_H__
-#define __LWPB_RPC_DIRECT_DIRECT_H__
+#ifndef __LWPB_RPC_DIRECT_H__
+#define __LWPB_RPC_DIRECT_H__
 
 #include <stdint.h>
 
 #include <lwpb/lwpb.h>
 
-/** Direct RPC service implementation */
-struct lwpb_service_direct {
-    struct lwpb_service super;
+/** Direct RPC transport implementation */
+struct lwpb_transport_direct {
+    struct lwpb_transport super;
     struct lwpb_client *client;
     struct lwpb_server *server;
 };
 
-lwpb_service_t lwpb_service_direct_init(struct lwpb_service_direct *service_direct);
+lwpb_transport_t lwpb_transport_direct_init(struct lwpb_transport_direct *transport_direct);
 
-#endif // __LWPB_RPC_DIRECT_DIRECT_H__
+#endif // __LWPB_RPC_DIRECT_H__

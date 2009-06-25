@@ -39,20 +39,20 @@ struct lwpb_service_socket_server_conn {
 
 /** Socket server RPC service implementation */
 struct lwpb_service_socket_server {
-    struct lwpb_service super;
+    struct lwpb_transport super;
     struct lwpb_server *server;
     int socket;
     int num_conns;
     struct lwpb_service_socket_server_conn conns[LWPB_SERVICE_SOCKET_SERVER_CONNS];
 };
 
-lwpb_service_t lwpb_service_socket_server_init(struct lwpb_service_socket_server *socket_server);
+lwpb_transport_t lwpb_service_socket_server_init(struct lwpb_service_socket_server *socket_server);
 
-lwpb_err_t lwpb_service_socket_server_open(lwpb_service_t service,
+lwpb_err_t lwpb_service_socket_server_open(lwpb_transport_t service,
                                            const char *host, uint16_t port);
 
-void lwpb_service_socket_server_close(lwpb_service_t service);
+void lwpb_service_socket_server_close(lwpb_transport_t service);
 
-lwpb_err_t lwpb_service_socket_server_update(lwpb_service_t service);
+lwpb_err_t lwpb_service_socket_server_update(lwpb_transport_t service);
 
 #endif // __LWPB_RPC_SOCKET_SERVER_H__

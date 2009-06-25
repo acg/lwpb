@@ -30,7 +30,7 @@
  * @param client Client
  * @param service Service implementation
  */
-void lwpb_client_init(struct lwpb_client *client, lwpb_service_t service)
+void lwpb_client_init(struct lwpb_client *client, lwpb_transport_t service)
 {
     LWPB_ASSERT(service, "Service implementation missing");
     
@@ -41,7 +41,7 @@ void lwpb_client_init(struct lwpb_client *client, lwpb_service_t service)
     client->done_handler = NULL;
     
     // Register the client in the service implementation
-    client->service->service_funs->register_client(client->service, client);
+    client->service->transport_funs->register_client(client->service, client);
 }
 
 /**
@@ -86,7 +86,7 @@ lwpb_err_t lwpb_client_call(struct lwpb_client *client,
     LWPB_ASSERT(client->done_handler, "Call done handler missing");
     
     // Forward the call to the service implementation
-    return client->service->service_funs->call(client->service, client, method_desc);
+    return client->service->transport_funs->call(client->service, client, method_desc);
 }
 
 /**
@@ -96,5 +96,5 @@ lwpb_err_t lwpb_client_call(struct lwpb_client *client,
 void lwpb_client_cancel(struct lwpb_client *client)
 {
     // Forward the request to the service implementation
-    client->service->service_funs->cancel(client->service, client);
+    client->service->transport_funs->cancel(client->service, client);
 }

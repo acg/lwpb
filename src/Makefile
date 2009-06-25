@@ -57,7 +57,7 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 liblwpb_la_LIBADD =
 am_liblwpb_la_OBJECTS = liblwpb_la-buf.lo liblwpb_la-decoder.lo \
 	liblwpb_la-encoder.lo liblwpb_la-misc.lo liblwpb_la-client.lo \
-	liblwpb_la-server.lo liblwpb_la-service.lo \
+	liblwpb_la-server.lo liblwpb_la-transport.lo \
 	liblwpb_la-direct.lo liblwpb_la-socket_client.lo \
 	liblwpb_la-socket_header_pb2.lo liblwpb_la-socket_protocol.lo \
 	liblwpb_la-socket_server.lo
@@ -249,7 +249,7 @@ lwpb/core/encoder.c \
 lwpb/core/misc.c \
 lwpb/rpc/client.c \
 lwpb/rpc/server.c \
-lwpb/rpc/service.c \
+lwpb/rpc/transport.c \
 lwpb/rpc/direct/direct.c \
 lwpb/rpc/socket/socket_client.c \
 lwpb/rpc/socket/socket_header_pb2.c \
@@ -409,11 +409,11 @@ include ./$(DEPDIR)/liblwpb_la-direct.Plo
 include ./$(DEPDIR)/liblwpb_la-encoder.Plo
 include ./$(DEPDIR)/liblwpb_la-misc.Plo
 include ./$(DEPDIR)/liblwpb_la-server.Plo
-include ./$(DEPDIR)/liblwpb_la-service.Plo
 include ./$(DEPDIR)/liblwpb_la-socket_client.Plo
 include ./$(DEPDIR)/liblwpb_la-socket_header_pb2.Plo
 include ./$(DEPDIR)/liblwpb_la-socket_protocol.Plo
 include ./$(DEPDIR)/liblwpb_la-socket_server.Plo
+include ./$(DEPDIR)/liblwpb_la-transport.Plo
 include ./$(DEPDIR)/test_full.Po
 include ./$(DEPDIR)/test_full.pb.Po
 include ./$(DEPDIR)/test_full_generate.Po
@@ -488,12 +488,12 @@ liblwpb_la-server.lo: lwpb/rpc/server.c
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
 #	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -c -o liblwpb_la-server.lo `test -f 'lwpb/rpc/server.c' || echo '$(srcdir)/'`lwpb/rpc/server.c
 
-liblwpb_la-service.lo: lwpb/rpc/service.c
-	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -MT liblwpb_la-service.lo -MD -MP -MF $(DEPDIR)/liblwpb_la-service.Tpo -c -o liblwpb_la-service.lo `test -f 'lwpb/rpc/service.c' || echo '$(srcdir)/'`lwpb/rpc/service.c
-	mv -f $(DEPDIR)/liblwpb_la-service.Tpo $(DEPDIR)/liblwpb_la-service.Plo
-#	source='lwpb/rpc/service.c' object='liblwpb_la-service.lo' libtool=yes \
+liblwpb_la-transport.lo: lwpb/rpc/transport.c
+	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -MT liblwpb_la-transport.lo -MD -MP -MF $(DEPDIR)/liblwpb_la-transport.Tpo -c -o liblwpb_la-transport.lo `test -f 'lwpb/rpc/transport.c' || echo '$(srcdir)/'`lwpb/rpc/transport.c
+	mv -f $(DEPDIR)/liblwpb_la-transport.Tpo $(DEPDIR)/liblwpb_la-transport.Plo
+#	source='lwpb/rpc/transport.c' object='liblwpb_la-transport.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -c -o liblwpb_la-service.lo `test -f 'lwpb/rpc/service.c' || echo '$(srcdir)/'`lwpb/rpc/service.c
+#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -c -o liblwpb_la-transport.lo `test -f 'lwpb/rpc/transport.c' || echo '$(srcdir)/'`lwpb/rpc/transport.c
 
 liblwpb_la-direct.lo: lwpb/rpc/direct/direct.c
 	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -MT liblwpb_la-direct.lo -MD -MP -MF $(DEPDIR)/liblwpb_la-direct.Tpo -c -o liblwpb_la-direct.lo `test -f 'lwpb/rpc/direct/direct.c' || echo '$(srcdir)/'`lwpb/rpc/direct/direct.c
