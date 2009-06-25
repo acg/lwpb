@@ -25,6 +25,8 @@
 #include "socket_protocol.h"
 #include "socket_header_pb2.h"
 
+#define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
+
 int send_request(int socket, const struct lwpb_method_desc *method_desc,
                  void *req_buf, size_t req_len)
 {
@@ -42,4 +44,37 @@ int send_request(int socket, const struct lwpb_method_desc *method_desc,
 
     send(socket, buf, len, 0);
     send(socket, req_buf, req_len, 0);
+}
+
+static void parse_request_field_handler(struct lwpb_decoder *decoder,
+                                        const struct lwpb_msg_desc *msg_desc,
+                                        const struct lwpb_field_desc *field_desc,
+                                        union lwpb_value *value, void *arg)
+{
+    struct socket_protocol_header_info *header_info = arg;
+    int i;
+    
+    if (msg_desc != socket_header_Header)
+        return;
+
+    if (field_desc == socket_header_Header_type)
+        header_info->msg_type = value->enum_;
+    
+    if (field_desc == socket_header_Header_service) {
+    }
+}
+
+int parse_request(void *buf, size_t len,
+                  struct socket_protocol_header_info *header_info)
+{
+    struct lwpb_decoder decoder;
+    
+    header_info->service_desc = NULL;
+    header_info->method_desc = NULL;
+    header_info->len = 0;
+    
+    lwpb_decoder_init(&decoder);
+    lwpb_decoder_arg(&decoder, header_info);
+    lwpb_decoder_field_handler(&decoder, parse_request_field_handler);
+    lwpb_decoder_decode(&decoder, socket_header_Header, buf, len);
 }

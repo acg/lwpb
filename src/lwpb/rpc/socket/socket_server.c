@@ -72,15 +72,20 @@ static void handle_new_connection(struct lwpb_service_socket_server *socket_serv
     
     make_nonblock(socket);
     
-    for (i = 0; i < LWPB_SERVICE_SOCKET_SERVER_CONNECTIONS; i++)
-        if (socket_server->client_sockets[i] == -1) {
+    for (i = 0; i < LWPB_SERVICE_SOCKET_SERVER_CONNS; i++) {
+        struct lwpb_service_socket_server_conn *conn = &socket_server->conns[i];
+        if (conn->socket == -1) {
             addr_in = (struct sockaddr_in *) &addr;
             inet_ntop(addr.ss_family, &addr_in->sin_addr, tmp, sizeof(tmp));
-            LWPB_DEBUG("Client(%d) accepted conncetion from %s", i, tmp);
-            socket_server->client_sockets[i] = socket;
-            socket_server->num_clients++;
+            LWPB_DEBUG("Client(%d) accepted conncetion from %s", conn->index, tmp);
+            conn->socket = socket;
+            if (!conn->buf)
+                lwpb_service_alloc_buf(&socket_server->super, &conn->buf, &conn->len);
+            conn->pos = conn->buf;
+            socket_server->num_conns++;
             return;
         }
+    }
     
     // No more connections allowed
     LWPB_DEBUG("No more connections allowed");
@@ -91,40 +96,42 @@ static void handle_new_connection(struct lwpb_service_socket_server *socket_serv
 /**
  * Closes a client connection.
  * @param socket_server Socket server
- * @param index Client index
+ * @param conn Client connection
  */
 static void close_connection(struct lwpb_service_socket_server *socket_server,
-                             int index)
+                             struct lwpb_service_socket_server_conn *conn)
 {
-    int socket = socket_server->client_sockets[index];
-
-    LWPB_DEBUG("Client(%d) disconnected", index);
-    close(socket);
-    socket_server->client_sockets[index] = -1;
-    socket_server->num_clients--;
+    LWPB_DEBUG("Client(%d) disconnected", conn->index);
+    close(conn->socket);
+    conn->socket = -1;
+    socket_server->num_conns--;
 }
 
 /**
  * Handles incoming data on a client connection.
  * @param socket_server Socket server
- * @param index Client index
+ * @param conn Client connection
  */
 static void handle_connection(struct lwpb_service_socket_server *socket_server,
-                              int index)
+        struct lwpb_service_socket_server_conn *conn)
 {
-    int socket = socket_server->client_sockets[index];
     uint8_t buf[1024];
+    size_t left;
     ssize_t len;
     
-    len = recv(socket, buf, sizeof(buf), 0);
+    left = conn->buf - conn->pos + conn->len;
+    
+    len = recv(conn->socket, conn->buf, left, 0);
     if (len <= 0) {
-        close_connection(socket_server, index);
+        close_connection(socket_server, conn);
         return;
     }
     
-    LWPB_DEBUG("Client(%d) received %d bytes", index, len);
+    LWPB_DEBUG("Client(%d) received %d bytes", conn->index, len);
     
-    send(socket, buf, len, 0);
+    //
+    
+    send(conn->socket, buf, len, 0);
 }
 
 /**
@@ -261,9 +268,13 @@ lwpb_service_t lwpb_service_socket_server_init(
     
     socket_server->server = NULL;
     socket_server->socket = -1;
-    socket_server->num_clients = 0;
-    for (i = 0; i < LWPB_SERVICE_SOCKET_SERVER_CONNECTIONS; i++)
-        socket_server->client_sockets[i] = -1;
+    socket_server->num_conns = 0;
+    for (i = 0; i < LWPB_SERVICE_SOCKET_SERVER_CONNS; i++) {
+        struct lwpb_service_socket_server_conn *conn = &socket_server->conns[i];
+        conn->index = i;
+        conn->socket = -1;
+        conn->buf = NULL;
+    }
     
     return &socket_server->super;
 }
@@ -337,7 +348,7 @@ lwpb_err_t lwpb_service_socket_server_open(lwpb_service_t service,
 
     // Start listening
     LWPB_DEBUG("Start listening on server socket");
-    if (listen(socket_server->socket, LWPB_SERVICE_SOCKET_SERVER_CONNECTIONS) == -1) {
+    if (listen(socket_server->socket, LWPB_SERVICE_SOCKET_SERVER_CONNS) == -1) {
         LWPB_ERR("Cannot listen on server socket (errno: %d)", errno);
         close(socket_server->socket);
         ret = LWPB_ERR_NET_INIT;
@@ -364,9 +375,11 @@ void lwpb_service_socket_server_close(lwpb_service_t service)
         return;
     
     // Close active connections
-    for (i = 0; i < LWPB_SERVICE_SOCKET_SERVER_CONNECTIONS; i++)
-        if (socket_server->client_sockets[i] != -1)
-            close_connection(socket_server, i);
+    for (i = 0; i < LWPB_SERVICE_SOCKET_SERVER_CONNS; i++) {
+        struct lwpb_service_socket_server_conn *conn = &socket_server->conns[i];
+        if (conn->socket != -1)
+            close_connection(socket_server, conn);
+    }
         
     // Close listen socket
     close(socket_server->socket);
@@ -397,10 +410,10 @@ lwpb_err_t lwpb_service_socket_server_update(lwpb_service_t service)
     high = socket_server->socket;
     FD_ZERO(&read_fds);
     FD_SET(socket_server->socket, &read_fds);
-    for (i = 0; i < LWPB_SERVICE_SOCKET_SERVER_CONNECTIONS; i++)
-        if (socket_server->client_sockets[i] != -1) {
-            FD_SET(socket_server->client_sockets[i], &read_fds);
-            high = socket_server->client_sockets[i];
+    for (i = 0; i < LWPB_SERVICE_SOCKET_SERVER_CONNS; i++)
+        if (socket_server->conns[i].socket != -1) {
+            FD_SET(socket_server->conns[i].socket, &read_fds);
+            high = socket_server->conns[i].socket;
         }
     
     // Wait for a socket to get active
@@ -415,10 +428,10 @@ lwpb_err_t lwpb_service_socket_server_update(lwpb_service_t service)
         handle_new_connection(socket_server);
     
     // Handle active connections
-    for (i = 0; i < LWPB_SERVICE_SOCKET_SERVER_CONNECTIONS; i++) {
-        if (socket_server->client_sockets[i] != -1 &&
-            FD_ISSET(socket_server->client_sockets[i], &read_fds))
-            handle_connection(socket_server, i);
+    for (i = 0; i < LWPB_SERVICE_SOCKET_SERVER_CONNS; i++) {
+        struct lwpb_service_socket_server_conn *conn = &socket_server->conns[i];
+        if (conn->socket != -1 && FD_ISSET(conn->socket, &read_fds))
+            handle_connection(socket_server, conn);
     }
     
     return LWPB_ERR_OK;

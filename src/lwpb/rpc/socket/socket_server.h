@@ -25,16 +25,25 @@
 
 #include <lwpb/lwpb.h>
 
-#define LWPB_SERVICE_SOCKET_SERVER_CONNECTIONS 4
+#define LWPB_SERVICE_SOCKET_SERVER_CONNS 4
+
+/** A single client connection in the socket server */
+struct lwpb_service_socket_server_conn {
+    int index;
+    int socket;
+    struct lwpb_client client;
+    void *buf;
+    void *pos;
+    size_t len;
+};
 
 /** Socket server RPC service implementation */
 struct lwpb_service_socket_server {
     struct lwpb_service super;
     struct lwpb_server *server;
     int socket;
-    int num_clients;
-    struct lwpb_client clients[LWPB_SERVICE_SOCKET_SERVER_CONNECTIONS];
-    int client_sockets[LWPB_SERVICE_SOCKET_SERVER_CONNECTIONS];
+    int num_conns;
+    struct lwpb_service_socket_server_conn conns[LWPB_SERVICE_SOCKET_SERVER_CONNS];
 };
 
 lwpb_service_t lwpb_service_socket_server_init(struct lwpb_service_socket_server *socket_server);

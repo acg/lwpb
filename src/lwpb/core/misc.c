@@ -29,8 +29,11 @@ const char *lwpb_err_text(lwpb_err_t err)
 {
     switch (err) {
     case LWPB_ERR_OK: return "OK";
+    case LWPB_ERR_CANCEL: return "Cancelled by user";
     case LWPB_ERR_UNKNOWN_FIELD: return "Unknown field";
     case LWPB_ERR_END_OF_BUF: return "End of buffer";
+    case LWPB_ERR_MEM: return "Memory allocation failed";
+    case LWPB_ERR_NET_INIT: return "Network initialization failed";
     default:
         return "Unknown errorcode";
     }
