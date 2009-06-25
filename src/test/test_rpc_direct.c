@@ -41,7 +41,7 @@ static lwpb_err_t client_response_handler(
         printf("Client: Received response\n");
     }
     
-    return lwpb_decoder_decode(&decoder, msg_desc, buf, len);
+    return lwpb_decoder_decode(&decoder, msg_desc, buf, len, NULL);
 }
 
 static void client_call_done_handler(
@@ -73,7 +73,7 @@ static lwpb_err_t server_request_handler(
     
     if (method_desc == test_Search_search_by_name) {
         printf("Server: Received request\n");
-        lwpb_decoder_decode(&decoder, req_desc, req_buf, req_len);
+        lwpb_decoder_decode(&decoder, req_desc, req_buf, req_len, NULL);
         
         printf("Server: Preparing response\n");
         lwpb_encoder_start(&encoder, test_LookupResult, res_buf, *res_len);
@@ -95,24 +95,28 @@ static lwpb_err_t server_request_handler(
     return LWPB_ERR_OK;
 }
 
+static const struct lwpb_service_desc *service_list[] = {
+    test_Search, NULL,
+};
+
 int main()
 {
     lwpb_err_t ret;
     
-    struct lwpb_transport_direct service_direct;
-    lwpb_transport_t service;
+    struct lwpb_transport_direct transport_direct;
+    lwpb_transport_t transport;
     struct lwpb_client client;
     struct lwpb_server server;
     
-    service = lwpb_transport_direct_init(&service_direct);
+    transport = lwpb_transport_direct_init(&transport_direct);
     
-    lwpb_client_init(&client, service);
+    lwpb_client_init(&client, transport);
     lwpb_client_handler(&client,
                         client_request_handler,
                         client_response_handler,
                         client_call_done_handler);
     
-    lwpb_server_init(&server, service);
+    lwpb_server_init(&server, service_list, transport);
     lwpb_server_handler(&server, server_request_handler);
     
     lwpb_client_call(&client, test_Search_search_by_name);

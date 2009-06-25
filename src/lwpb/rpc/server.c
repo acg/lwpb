@@ -28,12 +28,16 @@
 /**
  * Initializes the server.
  * @param server Server
+ * @param service_list Null-terminated list of supported services
  * @param transport Transport implementation
  */
-void lwpb_server_init(struct lwpb_server *server, struct lwpb_transport *transport)
+void lwpb_server_init(struct lwpb_server *server,
+                      const struct lwpb_service_desc **service_list,
+                      struct lwpb_transport *transport)
 {
     LWPB_ASSERT(transport, "Transport implementation missing");
 
+    server->service_list = service_list;
     server->transport = transport;
     server->arg = NULL;
     server->call_handler = NULL;

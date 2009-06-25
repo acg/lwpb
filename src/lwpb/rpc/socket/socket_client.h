@@ -30,6 +30,10 @@ struct lwpb_transport_socket_client {
     struct lwpb_transport super;
     struct lwpb_client *client;
     int socket;
+    void *buf;
+    void *pos;
+    size_t len;
+    const struct lwpb_method_desc *last_method;
 };
 
 lwpb_transport_t lwpb_transport_socket_client_init(struct lwpb_transport_socket_client *socket_client);

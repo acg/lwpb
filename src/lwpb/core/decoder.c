@@ -280,11 +280,12 @@ void lwpb_decoder_use_debug_handlers(struct lwpb_decoder *decoder)
  * @param msg_desc Root message descriptor of the protocol buffer
  * @param data Data to decode
  * @param len Length of data to decode
+ * @param used Returns the number of decoded bytes when not NULL.
  * @return Returns LWPB_ERR_OK when data was successfully decoded.
  */
 lwpb_err_t lwpb_decoder_decode(struct lwpb_decoder *decoder,
                                const struct lwpb_msg_desc *msg_desc,
-                               void *data, size_t len)
+                               void *data, size_t len, size_t *used)
 {
     lwpb_err_t ret;
     int i;
@@ -410,7 +411,7 @@ lwpb_err_t lwpb_decoder_decode(struct lwpb_decoder *decoder,
             if (decoder->field_handler)
                 decoder->field_handler(decoder, msg_desc, field_desc, NULL, decoder->arg);
             // Decode nested message
-            lwpb_decoder_decode(decoder, field_desc->msg_desc, wire_value.string.data, wire_value.string.len);
+            lwpb_decoder_decode(decoder, field_desc->msg_desc, wire_value.string.data, wire_value.string.len, NULL);
             break;
         }
         
@@ -421,6 +422,9 @@ lwpb_err_t lwpb_decoder_decode(struct lwpb_decoder *decoder,
     
     if (decoder->msg_end_handler)
         decoder->msg_end_handler(decoder, msg_desc, decoder->arg);
+    
+    if (used)
+        *used = lwpb_buf_used(&buf);
     
     return LWPB_ERR_OK;
 }

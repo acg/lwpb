@@ -45,25 +45,12 @@ const struct lwpb_field_desc lwpb_fields_socket_header_header[] = {
         .def.string = "",
 #endif
     },
-    {
-        .number = 4,
-        .opts.label = LWPB_REQUIRED,
-        .opts.typ = LWPB_UINT32,
-        .opts.flags = 0,
-        .msg_desc = 0,
-#if LWPB_FIELD_NAMES
-        .name = "length",
-#endif
-#if LWPB_FIELD_DEFAULTS
-        .def.uint32 = 0,
-#endif
-    },
 };
 
 // Message descriptors
 const struct lwpb_msg_desc lwpb_messages_socket_header[] = {
     {
-        .num_fields = 4,
+        .num_fields = 3,
         .fields = lwpb_fields_socket_header_header,
 #if LWPB_MESSAGE_NAMES
         .name = "Header",

@@ -50,6 +50,57 @@ static void make_nonblock(int sock)
         LWPB_FAIL("fcntl(F_SETFL)");
 }
 
+static void handle_data(struct lwpb_transport_socket_client *socket_client)
+{
+    ssize_t len;
+    size_t used;
+    struct protocol_header_info info;
+    lwpb_err_t ret;
+    
+    used = socket_client->pos - socket_client->buf;
+    
+    len = recv(socket_client->socket, socket_client->pos,
+               socket_client->len - used, 0);
+    if (len <= 0) {
+        // Server closed connection TODO
+        LWPB_FAIL("Server closed connection");
+        return;
+    }
+    
+    socket_client->pos += len;
+    used = socket_client->pos - socket_client->buf;
+    
+    LWPB_DEBUG("Received %d bytes", len);
+    
+    // Try to decode the request
+    ret = parse_request(socket_client->buf, used, &info, NULL);
+    if (ret != PARSE_ERR_OK)
+        return;
+    
+    LWPB_DEBUG("Received request header");
+    LWPB_DEBUG("type = %d, service = %p, method = %p, header_len = %d, msg_len = %d",
+               info.msg_type, info.service_desc, info.method_desc,
+               info.header_len, info.msg_len);
+    
+    if (!info.service_desc) {
+        // TODO unknown service
+    }
+    
+    if (!info.method_desc) {
+        // TODO unknown method
+    }
+    
+    // Process response
+    ret = socket_client->client->response_handler(
+        socket_client->client, socket_client->last_method,
+        socket_client->last_method->res_desc,
+        socket_client->buf + info.header_len, info.msg_len,
+        socket_client->client->arg);
+    if (ret != LWPB_ERR_OK) {
+        
+    }
+}
+
 /**
  * This method is called from the client when it is registered with the
  * transport.
@@ -101,6 +152,9 @@ static lwpb_err_t transport_call(lwpb_transport_t transport,
                                   req_buf, &req_len, client->arg);
     if (ret != LWPB_ERR_OK)
         goto out;
+
+    
+    socket_client->last_method = method_desc;
     
     // Send the request to the server
     // TODO check result
@@ -165,6 +219,7 @@ lwpb_transport_t lwpb_transport_socket_client_init(
     
     socket_client->client = NULL;
     socket_client->socket = -1;
+    socket_client->buf = NULL;
     
     return &socket_client->super;
 }
@@ -193,6 +248,13 @@ lwpb_err_t lwpb_transport_socket_client_open(lwpb_transport_t transport,
         LWPB_INFO("Socket client already opened");
         return LWPB_ERR_OK;
     }
+
+    // Allocate receive buffer
+    ret = lwpb_transport_alloc_buf(&socket_client->super,
+                                   &socket_client->buf, &socket_client->len);
+    if (ret != LWPB_ERR_OK)
+        return ret;
+    socket_client->pos = socket_client->buf;
 
     // Resolve hostname
     LWPB_DEBUG("Resolving hostname '%s'", host);
@@ -255,6 +317,9 @@ void lwpb_transport_socket_client_close(lwpb_transport_t transport)
     if (socket_client->socket == -1)
         return;
     
+    // Free receive buffer
+    lwpb_transport_free_buf(transport, socket_client->buf);
+    
     // Close socket
     close(socket_client->socket);
     socket_client->socket == -1;
@@ -293,7 +358,7 @@ lwpb_err_t lwpb_transport_socket_client_update(lwpb_transport_t transport)
         return LWPB_ERR_OK;
     
     // Handle data
-    
+    handle_data(socket_client);
     
     return LWPB_ERR_OK;
 }

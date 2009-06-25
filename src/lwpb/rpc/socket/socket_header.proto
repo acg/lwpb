@@ -10,5 +10,4 @@ message Header {
   required MessageType type = 1;
   required string service = 2;
   required string method = 3;
-  required uint32 length = 4;
 };

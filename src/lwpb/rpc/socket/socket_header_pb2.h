@@ -21,7 +21,6 @@ extern const struct lwpb_field_desc lwpb_fields_socket_header_header[];
 #define socket_header_Header_type (&lwpb_fields_socket_header_header[0])
 #define socket_header_Header_service (&lwpb_fields_socket_header_header[1])
 #define socket_header_Header_method (&lwpb_fields_socket_header_header[2])
-#define socket_header_Header_length (&lwpb_fields_socket_header_header[3])
 
 extern const struct lwpb_service_desc lwpb_services_socket_header[];
 

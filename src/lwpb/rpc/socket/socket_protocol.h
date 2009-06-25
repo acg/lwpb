@@ -26,21 +26,33 @@
 #include <lwpb/lwpb.h>
 
 typedef enum {
-    SOCKET_PROTOCOL_REQUEST = 0,
-    SOCKET_PROTOCOL_RESPONSE = 1,
-} socket_protocol_msg_type_t;
+    MSG_TYPE_REQUEST = 0,
+    MSG_TYPE_RESPONSE = 1,
+} protocol_msg_type_t;
 
-struct socket_protocol_header_info {
-    socket_protocol_msg_type_t msg_type;
-    struct lwpb_service_desc *service_desc;
-    struct lwpb_method_desc *method_desc;
-    size_t len;
+struct protocol_header_info {
+    protocol_msg_type_t msg_type;
+    const struct lwpb_service_desc *service_desc;
+    const struct lwpb_method_desc *method_desc;
+    size_t header_len;
+    size_t msg_len;
+    const struct lwpb_service_desc **_service_list;
 };
 
 int send_request(int socket, const struct lwpb_method_desc *method_desc,
                  void *req_buf, size_t req_len);
 
-int parse_request(void *buf, size_t len,
-                  struct socket_protocol_header_info *header_info);
+int send_response(int socket, const struct lwpb_method_desc *method_desc,
+                  void *res_buf, size_t res_len);
+
+typedef enum {
+    PARSE_ERR_OK,
+    PARSE_ERR_END_OF_BUF,
+    PARSE_ERR_INVALID_MAGIC,
+} protocol_parse_err_t;
+
+protocol_parse_err_t parse_request(void *buf, size_t len,
+                                   struct protocol_header_info *info,
+                                   const struct lwpb_service_desc **service_list);
 
 #endif // __LWPB_RPC_SOCKET_PROTOCOL_H__

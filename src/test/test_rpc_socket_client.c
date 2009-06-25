@@ -41,7 +41,7 @@ static lwpb_err_t client_response_handler(
         printf("Client: Received response\n");
     }
     
-    return lwpb_decoder_decode(&decoder, msg_desc, buf, len);
+    return lwpb_decoder_decode(&decoder, msg_desc, buf, len, NULL);
 }
 
 static void client_call_done_handler(
@@ -55,6 +55,9 @@ static void client_call_done_handler(
     }
 }
 
+static const struct lwpb_service_desc *service_list[] = {
+    test_Search, NULL,
+};
 
 int main()
 {

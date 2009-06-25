@@ -87,7 +87,7 @@ void lwpb_decoder_use_debug_handlers(struct lwpb_decoder *decoder);
 
 lwpb_err_t lwpb_decoder_decode(struct lwpb_decoder *decoder,
                                const struct lwpb_msg_desc *msg_desc,
-                               void *data, size_t len);
+                               void *data, size_t len, size_t *used);
 
 
 #endif // __LWPB_CORE_DECODER_H__

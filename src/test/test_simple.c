@@ -59,7 +59,7 @@ int main()
     
     lwpb_decoder_init(&decoder);
     lwpb_decoder_use_debug_handlers(&decoder);
-    ret = lwpb_decoder_decode(&decoder, test_Person, &buf, len);
+    ret = lwpb_decoder_decode(&decoder, test_Person, &buf, len, NULL);
     
     printf("ret = %d\n", ret);
     

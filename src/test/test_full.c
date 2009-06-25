@@ -394,7 +394,7 @@ static void test_enum_small(void)
         struct lwpb_decoder decoder;                                        \
         struct testing_fields fields;                                       \
         uint8_t buf[128];                                                   \
-        size_t len;                                                         \
+        size_t len, used;                                                   \
         lwpb_encoder_init(&encoder);                                        \
         lwpb_encoder_start(&encoder, foo_TestMessRequiredEnumSmall, buf, sizeof(buf)); \
         ret = lwpb_encoder_add_enum(&encoder, foo_TestMessRequiredEnumSmall_test, FOO_##value); \
@@ -405,7 +405,8 @@ static void test_enum_small(void)
         lwpb_decoder_init(&decoder);                                        \
         lwpb_decoder_arg(&decoder, &fields);                                \
         lwpb_decoder_field_handler(&decoder, generic_field_handler);        \
-        ret = lwpb_decoder_decode(&decoder, foo_TestMessRequiredEnumSmall, buf, len); \
+        ret = lwpb_decoder_decode(&decoder, foo_TestMessRequiredEnumSmall, buf, len, &used); \
+        CHECK_ASSERT(used == sizeof(test_enum_small_##value), "not decoded all bytes"); \
         CHECK_LWPB(ret);                                                    \
     } while (0);
     
@@ -424,7 +425,7 @@ static void test_enum_big(void)
         struct lwpb_decoder decoder;                                        \
         struct testing_fields fields;                                       \
         uint8_t buf[128];                                                   \
-        size_t len;                                                         \
+        size_t len, used;                                                   \
         lwpb_encoder_init(&encoder);                                        \
         lwpb_encoder_start(&encoder, foo_TestMessRequiredEnum, buf, sizeof(buf)); \
         ret = lwpb_encoder_add_enum(&encoder, foo_TestMessRequiredEnum_test, FOO_##value); \
@@ -435,7 +436,8 @@ static void test_enum_big(void)
         lwpb_decoder_init(&decoder);                                        \
         lwpb_decoder_arg(&decoder, &fields);                                \
         lwpb_decoder_field_handler(&decoder, generic_field_handler);        \
-        ret = lwpb_decoder_decode(&decoder, foo_TestMessRequiredEnumSmall, buf, len); \
+        ret = lwpb_decoder_decode(&decoder, foo_TestMessRequiredEnumSmall, buf, len, &used); \
+        CHECK_ASSERT(used == sizeof(test_enum_big_##value), "not decoded all bytes"); \
         CHECK_LWPB(ret);                                                    \
     } while (0);
     
@@ -461,7 +463,7 @@ static void test_field_numbers(void)
         struct lwpb_decoder decoder;                                        \
         struct testing_fields fields;                                       \
         uint8_t buf[128];                                                   \
-        size_t len;                                                         \
+        size_t len, used;                                                   \
         lwpb_encoder_init(&encoder);                                        \
         lwpb_encoder_start(&encoder, foo_TestFieldNo##field, buf, sizeof(buf)); \
         ret = lwpb_encoder_add_string(&encoder, foo_TestFieldNo##field##_test, "tst"); \
@@ -472,7 +474,8 @@ static void test_field_numbers(void)
         lwpb_decoder_init(&decoder);                                        \
         lwpb_decoder_arg(&decoder, &fields);                                \
         lwpb_decoder_field_handler(&decoder, generic_field_handler);        \
-        ret = lwpb_decoder_decode(&decoder, foo_TestFieldNo##field, buf, len); \
+        ret = lwpb_decoder_decode(&decoder, foo_TestFieldNo##field, buf, len, &used); \
+        CHECK_ASSERT(used == sizeof(test_field_number_##field), "not decoded all bytes"); \
         CHECK_LWPB(ret);                                                    \
     } while (0);
     
@@ -495,7 +498,7 @@ static void test_field_numbers(void)
         struct lwpb_decoder decoder;                                        \
         struct testing_fields fields;                                       \
         uint8_t buf[256];                                                   \
-        size_t len;                                                         \
+        size_t len, used;                                                   \
         lwpb_encoder_init(&encoder);                                        \
         lwpb_encoder_start(&encoder, foo_TestMessRequired##msg_type, buf, sizeof(buf)); \
         ret = lwpb_encoder_add_##lwpb_type(&encoder, foo_TestMessRequired##msg_type##_test, value); \
@@ -506,7 +509,8 @@ static void test_field_numbers(void)
         lwpb_decoder_init(&decoder);                                        \
         lwpb_decoder_arg(&decoder, &fields);                                \
         lwpb_decoder_field_handler(&decoder, generic_field_handler);        \
-        ret = lwpb_decoder_decode(&decoder, foo_TestMessRequired##msg_type, buf, len); \
+        ret = lwpb_decoder_decode(&decoder, foo_TestMessRequired##msg_type, buf, len, &used); \
+        CHECK_ASSERT(used == sizeof(vector), "not decoded all bytes");      \
         CHECK_LWPB(ret);                                                    \
     } while (0);
 
@@ -683,13 +687,14 @@ static void test_empty_optional(void)
     struct lwpb_decoder decoder;
     struct testing_fields fields;
     uint8_t buf[256];
-    size_t len;
+    size_t len, used;
     lwpb_encoder_init(&encoder);
     lwpb_encoder_start(&encoder, foo_TestMessOptional, buf, sizeof(buf));
     len = lwpb_encoder_finish(&encoder);
     CHECK_ASSERT(len == 0, "length must be null");
     lwpb_decoder_init(&decoder);
-    ret = lwpb_decoder_decode(&decoder, foo_TestMessOptional, buf, len);
+    ret = lwpb_decoder_decode(&decoder, foo_TestMessOptional, buf, len, &used);
+    CHECK_ASSERT(used == 0, "not decoded all bytes");
     CHECK_LWPB(ret);
 }
 
@@ -700,7 +705,7 @@ static void test_empty_optional(void)
         struct lwpb_decoder decoder;                                        \
         struct testing_fields fields;                                       \
         uint8_t buf[256];                                                   \
-        size_t len;                                                         \
+        size_t len, used;                                                   \
         lwpb_encoder_init(&encoder);                                        \
         lwpb_encoder_start(&encoder, foo_TestMessOptional, buf, sizeof(buf)); \
         ret = lwpb_encoder_add_##lwpb_type(&encoder, foo_TestMessOptional_test_##field, value); \
@@ -711,7 +716,8 @@ static void test_empty_optional(void)
         lwpb_decoder_init(&decoder);                                        \
         lwpb_decoder_arg(&decoder, &fields);                                \
         lwpb_decoder_field_handler(&decoder, generic_field_handler);        \
-        ret = lwpb_decoder_decode(&decoder, foo_TestMessOptional, buf, len); \
+        ret = lwpb_decoder_decode(&decoder, foo_TestMessOptional, buf, len, &used); \
+        CHECK_ASSERT(used == sizeof(vector), "not decoded all bytes");      \
         CHECK_LWPB(ret);                                                    \
     } while (0);
 
@@ -870,13 +876,14 @@ static void test_empty_repeated(void)
     struct lwpb_decoder decoder;
     struct testing_fields fields;
     uint8_t buf[256];
-    size_t len;
+    size_t len, used;
     lwpb_encoder_init(&encoder);
     lwpb_encoder_start(&encoder, foo_TestMess, buf, sizeof(buf));
     len = lwpb_encoder_finish(&encoder);
     CHECK_ASSERT(len == 0, "length must be null");
     lwpb_decoder_init(&decoder);
-    ret = lwpb_decoder_decode(&decoder, foo_TestMess, buf, len);
+    ret = lwpb_decoder_decode(&decoder, foo_TestMess, buf, len, &used);
+    CHECK_ASSERT(used == 0, "not decoded all bytes");
     CHECK_LWPB(ret);
 }
 
@@ -887,10 +894,10 @@ static void test_empty_repeated(void)
         struct lwpb_decoder decoder;                                        \
         struct testing_fields fields;                                       \
         uint8_t buf[512];                                                   \
-        size_t len;                                                         \
+        size_t len, used;                                                   \
         int i;                                                              \
         lwpb_encoder_init(&encoder);                                        \
-        lwpb_encoder_start(&encoder, foo_TestMess, buf, sizeof(buf)); \
+        lwpb_encoder_start(&encoder, foo_TestMess, buf, sizeof(buf));       \
         for (i = 0; i < ARRAY_SIZE(array); i++)                             \
             ret = lwpb_encoder_add_##lwpb_type(&encoder, foo_TestMess_test_##field, array[i]); \
         CHECK_LWPB(ret);                                                    \
@@ -900,7 +907,8 @@ static void test_empty_repeated(void)
         lwpb_decoder_init(&decoder);                                        \
         lwpb_decoder_arg(&decoder, &fields);                                \
         lwpb_decoder_field_handler(&decoder, generic_field_handler);        \
-        ret = lwpb_decoder_decode(&decoder, foo_TestMess, buf, len);        \
+        ret = lwpb_decoder_decode(&decoder, foo_TestMess, buf, len, &used); \
+        CHECK_ASSERT(used == sizeof(vector), "not decoded all bytes");      \
         CHECK_LWPB(ret);                                                    \
     } while (0);
 

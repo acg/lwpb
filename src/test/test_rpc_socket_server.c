@@ -24,7 +24,7 @@ static lwpb_err_t server_request_handler(
     
     if (method_desc == test_Search_search_by_name) {
         printf("Server: Received request\n");
-        lwpb_decoder_decode(&decoder, req_desc, req_buf, req_len);
+        lwpb_decoder_decode(&decoder, req_desc, req_buf, req_len, NULL);
         
         printf("Server: Preparing response\n");
         lwpb_encoder_start(&encoder, test_LookupResult, res_buf, *res_len);
@@ -46,33 +46,37 @@ static lwpb_err_t server_request_handler(
     return LWPB_ERR_OK;
 }
 
+static const struct lwpb_service_desc *service_list[] = {
+    test_Search, NULL,
+};
+
 int main()
 {
     lwpb_err_t ret;
-    struct lwpb_transport_socket_server service_socket_server;
-    lwpb_transport_t service;
+    struct lwpb_transport_socket_server transport_socket_server;
+    lwpb_transport_t transport;
     struct lwpb_server server;
     
-    service = lwpb_transport_socket_server_init(&service_socket_server);
+    transport = lwpb_transport_socket_server_init(&transport_socket_server);
     
-    lwpb_server_init(&server, service);
+    lwpb_server_init(&server, service_list, transport);
     lwpb_server_handler(&server, server_request_handler);
     
-    ret = lwpb_transport_socket_server_open(service, "localhost", 12345);
+    ret = lwpb_transport_socket_server_open(transport, "localhost", 12345);
     if (ret != LWPB_ERR_OK) {
         printf("Cannot open socket server\n");
         return 1;
     }
     
     while (1) {
-        ret = lwpb_transport_socket_server_update(service);
+        ret = lwpb_transport_socket_server_update(transport);
         if (ret != LWPB_ERR_OK) {
             printf("Socket server failed\n");
             return 1;
         }
     }
     
-    lwpb_transport_socket_server_close(service);
+    lwpb_transport_socket_server_close(transport);
     
     return 0;
 }
