@@ -28,20 +28,20 @@
 /**
  * Initializes the client.
  * @param client Client
- * @param service Service implementation
+ * @param transport Transport implementation
  */
-void lwpb_client_init(struct lwpb_client *client, lwpb_transport_t service)
+void lwpb_client_init(struct lwpb_client *client, lwpb_transport_t transport)
 {
-    LWPB_ASSERT(service, "Service implementation missing");
+    LWPB_ASSERT(transport, "Transport implementation missing");
     
-    client->service = service;
+    client->transport = transport;
     client->arg = NULL;
     client->request_handler = NULL;
     client->response_handler = NULL;
     client->done_handler = NULL;
     
-    // Register the client in the service implementation
-    client->service->transport_funs->register_client(client->service, client);
+    // Register the client in the transport implementation
+    client->transport->transport_funs->register_client(client->transport, client);
 }
 
 /**
@@ -80,13 +80,13 @@ void lwpb_client_handler(struct lwpb_client *client,
 lwpb_err_t lwpb_client_call(struct lwpb_client *client,
                             const struct lwpb_method_desc *method_desc)
 {
-    LWPB_ASSERT(client->service, "Service implementation missing");
+    LWPB_ASSERT(client->transport, "Transport implementation missing");
     LWPB_ASSERT(client->request_handler, "Request handler missing");
     LWPB_ASSERT(client->response_handler, "Response handler missing");
     LWPB_ASSERT(client->done_handler, "Call done handler missing");
     
-    // Forward the call to the service implementation
-    return client->service->transport_funs->call(client->service, client, method_desc);
+    // Forward the call to the transport implementation
+    return client->transport->transport_funs->call(client->transport, client, method_desc);
 }
 
 /**
@@ -95,6 +95,6 @@ lwpb_err_t lwpb_client_call(struct lwpb_client *client,
  */
 void lwpb_client_cancel(struct lwpb_client *client)
 {
-    // Forward the request to the service implementation
-    client->service->transport_funs->cancel(client->service, client);
+    // Forward the request to the transport implementation
+    client->transport->transport_funs->cancel(client->transport, client);
 }

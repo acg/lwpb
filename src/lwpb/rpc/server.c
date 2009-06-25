@@ -28,18 +28,18 @@
 /**
  * Initializes the server.
  * @param server Server
- * @param service Service implementation
+ * @param transport Transport implementation
  */
-void lwpb_server_init(struct lwpb_server *server, struct lwpb_transport *service)
+void lwpb_server_init(struct lwpb_server *server, struct lwpb_transport *transport)
 {
-    LWPB_ASSERT(service, "Service implementation missing");
+    LWPB_ASSERT(transport, "Transport implementation missing");
 
-    server->service = service;
+    server->transport = transport;
     server->arg = NULL;
     server->call_handler = NULL;
     
-    // Register the server in the service implementation
-    service->transport_funs->register_server(service, server);
+    // Register the server in the transport implementation
+    transport->transport_funs->register_server(transport, server);
 }
 
 /**

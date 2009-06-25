@@ -73,14 +73,14 @@ typedef void (*lwpb_client_done_handler_t)
 
 /** Protocol buffer RPC client */
 struct lwpb_client {
-    lwpb_transport_t service;
+    lwpb_transport_t transport;
     void *arg;
     lwpb_client_request_handler_t request_handler;
     lwpb_client_response_handler_t response_handler;
     lwpb_client_done_handler_t done_handler;
 };
 
-void lwpb_client_init(struct lwpb_client *client, lwpb_transport_t service);
+void lwpb_client_init(struct lwpb_client *client, lwpb_transport_t transport);
 
 void lwpb_client_arg(struct lwpb_client *client, void *arg);
 
