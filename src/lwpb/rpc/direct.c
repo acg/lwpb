@@ -22,7 +22,7 @@
 #include <stdio.h>
 
 #include <lwpb/lwpb.h>
-#include <lwpb/rpc/direct/direct.h>
+#include <lwpb/rpc/direct.h>
 
 
 /**

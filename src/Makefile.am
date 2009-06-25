@@ -8,9 +8,9 @@ lwpb/core/decoder.c \
 lwpb/core/encoder.c \
 lwpb/core/misc.c \
 lwpb/rpc/client.c \
+lwpb/rpc/direct.c \
 lwpb/rpc/server.c \
 lwpb/rpc/transport.c \
-lwpb/rpc/direct/direct.c \
 lwpb/rpc/socket/socket_client.c \
 lwpb/rpc/socket/socket_header_pb2.c \
 lwpb/rpc/socket/socket_protocol.c \

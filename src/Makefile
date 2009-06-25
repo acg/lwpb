@@ -57,8 +57,8 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 liblwpb_la_LIBADD =
 am_liblwpb_la_OBJECTS = liblwpb_la-buf.lo liblwpb_la-decoder.lo \
 	liblwpb_la-encoder.lo liblwpb_la-misc.lo liblwpb_la-client.lo \
-	liblwpb_la-server.lo liblwpb_la-transport.lo \
-	liblwpb_la-direct.lo liblwpb_la-socket_client.lo \
+	liblwpb_la-direct.lo liblwpb_la-server.lo \
+	liblwpb_la-transport.lo liblwpb_la-socket_client.lo \
 	liblwpb_la-socket_header_pb2.lo liblwpb_la-socket_protocol.lo \
 	liblwpb_la-socket_server.lo
 liblwpb_la_OBJECTS = $(am_liblwpb_la_OBJECTS)
@@ -248,9 +248,9 @@ lwpb/core/decoder.c \
 lwpb/core/encoder.c \
 lwpb/core/misc.c \
 lwpb/rpc/client.c \
+lwpb/rpc/direct.c \
 lwpb/rpc/server.c \
 lwpb/rpc/transport.c \
-lwpb/rpc/direct/direct.c \
 lwpb/rpc/socket/socket_client.c \
 lwpb/rpc/socket/socket_header_pb2.c \
 lwpb/rpc/socket/socket_protocol.c \
@@ -481,6 +481,13 @@ liblwpb_la-client.lo: lwpb/rpc/client.c
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
 #	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -c -o liblwpb_la-client.lo `test -f 'lwpb/rpc/client.c' || echo '$(srcdir)/'`lwpb/rpc/client.c
 
+liblwpb_la-direct.lo: lwpb/rpc/direct.c
+	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -MT liblwpb_la-direct.lo -MD -MP -MF $(DEPDIR)/liblwpb_la-direct.Tpo -c -o liblwpb_la-direct.lo `test -f 'lwpb/rpc/direct.c' || echo '$(srcdir)/'`lwpb/rpc/direct.c
+	mv -f $(DEPDIR)/liblwpb_la-direct.Tpo $(DEPDIR)/liblwpb_la-direct.Plo
+#	source='lwpb/rpc/direct.c' object='liblwpb_la-direct.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -c -o liblwpb_la-direct.lo `test -f 'lwpb/rpc/direct.c' || echo '$(srcdir)/'`lwpb/rpc/direct.c
+
 liblwpb_la-server.lo: lwpb/rpc/server.c
 	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -MT liblwpb_la-server.lo -MD -MP -MF $(DEPDIR)/liblwpb_la-server.Tpo -c -o liblwpb_la-server.lo `test -f 'lwpb/rpc/server.c' || echo '$(srcdir)/'`lwpb/rpc/server.c
 	mv -f $(DEPDIR)/liblwpb_la-server.Tpo $(DEPDIR)/liblwpb_la-server.Plo
@@ -494,13 +501,6 @@ liblwpb_la-transport.lo: lwpb/rpc/transport.c
 #	source='lwpb/rpc/transport.c' object='liblwpb_la-transport.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
 #	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -c -o liblwpb_la-transport.lo `test -f 'lwpb/rpc/transport.c' || echo '$(srcdir)/'`lwpb/rpc/transport.c
-
-liblwpb_la-direct.lo: lwpb/rpc/direct/direct.c
-	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -MT liblwpb_la-direct.lo -MD -MP -MF $(DEPDIR)/liblwpb_la-direct.Tpo -c -o liblwpb_la-direct.lo `test -f 'lwpb/rpc/direct/direct.c' || echo '$(srcdir)/'`lwpb/rpc/direct/direct.c
-	mv -f $(DEPDIR)/liblwpb_la-direct.Tpo $(DEPDIR)/liblwpb_la-direct.Plo
-#	source='lwpb/rpc/direct/direct.c' object='liblwpb_la-direct.lo' libtool=yes \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -c -o liblwpb_la-direct.lo `test -f 'lwpb/rpc/direct/direct.c' || echo '$(srcdir)/'`lwpb/rpc/direct/direct.c
 
 liblwpb_la-socket_client.lo: lwpb/rpc/socket/socket_client.c
 	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -MT liblwpb_la-socket_client.lo -MD -MP -MF $(DEPDIR)/liblwpb_la-socket_client.Tpo -c -o liblwpb_la-socket_client.lo `test -f 'lwpb/rpc/socket/socket_client.c' || echo '$(srcdir)/'`lwpb/rpc/socket/socket_client.c
