@@ -1,7 +1,7 @@
 /**
- * @file socket_protocol.h
+ * @file socket_helper.h
  * 
- * Definitions for the socket RPC protocol.
+ * Helper functions for the socket RPC protocol.
  * 
  * Copyright 2009 Simon Kallweit
  * 

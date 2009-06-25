@@ -2,10 +2,10 @@
 
 #include <lwpb/lwpb.h>
 
-#include "socket_header_pb2.h"
+#include "socket_protocol_pb2.h"
 
 // 'Header' field descriptors
-const struct lwpb_field_desc lwpb_fields_socket_header_header[] = {
+const struct lwpb_field_desc lwpb_fields_socket_protocol_header[] = {
     {
         .number = 1,
         .opts.label = LWPB_REQUIRED,
@@ -21,7 +21,7 @@ const struct lwpb_field_desc lwpb_fields_socket_header_header[] = {
     },
     {
         .number = 2,
-        .opts.label = LWPB_REQUIRED,
+        .opts.label = LWPB_OPTIONAL,
         .opts.typ = LWPB_STRING,
         .opts.flags = 0,
         .msg_desc = 0,
@@ -34,7 +34,7 @@ const struct lwpb_field_desc lwpb_fields_socket_header_header[] = {
     },
     {
         .number = 3,
-        .opts.label = LWPB_REQUIRED,
+        .opts.label = LWPB_OPTIONAL,
         .opts.typ = LWPB_STRING,
         .opts.flags = 0,
         .msg_desc = 0,
@@ -48,10 +48,10 @@ const struct lwpb_field_desc lwpb_fields_socket_header_header[] = {
 };
 
 // Message descriptors
-const struct lwpb_msg_desc lwpb_messages_socket_header[] = {
+const struct lwpb_msg_desc lwpb_messages_socket_protocol[] = {
     {
         .num_fields = 3,
-        .fields = lwpb_fields_socket_header_header,
+        .fields = lwpb_fields_socket_protocol_header,
 #if LWPB_MESSAGE_NAMES
         .name = "Header",
 #endif
@@ -59,6 +59,6 @@ const struct lwpb_msg_desc lwpb_messages_socket_header[] = {
 };
 
 // Service descriptors
-const struct lwpb_service_desc lwpb_services_socket_header[] = {
+const struct lwpb_service_desc lwpb_services_socket_protocol[] = {
 };
 

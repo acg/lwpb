@@ -1,5 +1,5 @@
 
-package socket.header;
+package socket.protocol;
 
 enum MessageType {
   REQUEST = 0;
@@ -8,6 +8,6 @@ enum MessageType {
 
 message Header {
   required MessageType type = 1;
-  required string service = 2;
-  required string method = 3;
+  optional string service = 2;
+  optional string method = 3;
 };

@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 #include <lwpb/lwpb.h>
-#include <lwpb/rpc/socket/socket_server.h>
+#include <lwpb/rpc/socket_server.h>
 
 #include "generated/test_rpc_pb2.h"
 

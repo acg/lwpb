@@ -29,9 +29,9 @@
 #include <fcntl.h>
 
 #include <lwpb/lwpb.h>
-#include <lwpb/rpc/socket/socket_client.h>
+#include <lwpb/rpc/socket_client.h>
 
-#include "socket_protocol.h"
+#include "socket_helper.h"
 
 
 /**

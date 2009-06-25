@@ -58,9 +58,9 @@ liblwpb_la_LIBADD =
 am_liblwpb_la_OBJECTS = liblwpb_la-buf.lo liblwpb_la-decoder.lo \
 	liblwpb_la-encoder.lo liblwpb_la-misc.lo liblwpb_la-client.lo \
 	liblwpb_la-direct.lo liblwpb_la-server.lo \
-	liblwpb_la-transport.lo liblwpb_la-socket_client.lo \
-	liblwpb_la-socket_header_pb2.lo liblwpb_la-socket_protocol.lo \
-	liblwpb_la-socket_server.lo
+	liblwpb_la-socket_client.lo liblwpb_la-socket_helper.lo \
+	liblwpb_la-socket_protocol_pb2.lo liblwpb_la-socket_server.lo \
+	liblwpb_la-transport.lo
 liblwpb_la_OBJECTS = $(am_liblwpb_la_OBJECTS)
 liblwpb_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(liblwpb_la_CFLAGS) \
@@ -250,11 +250,11 @@ lwpb/core/misc.c \
 lwpb/rpc/client.c \
 lwpb/rpc/direct.c \
 lwpb/rpc/server.c \
-lwpb/rpc/transport.c \
-lwpb/rpc/socket/socket_client.c \
-lwpb/rpc/socket/socket_header_pb2.c \
-lwpb/rpc/socket/socket_protocol.c \
-lwpb/rpc/socket/socket_server.c
+lwpb/rpc/socket_client.c \
+lwpb/rpc/socket_helper.c \
+lwpb/rpc/socket_protocol_pb2.c \
+lwpb/rpc/socket_server.c \
+lwpb/rpc/transport.c
 
 liblwpb_la_CFLAGS = -I./lwpb/core -I./lwpb/rpc
 test_simple_SOURCES = \
@@ -410,8 +410,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblwpb_la-misc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblwpb_la-server.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblwpb_la-socket_client.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblwpb_la-socket_header_pb2.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblwpb_la-socket_protocol.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblwpb_la-socket_helper.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblwpb_la-socket_protocol_pb2.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblwpb_la-socket_server.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblwpb_la-transport.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_full.Po@am__quote@
@@ -495,40 +495,40 @@ liblwpb_la-server.lo: lwpb/rpc/server.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -c -o liblwpb_la-server.lo `test -f 'lwpb/rpc/server.c' || echo '$(srcdir)/'`lwpb/rpc/server.c
 
+liblwpb_la-socket_client.lo: lwpb/rpc/socket_client.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -MT liblwpb_la-socket_client.lo -MD -MP -MF $(DEPDIR)/liblwpb_la-socket_client.Tpo -c -o liblwpb_la-socket_client.lo `test -f 'lwpb/rpc/socket_client.c' || echo '$(srcdir)/'`lwpb/rpc/socket_client.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblwpb_la-socket_client.Tpo $(DEPDIR)/liblwpb_la-socket_client.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lwpb/rpc/socket_client.c' object='liblwpb_la-socket_client.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -c -o liblwpb_la-socket_client.lo `test -f 'lwpb/rpc/socket_client.c' || echo '$(srcdir)/'`lwpb/rpc/socket_client.c
+
+liblwpb_la-socket_helper.lo: lwpb/rpc/socket_helper.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -MT liblwpb_la-socket_helper.lo -MD -MP -MF $(DEPDIR)/liblwpb_la-socket_helper.Tpo -c -o liblwpb_la-socket_helper.lo `test -f 'lwpb/rpc/socket_helper.c' || echo '$(srcdir)/'`lwpb/rpc/socket_helper.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblwpb_la-socket_helper.Tpo $(DEPDIR)/liblwpb_la-socket_helper.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lwpb/rpc/socket_helper.c' object='liblwpb_la-socket_helper.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -c -o liblwpb_la-socket_helper.lo `test -f 'lwpb/rpc/socket_helper.c' || echo '$(srcdir)/'`lwpb/rpc/socket_helper.c
+
+liblwpb_la-socket_protocol_pb2.lo: lwpb/rpc/socket_protocol_pb2.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -MT liblwpb_la-socket_protocol_pb2.lo -MD -MP -MF $(DEPDIR)/liblwpb_la-socket_protocol_pb2.Tpo -c -o liblwpb_la-socket_protocol_pb2.lo `test -f 'lwpb/rpc/socket_protocol_pb2.c' || echo '$(srcdir)/'`lwpb/rpc/socket_protocol_pb2.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblwpb_la-socket_protocol_pb2.Tpo $(DEPDIR)/liblwpb_la-socket_protocol_pb2.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lwpb/rpc/socket_protocol_pb2.c' object='liblwpb_la-socket_protocol_pb2.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -c -o liblwpb_la-socket_protocol_pb2.lo `test -f 'lwpb/rpc/socket_protocol_pb2.c' || echo '$(srcdir)/'`lwpb/rpc/socket_protocol_pb2.c
+
+liblwpb_la-socket_server.lo: lwpb/rpc/socket_server.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -MT liblwpb_la-socket_server.lo -MD -MP -MF $(DEPDIR)/liblwpb_la-socket_server.Tpo -c -o liblwpb_la-socket_server.lo `test -f 'lwpb/rpc/socket_server.c' || echo '$(srcdir)/'`lwpb/rpc/socket_server.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblwpb_la-socket_server.Tpo $(DEPDIR)/liblwpb_la-socket_server.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lwpb/rpc/socket_server.c' object='liblwpb_la-socket_server.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -c -o liblwpb_la-socket_server.lo `test -f 'lwpb/rpc/socket_server.c' || echo '$(srcdir)/'`lwpb/rpc/socket_server.c
+
 liblwpb_la-transport.lo: lwpb/rpc/transport.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -MT liblwpb_la-transport.lo -MD -MP -MF $(DEPDIR)/liblwpb_la-transport.Tpo -c -o liblwpb_la-transport.lo `test -f 'lwpb/rpc/transport.c' || echo '$(srcdir)/'`lwpb/rpc/transport.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblwpb_la-transport.Tpo $(DEPDIR)/liblwpb_la-transport.Plo
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lwpb/rpc/transport.c' object='liblwpb_la-transport.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -c -o liblwpb_la-transport.lo `test -f 'lwpb/rpc/transport.c' || echo '$(srcdir)/'`lwpb/rpc/transport.c
-
-liblwpb_la-socket_client.lo: lwpb/rpc/socket/socket_client.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -MT liblwpb_la-socket_client.lo -MD -MP -MF $(DEPDIR)/liblwpb_la-socket_client.Tpo -c -o liblwpb_la-socket_client.lo `test -f 'lwpb/rpc/socket/socket_client.c' || echo '$(srcdir)/'`lwpb/rpc/socket/socket_client.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblwpb_la-socket_client.Tpo $(DEPDIR)/liblwpb_la-socket_client.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lwpb/rpc/socket/socket_client.c' object='liblwpb_la-socket_client.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -c -o liblwpb_la-socket_client.lo `test -f 'lwpb/rpc/socket/socket_client.c' || echo '$(srcdir)/'`lwpb/rpc/socket/socket_client.c
-
-liblwpb_la-socket_header_pb2.lo: lwpb/rpc/socket/socket_header_pb2.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -MT liblwpb_la-socket_header_pb2.lo -MD -MP -MF $(DEPDIR)/liblwpb_la-socket_header_pb2.Tpo -c -o liblwpb_la-socket_header_pb2.lo `test -f 'lwpb/rpc/socket/socket_header_pb2.c' || echo '$(srcdir)/'`lwpb/rpc/socket/socket_header_pb2.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblwpb_la-socket_header_pb2.Tpo $(DEPDIR)/liblwpb_la-socket_header_pb2.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lwpb/rpc/socket/socket_header_pb2.c' object='liblwpb_la-socket_header_pb2.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -c -o liblwpb_la-socket_header_pb2.lo `test -f 'lwpb/rpc/socket/socket_header_pb2.c' || echo '$(srcdir)/'`lwpb/rpc/socket/socket_header_pb2.c
-
-liblwpb_la-socket_protocol.lo: lwpb/rpc/socket/socket_protocol.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -MT liblwpb_la-socket_protocol.lo -MD -MP -MF $(DEPDIR)/liblwpb_la-socket_protocol.Tpo -c -o liblwpb_la-socket_protocol.lo `test -f 'lwpb/rpc/socket/socket_protocol.c' || echo '$(srcdir)/'`lwpb/rpc/socket/socket_protocol.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblwpb_la-socket_protocol.Tpo $(DEPDIR)/liblwpb_la-socket_protocol.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lwpb/rpc/socket/socket_protocol.c' object='liblwpb_la-socket_protocol.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -c -o liblwpb_la-socket_protocol.lo `test -f 'lwpb/rpc/socket/socket_protocol.c' || echo '$(srcdir)/'`lwpb/rpc/socket/socket_protocol.c
-
-liblwpb_la-socket_server.lo: lwpb/rpc/socket/socket_server.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -MT liblwpb_la-socket_server.lo -MD -MP -MF $(DEPDIR)/liblwpb_la-socket_server.Tpo -c -o liblwpb_la-socket_server.lo `test -f 'lwpb/rpc/socket/socket_server.c' || echo '$(srcdir)/'`lwpb/rpc/socket/socket_server.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblwpb_la-socket_server.Tpo $(DEPDIR)/liblwpb_la-socket_server.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lwpb/rpc/socket/socket_server.c' object='liblwpb_la-socket_server.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblwpb_la_CFLAGS) $(CFLAGS) -c -o liblwpb_la-socket_server.lo `test -f 'lwpb/rpc/socket/socket_server.c' || echo '$(srcdir)/'`lwpb/rpc/socket/socket_server.c
 
 test_full.o: test/test_full.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_full.o -MD -MP -MF $(DEPDIR)/test_full.Tpo -c -o test_full.o `test -f 'test/test_full.c' || echo '$(srcdir)/'`test/test_full.c
