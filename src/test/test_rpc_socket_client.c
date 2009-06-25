@@ -60,11 +60,11 @@ int main()
 {
     lwpb_err_t ret;
     
-    struct lwpb_service_socket_client service_socket_client;
+    struct lwpb_transport_socket_client service_socket_client;
     lwpb_transport_t service;
     struct lwpb_client client;
     
-    service = lwpb_service_socket_client_init(&service_socket_client);
+    service = lwpb_transport_socket_client_init(&service_socket_client);
     
     lwpb_client_init(&client, service);
     lwpb_client_handler(&client,
@@ -72,7 +72,7 @@ int main()
                         client_response_handler,
                         client_call_done_handler);
     
-    ret = lwpb_service_socket_client_open(service, "localhost", 12345);
+    ret = lwpb_transport_socket_client_open(service, "localhost", 12345);
     if (ret != LWPB_ERR_OK) {
         printf("Cannot open socket client\n");
         return 1;
@@ -81,14 +81,14 @@ int main()
     lwpb_client_call(&client, test_Search_search_by_name);
     
     while (1) {
-        ret = lwpb_service_socket_client_update(service);
+        ret = lwpb_transport_socket_client_update(service);
         if (ret != LWPB_ERR_OK) {
             printf("Socket client failed\n");
             return 1;
         }
     }
     
-    lwpb_service_socket_client_close(service);
+    lwpb_transport_socket_client_close(service);
  
     return 0;
 }

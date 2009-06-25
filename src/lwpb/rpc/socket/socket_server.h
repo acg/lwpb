@@ -1,7 +1,7 @@
 /**
  * @file socket_server.h
  * 
- * Socket server RPC service implementation.
+ * Socket server RPC transport implementation.
  * 
  * Copyright 2009 Simon Kallweit
  * 
@@ -25,10 +25,10 @@
 
 #include <lwpb/lwpb.h>
 
-#define LWPB_SERVICE_SOCKET_SERVER_CONNS 4
+#define LWPB_TRANSPORT_SOCKET_SERVER_CONNS 4
 
 /** A single client connection in the socket server */
-struct lwpb_service_socket_server_conn {
+struct lwpb_socket_server_conn {
     int index;
     int socket;
     struct lwpb_client client;
@@ -37,22 +37,22 @@ struct lwpb_service_socket_server_conn {
     size_t len;
 };
 
-/** Socket server RPC service implementation */
-struct lwpb_service_socket_server {
+/** Socket server RPC transport implementation */
+struct lwpb_transport_socket_server {
     struct lwpb_transport super;
     struct lwpb_server *server;
     int socket;
     int num_conns;
-    struct lwpb_service_socket_server_conn conns[LWPB_SERVICE_SOCKET_SERVER_CONNS];
+    struct lwpb_socket_server_conn conns[LWPB_TRANSPORT_SOCKET_SERVER_CONNS];
 };
 
-lwpb_transport_t lwpb_service_socket_server_init(struct lwpb_service_socket_server *socket_server);
+lwpb_transport_t lwpb_transport_socket_server_init(struct lwpb_transport_socket_server *socket_server);
 
-lwpb_err_t lwpb_service_socket_server_open(lwpb_transport_t service,
-                                           const char *host, uint16_t port);
+lwpb_err_t lwpb_transport_socket_server_open(lwpb_transport_t transport,
+                                             const char *host, uint16_t port);
 
-void lwpb_service_socket_server_close(lwpb_transport_t service);
+void lwpb_transport_socket_server_close(lwpb_transport_t transport);
 
-lwpb_err_t lwpb_service_socket_server_update(lwpb_transport_t service);
+lwpb_err_t lwpb_transport_socket_server_update(lwpb_transport_t transport);
 
 #endif // __LWPB_RPC_SOCKET_SERVER_H__

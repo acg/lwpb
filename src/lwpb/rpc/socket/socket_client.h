@@ -1,7 +1,7 @@
 /**
  * @file socket_client.h
  * 
- * Socket client RPC service implementation.
+ * Socket client RPC transport implementation.
  * 
  * Copyright 2009 Simon Kallweit
  * 
@@ -25,20 +25,20 @@
 
 #include <lwpb/lwpb.h>
 
-/** Socket client RPC service implementation */
-struct lwpb_service_socket_client {
+/** Socket client RPC transport implementation */
+struct lwpb_transport_socket_client {
     struct lwpb_transport super;
     struct lwpb_client *client;
     int socket;
 };
 
-lwpb_transport_t lwpb_service_socket_client_init(struct lwpb_service_socket_client *socket_client);
+lwpb_transport_t lwpb_transport_socket_client_init(struct lwpb_transport_socket_client *socket_client);
 
-lwpb_err_t lwpb_service_socket_client_open(lwpb_transport_t service,
-                                           const char *host, uint16_t port);
+lwpb_err_t lwpb_transport_socket_client_open(lwpb_transport_t transport,
+                                             const char *host, uint16_t port);
 
-void lwpb_service_socket_client_close(lwpb_transport_t service);
+void lwpb_transport_socket_client_close(lwpb_transport_t transport);
 
-lwpb_err_t lwpb_service_socket_client_update(lwpb_transport_t service);
+lwpb_err_t lwpb_transport_socket_client_update(lwpb_transport_t transport);
 
 #endif // __LWPB_RPC_SOCKET_CLIENT_H__

@@ -49,30 +49,30 @@ static lwpb_err_t server_request_handler(
 int main()
 {
     lwpb_err_t ret;
-    struct lwpb_service_socket_server service_socket_server;
+    struct lwpb_transport_socket_server service_socket_server;
     lwpb_transport_t service;
     struct lwpb_server server;
     
-    service = lwpb_service_socket_server_init(&service_socket_server);
+    service = lwpb_transport_socket_server_init(&service_socket_server);
     
     lwpb_server_init(&server, service);
     lwpb_server_handler(&server, server_request_handler);
     
-    ret = lwpb_service_socket_server_open(service, "localhost", 12345);
+    ret = lwpb_transport_socket_server_open(service, "localhost", 12345);
     if (ret != LWPB_ERR_OK) {
         printf("Cannot open socket server\n");
         return 1;
     }
     
     while (1) {
-        ret = lwpb_service_socket_server_update(service);
+        ret = lwpb_transport_socket_server_update(service);
         if (ret != LWPB_ERR_OK) {
             printf("Socket server failed\n");
             return 1;
         }
     }
     
-    lwpb_service_socket_server_close(service);
+    lwpb_transport_socket_server_close(service);
     
     return 0;
 }

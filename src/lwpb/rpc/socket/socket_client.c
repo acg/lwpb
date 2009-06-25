@@ -1,7 +1,7 @@
 /**
  * @file socket_client.c
  * 
- * Socket client RPC service implementation.
+ * Socket client RPC transport implementation.
  * 
  * Copyright 2009 Simon Kallweit
  * 
@@ -52,15 +52,15 @@ static void make_nonblock(int sock)
 
 /**
  * This method is called from the client when it is registered with the
- * service.
- * @param service Service implementation
+ * transport.
+ * @param transport Transport implementation
  * @param client Client
  */
-static void service_register_client(lwpb_transport_t service,
-                                    struct lwpb_client *client)
+static void transport_register_client(lwpb_transport_t transport,
+                                      struct lwpb_client *client)
 {
-    struct lwpb_service_socket_client *socket_client =
-        (struct lwpb_service_socket_client *) service;
+    struct lwpb_transport_socket_client *socket_client =
+        (struct lwpb_transport_socket_client *) transport;
 
     LWPB_ASSERT(!socket_client->client, "Only one client can be registered");
     
@@ -69,17 +69,17 @@ static void service_register_client(lwpb_transport_t service,
 
 /**
  * This method is called from the client to start an RPC call.
- * @param service Service implementation
+ * @param transport Transport implementation
  * @param client Client
  * @param method_desc Method descriptor
  * @return Returns LWPB_ERR_OK if successful.
  */
-static lwpb_err_t service_call(lwpb_transport_t service,
-                               struct lwpb_client *client,
-                               const struct lwpb_method_desc *method_desc)
+static lwpb_err_t transport_call(lwpb_transport_t transport,
+                                 struct lwpb_client *client,
+                                 const struct lwpb_method_desc *method_desc)
 {
-    struct lwpb_service_socket_client *socket_client =
-        (struct lwpb_service_socket_client *) service;
+    struct lwpb_transport_socket_client *socket_client =
+        (struct lwpb_transport_socket_client *) transport;
     lwpb_err_t ret = LWPB_ERR_OK;
     void *req_buf = NULL;
     size_t req_len;
@@ -92,7 +92,7 @@ static lwpb_err_t service_call(lwpb_transport_t service,
     }
     
     // Allocate a buffer for the request message
-    ret = lwpb_transport_alloc_buf(service, &req_buf, &req_len);
+    ret = lwpb_transport_alloc_buf(transport, &req_buf, &req_len);
     if (ret != LWPB_ERR_OK)
         goto out;
     
@@ -109,7 +109,7 @@ static lwpb_err_t service_call(lwpb_transport_t service,
 out:
     // Free allocated requiest message buffer
     if (req_buf)
-        lwpb_transport_free_buf(service, req_buf);
+        lwpb_transport_free_buf(transport, req_buf);
     
     return ret;
 }
@@ -117,32 +117,32 @@ out:
 /**
  * This method is called from the client when the current RPC call should
  * be cancelled.
- * @param service Service implementation
+ * @param transport Transport implementation
  * @param client Client
  */
-static void service_cancel(lwpb_transport_t service,
-                           struct lwpb_client *client)
+static void transport_cancel(lwpb_transport_t transport,
+                             struct lwpb_client *client)
 {
-    // Cancel is not supported in this service implementation.
+    // Cancel is not supported in this transport implementation.
 }
 
 /**
  * This method is called from the server when it is registered with the
- * service.
- * @param service Service implementation
+ * transport.
+ * @param transport Transport implementation
  * @param server Server
  */
-static void service_register_server(lwpb_transport_t service,
-                                    struct lwpb_server *server)
+static void transport_register_server(lwpb_transport_t transport,
+                                      struct lwpb_server *server)
 {
     LWPB_FAIL("No servers can be registered");
 }
 
-static const struct lwpb_transport_funs service_funs = {
-        .register_client = service_register_client,
-        .call = service_call,
-        .cancel = service_cancel,
-        .register_server = service_register_server,
+static const struct lwpb_transport_funs transport_funs = {
+        .register_client = transport_register_client,
+        .call = transport_call,
+        .cancel = transport_cancel,
+        .register_server = transport_register_server,
 };
 
 
@@ -150,18 +150,18 @@ static const struct lwpb_transport_funs service_funs = {
 
 
 /**
- * Initializes the socket client service implementation.
- * @param socket_client Socket client service data
- * @return Returns the service handle.
+ * Initializes the socket client transport implementation.
+ * @param socket_client Socket client transport data
+ * @return Returns the transport handle.
  */
-lwpb_transport_t lwpb_service_socket_client_init(
-        struct lwpb_service_socket_client *socket_client)
+lwpb_transport_t lwpb_transport_socket_client_init(
+        struct lwpb_transport_socket_client *socket_client)
 {
     int i;
     
     LWPB_DEBUG("Initializing socket client");
     
-    lwpb_transport_init(&socket_client->super, &service_funs);
+    lwpb_transport_init(&socket_client->super, &transport_funs);
     
     socket_client->client = NULL;
     socket_client->socket = -1;
@@ -171,16 +171,16 @@ lwpb_transport_t lwpb_service_socket_client_init(
 
 /**
  * Opens the socket client for communication.
- * @param service Service handle
+ * @param transport Transport handle
  * @param host Hostname or IP address (using local address if NULL)
  * @param port Port number for listen port
  * @return Returns LWPB_ERR_OK if successful.
  */
-lwpb_err_t lwpb_service_socket_client_open(lwpb_transport_t service,
+lwpb_err_t lwpb_transport_socket_client_open(lwpb_transport_t transport,
                                            const char *host, uint16_t port)
 {
-    struct lwpb_service_socket_client *socket_client =
-        (struct lwpb_service_socket_client *) service;
+    struct lwpb_transport_socket_client *socket_client =
+        (struct lwpb_transport_socket_client *) transport;
     lwpb_err_t ret = LWPB_ERR_OK;
     int status;
     struct addrinfo hints;
@@ -244,12 +244,12 @@ out:
 
 /**
  * Closes the socket client.
- * @param service Service handle
+ * @param transport Transport handle
  */
-void lwpb_service_socket_client_close(lwpb_transport_t service)
+void lwpb_transport_socket_client_close(lwpb_transport_t transport)
 {
-    struct lwpb_service_socket_client *socket_client =
-        (struct lwpb_service_socket_client *) service;
+    struct lwpb_transport_socket_client *socket_client =
+        (struct lwpb_transport_socket_client *) transport;
     int i;
     
     if (socket_client->socket == -1)
@@ -262,12 +262,12 @@ void lwpb_service_socket_client_close(lwpb_transport_t service)
 
 /**
  * Updates the socket client. This method needs to be called periodically.
- * @param service Service handle
+ * @param transport Transport handle
  */
-lwpb_err_t lwpb_service_socket_client_update(lwpb_transport_t service)
+lwpb_err_t lwpb_transport_socket_client_update(lwpb_transport_t transport)
 {
-    struct lwpb_service_socket_client *socket_client =
-        (struct lwpb_service_socket_client *) service;
+    struct lwpb_transport_socket_client *socket_client =
+        (struct lwpb_transport_socket_client *) transport;
     int i;
     int socket;
     struct timeval timeout;
