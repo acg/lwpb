@@ -36,6 +36,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 #include <google/protobuf/compiler/lwpb/lwpb_generator.h>
 #include <google/protobuf/descriptor.pb.h>
@@ -53,15 +54,6 @@ namespace compiler {
 namespace lwpb {
 
 namespace {
-
-// Gets the index of an element in a vector
-template<typename InputIterator, typename EqualityComparable>
-typename iterator_traits<InputIterator>::difference_type
-Index(const InputIterator& begin, const InputIterator& end,
-const EqualityComparable& item) {
-return distance(begin, find(begin, end, item));
-}
-
 
 // Returns a copy of |filename| with any trailing ".protodevel" or ".proto
 // suffix stripped.
@@ -399,7 +391,7 @@ void Generator::AddNestedMessages(
 
 // Returns the index of a message descriptor in the flat vector |messages_|.
 int Generator::GetMessageIndex(const Descriptor* message_descriptor) const {
-  return Index(messages_.begin(), messages_.end(), message_descriptor);
+  return distance(messages_.begin(), find(messages_.begin(), messages_.end(), message_descriptor)); 
 }
 
 
