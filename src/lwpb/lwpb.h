@@ -29,5 +29,7 @@
 #include <lwpb/rpc/transport.h>
 #include <lwpb/rpc/client.h>
 #include <lwpb/rpc/server.h>
+#include <lwpb/utils/struct_decoder.h>
+#include <lwpb/utils/struct_map.h>
 
 #endif // __LWPB_H__
