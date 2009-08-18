@@ -1,0 +1,31 @@
+
+package test;
+
+message StructTest {
+
+  enum TestEnum {
+    VALUE1 = 1;
+    VALUE2 = 2;
+    VALUE3 = 3;
+  }
+
+  required int32 field_int32 = 1;
+  required int64 field_int64 = 2;
+  required bool field_bool = 3;
+  required TestEnum field_enum = 4;
+  required string field_string = 5;
+  required bytes field_bytes = 6;
+  
+  message Nested1 {
+    required int32 field_int32 = 1;
+    required int64 field_int64 = 2;
+  }
+  
+  required Nested1 nested1 = 7;
+  
+  message Nested2 {
+    required string field_string = 1;
+  }
+  
+  repeated Nested2 nested2 = 8;
+}
