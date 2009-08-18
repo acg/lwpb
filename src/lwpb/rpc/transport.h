@@ -31,7 +31,7 @@ struct lwpb_client;
 struct lwpb_server;
 struct lwpb_transport;
 
-/** RPC transport implementation handle */
+/** RPC transport handle */
 typedef struct lwpb_transport *lwpb_transport_t;
 
 /** RPC transport allocator functions */

@@ -138,11 +138,12 @@ static void transport_register_server(lwpb_transport_t transport,
     direct->server = server;
 }
 
+/** Direct transport functions */
 static const struct lwpb_transport_funs transport_funs = {
-        .register_client = transport_register_client,
-        .call = transport_call,
-        .cancel = transport_cancel,
-        .register_server = transport_register_server,
+    .register_client = transport_register_client,
+    .call = transport_call,
+    .cancel = transport_cancel,
+    .register_server = transport_register_server,
 };
 
 /**

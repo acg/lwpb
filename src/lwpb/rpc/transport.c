@@ -27,27 +27,44 @@
 
 // Default allocator implementation
 
+/**
+ * Allocates a buffer on the heap.
+ * @param transport Transport
+ * @param buf Pointer to buffer base pointer
+ * @param len Pointer to buffer length
+ * @return Returns LWPB_ERR_OK if successful, LWPB_ERR_MEM otherwise.
+ */
 static lwpb_err_t default_alloc_buf(lwpb_transport_t transport,
                                     void **buf, size_t *len)
 {
     *len = 1024;
     *buf = malloc(*len);
     
-    return LWPB_ERR_OK;
+    return *buf ? LWPB_ERR_OK : LWPB_ERR_MEM;
 }
 
+/**
+ * Frees a buffer to the heap.
+ * @param transport Transport
+ * @param buf Buffer to free
+ */
 static void default_free_buf(lwpb_transport_t transport, void *buf)
 {
     free(buf);
 };
 
+/** Default allocator functions */
 static const struct lwpb_allocator_funs default_allocator_funs = {
     .alloc_buf = default_alloc_buf,
     .free_buf = default_free_buf,
 };
 
 
-
+/**
+ * Initializes the RPC transport.
+ * @param transport Transport handle
+ * @param transport_funs Transport functions
+ */
 void lwpb_transport_init(lwpb_transport_t transport,
                          const struct lwpb_transport_funs *transport_funs)
 {
@@ -55,18 +72,36 @@ void lwpb_transport_init(lwpb_transport_t transport,
     transport->transport_funs = transport_funs;
 }
 
+/**
+ * Sets the memory allocator.
+ * @note This overrides the usage of the default memory alloactor.
+ * @param transport Transport handle
+ * @param allocator_funs Allocator functions
+ */
 void lwpb_transport_set_allocator(lwpb_transport_t transport,
                                   const struct lwpb_allocator_funs *allocator_funs)
 {
     transport->allocator_funs = allocator_funs;
 }
 
+/**
+ * Allocates a memory buffer.
+ * @param transport Transport handle
+ * @param buf Pointer to buffer base pointer
+ * @param len Pointer to buffer length
+ * @return Returns LWPB_ERR_OK if successful, LWPB_ERR_MEM otherwise.
+ */
 lwpb_err_t lwpb_transport_alloc_buf(lwpb_transport_t transport,
                                     void **buf, size_t *len)
 {
     return transport->allocator_funs->alloc_buf(transport, buf, len);
 }
 
+/**
+ * Frees a memory buffer.
+ * @param transport Transport handle
+ * @param buf Buffer to free
+ */
 void lwpb_transport_free_buf(lwpb_transport_t transport, void *buf)
 {
     transport->allocator_funs->free_buf(transport, buf);
