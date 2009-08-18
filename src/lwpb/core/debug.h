@@ -24,25 +24,25 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-/* Simple assert macro */
-#define LWPB_ASSERT(expr, msg)                                              \
+/** Simple assert macro */
+#define LWPB_ASSERT(_expr_, _msg_)                                          \
     do {                                                                    \
-        if (!(expr)) {                                                      \
-            printf(msg "\n");                                               \
+        if (!(_expr_)) {                                                    \
+            printf(_msg_ "\n");                                             \
             exit(0);                                                        \
         }                                                                   \
     } while (0)
 
-/* Simple failure macro */
-#define LWPB_FAIL(msg)                                                      \
+/** Simple failure macro */
+#define LWPB_FAIL(_msg_)                                                    \
     do {                                                                    \
-        printf(msg "\n");                                                   \
+        printf(_msg_ "\n");                                                 \
         exit(0);                                                            \
     } while(0)
 
 /* Logging macros */
-#define LWPB_DEBUG(format, args...) printf("DBG: " format "\n", ##args)
-#define LWPB_INFO(format, args...) printf("INF: " format "\n", ##args)
-#define LWPB_ERR(format, args...) printf("ERR: " format "\n", ##args)
+#define LWPB_DEBUG(_format_, _args_...) printf("DBG: " _format_ "\n", ##_args_)
+#define LWPB_INFO(_format_, _args_...) printf("INF: " _format_ "\n", ##_args_)
+#define LWPB_ERR(_format_, _args_...) printf("ERR: " _format_ "\n", ##_args_)
 
 #endif // __LWPB_CORE_DEBUG_H__

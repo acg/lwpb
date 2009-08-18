@@ -37,7 +37,6 @@ struct lwpb_encoder_stack_frame {
 struct lwpb_encoder {
     struct lwpb_encoder_stack_frame stack[LWPB_MAX_DEPTH];
     int depth;
-    
 };
 
 void lwpb_encoder_init(struct lwpb_encoder *encoder);

@@ -28,7 +28,7 @@ enum wire_type {
     WT_VARINT = 0,
     WT_64BIT  = 1,
     WT_STRING = 2,
-    WT_32BIT  = 5
+    WT_32BIT  = 5,
 };
 
 /** Protocol buffer wire values */

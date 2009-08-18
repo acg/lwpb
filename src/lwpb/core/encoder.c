@@ -114,6 +114,13 @@ void lwpb_encoder_init(struct lwpb_encoder *encoder)
 {
 }
 
+/**
+ * Starts encoding a message.
+ * @param encoder Encoder
+ * @param msg_desc Root message descriptor
+ * @param data Data buffer to encode into
+ * @param len Length of data buffer
+ */
 void lwpb_encoder_start(struct lwpb_encoder *encoder,
                         const struct lwpb_msg_desc *msg_desc,
                         void *data, size_t len)
@@ -124,11 +131,22 @@ void lwpb_encoder_start(struct lwpb_encoder *encoder,
     encoder->stack[0].msg_desc = msg_desc;
 }
 
+/**
+ * Finishes encoding a message.
+ * @param encoder Encoder
+ * @return Returns the total size of the encoded message.
+ */
 size_t lwpb_encoder_finish(struct lwpb_encoder *encoder)
 {
     return lwpb_buf_used(&encoder->stack[0].buf);
 }
 
+/**
+ * Starts encoding a nested message.
+ * @param encoder
+ * @param field_desc Field descriptor holding the nested message
+ * @return Returns LWPB_ERR_OK if successful.
+ */
 lwpb_err_t lwpb_encoder_nested_start(struct lwpb_encoder *encoder,
                                      const struct lwpb_field_desc *field_desc)
 {
@@ -155,6 +173,11 @@ lwpb_err_t lwpb_encoder_nested_start(struct lwpb_encoder *encoder,
                   lwpb_buf_left(&frame->buf) - MSG_RESERVE_BYTES);
 }
 
+/**
+ * Ends encoding a nested message.
+ * @param encoder
+ * @return Returns LWPB_ERR_OK if successful.
+ */
 lwpb_err_t lwpb_encoder_nested_end(struct lwpb_encoder *encoder)
 {
     struct lwpb_encoder_stack_frame *frame, *parent_frame;
@@ -171,6 +194,15 @@ lwpb_err_t lwpb_encoder_nested_end(struct lwpb_encoder *encoder)
     return lwpb_encoder_add_field(encoder, frame->field_desc, &value);
 }
 
+/**
+ * Encodes a field.
+ * @note This method should not normally be used. Use the lwpb_encoder_add_xxx()
+ * methods to directly add a field of a given type.
+ * @param encoder Encoder
+ * @param field_desc Field descriptor of field to encode
+ * @param value Field value
+ * @return Returns LWPB_ERR_OK if successful.
+ */
 lwpb_err_t lwpb_encoder_add_field(struct lwpb_encoder *encoder,
                                   const struct lwpb_field_desc *field_desc,
                                   union lwpb_value *value)
@@ -314,6 +346,13 @@ lwpb_err_t lwpb_encoder_add_field(struct lwpb_encoder *encoder,
     return LWPB_ERR_OK;
 }
 
+/**
+ * Encodes a field of type 'double'.
+ * @param encoder
+ * @param field_desc Field descriptor of field to encode
+ * @param double_ Value
+ * @return Returns LWPB_ERR_OK if successful.
+ */
 lwpb_err_t lwpb_encoder_add_double(struct lwpb_encoder *encoder,
                                    const struct lwpb_field_desc *field_desc,
                                    double double_)
@@ -323,6 +362,13 @@ lwpb_err_t lwpb_encoder_add_double(struct lwpb_encoder *encoder,
     return lwpb_encoder_add_field(encoder, field_desc, &value);
 }
 
+/**
+ * Encodes a field of type 'float'.
+ * @param encoder
+ * @param field_desc Field descriptor of field to encode
+ * @param float_ Value
+ * @return Returns LWPB_ERR_OK if successful.
+ */
 lwpb_err_t lwpb_encoder_add_float(struct lwpb_encoder *encoder,
                                   const struct lwpb_field_desc *field_desc,
                                   float float_)
@@ -332,6 +378,13 @@ lwpb_err_t lwpb_encoder_add_float(struct lwpb_encoder *encoder,
     return lwpb_encoder_add_field(encoder, field_desc, &value);
 }
 
+/**
+ * Encodes a field of type 'int32'.
+ * @param encoder
+ * @param field_desc Field descriptor of field to encode
+ * @param int32 Value
+ * @return Returns LWPB_ERR_OK if successful.
+ */
 lwpb_err_t lwpb_encoder_add_int32(struct lwpb_encoder *encoder,
                                   const struct lwpb_field_desc *field_desc,
                                   int32_t int32)
@@ -341,6 +394,13 @@ lwpb_err_t lwpb_encoder_add_int32(struct lwpb_encoder *encoder,
     return lwpb_encoder_add_field(encoder, field_desc, &value);
 }
 
+/**
+ * Encodes a field of type 'uint32'.
+ * @param encoder
+ * @param field_desc Field descriptor of field to encode
+ * @param uint32 Value
+ * @return Returns LWPB_ERR_OK if successful.
+ */
 lwpb_err_t lwpb_encoder_add_uint32(struct lwpb_encoder *encoder,
                                    const struct lwpb_field_desc *field_desc,
                                    uint32_t uint32)
@@ -350,6 +410,13 @@ lwpb_err_t lwpb_encoder_add_uint32(struct lwpb_encoder *encoder,
     return lwpb_encoder_add_field(encoder, field_desc, &value);
 }
 
+/**
+ * Encodes a field of type 'int64'.
+ * @param encoder
+ * @param field_desc Field descriptor of field to encode
+ * @param int64 Value
+ * @return Returns LWPB_ERR_OK if successful.
+ */
 lwpb_err_t lwpb_encoder_add_int64(struct lwpb_encoder *encoder,
                                   const struct lwpb_field_desc *field_desc,
                                   int64_t int64)
@@ -359,6 +426,13 @@ lwpb_err_t lwpb_encoder_add_int64(struct lwpb_encoder *encoder,
     return lwpb_encoder_add_field(encoder, field_desc, &value);
 }
 
+/**
+ * Encodes a field of type 'uint64'.
+ * @param encoder
+ * @param field_desc Field descriptor of field to encode
+ * @param uint64 Value
+ * @return Returns LWPB_ERR_OK if successful.
+ */
 lwpb_err_t lwpb_encoder_add_uint64(struct lwpb_encoder *encoder,
                                    const struct lwpb_field_desc *field_desc,
                                    uint64_t uint64)
@@ -368,6 +442,13 @@ lwpb_err_t lwpb_encoder_add_uint64(struct lwpb_encoder *encoder,
     return lwpb_encoder_add_field(encoder, field_desc, &value);
 }
 
+/**
+ * Encodes a field of type 'bool'.
+ * @param encoder
+ * @param field_desc Field descriptor of field to encode
+ * @param bool Value
+ * @return Returns LWPB_ERR_OK if successful.
+ */
 lwpb_err_t lwpb_encoder_add_bool(struct lwpb_encoder *encoder,
                                  const struct lwpb_field_desc *field_desc,
                                  lwpb_bool_t bool)
@@ -377,6 +458,13 @@ lwpb_err_t lwpb_encoder_add_bool(struct lwpb_encoder *encoder,
     return lwpb_encoder_add_field(encoder, field_desc, &value);
 }
 
+/**
+ * Encodes a field of type 'enum'.
+ * @param encoder
+ * @param field_desc Field descriptor of field to encode
+ * @param enum_ Value
+ * @return Returns LWPB_ERR_OK if successful.
+ */
 lwpb_err_t lwpb_encoder_add_enum(struct lwpb_encoder *encoder,
                                  const struct lwpb_field_desc *field_desc,
                                  lwpb_enum_t enum_)
@@ -386,6 +474,14 @@ lwpb_err_t lwpb_encoder_add_enum(struct lwpb_encoder *encoder,
     return lwpb_encoder_add_field(encoder, field_desc, &value);
 }
 
+/**
+ * Encodes a field of type 'string'.
+ * @note The string must be null-termiated.
+ * @param encoder
+ * @param field_desc Field descriptor of field to encode
+ * @param str Value
+ * @return Returns LWPB_ERR_OK if successful.
+ */
 lwpb_err_t lwpb_encoder_add_string(struct lwpb_encoder *encoder,
                                    const struct lwpb_field_desc *field_desc,
                                    char *str)
@@ -396,6 +492,14 @@ lwpb_err_t lwpb_encoder_add_string(struct lwpb_encoder *encoder,
     return lwpb_encoder_add_field(encoder, field_desc, &value);
 }
 
+/**
+ * Encodes a field of type 'bytes'.
+ * @param encoder
+ * @param field_desc Field descriptor of field to encode
+ * @param data Bytes to encode
+ * @param len Number of bytes to encode
+ * @return Returns LWPB_ERR_OK if successful.
+ */
 lwpb_err_t lwpb_encoder_add_bytes(struct lwpb_encoder *encoder,
                                   const struct lwpb_field_desc *field_desc,
                                   uint8_t *data, size_t len)
