@@ -14,7 +14,8 @@ lwpb/rpc/socket_client.c \
 lwpb/rpc/socket_helper.c \
 lwpb/rpc/socket_protocol_pb2.c \
 lwpb/rpc/socket_server.c \
-lwpb/rpc/transport.c
+lwpb/rpc/transport.c \
+lwpb/utils/struct_decoder.c
 
 liblwpb_la_CFLAGS = -I./lwpb/core -I./lwpb/rpc
 
@@ -24,7 +25,8 @@ test_full \
 test_full_generate \
 test_rpc_direct \
 test_rpc_socket_client \
-test_rpc_socket_server
+test_rpc_socket_server \
+test_struct_map
 
 test_simple_SOURCES = \
 test/test_simple.c \
@@ -42,7 +44,7 @@ test_full_generate_SOURCES = \
 test/test_full_generate.cc \
 test/generated/test_full.pb.cc
 
-test_full_generate_LDADD = /usr/lib/libprotobuf.la -lpthread
+test_full_generate_LDADD = /usr/local/lib/libprotobuf.la -lpthread
 
 test_rpc_direct_SOURCES = \
 test/test_rpc_direct.c \
@@ -61,3 +63,9 @@ test/test_rpc_socket_server.c \
 test/generated/test_rpc_pb2.c
 
 test_rpc_socket_server_LDADD = liblwpb.la
+
+test_struct_map_SOURCES = \
+test/test_struct_map.c \
+test/generated/test_struct_map_pb2.c
+
+test_struct_map_LDADD = liblwpb.la
