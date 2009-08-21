@@ -2,24 +2,6 @@ SUBDIRS = .
 
 lib_LTLIBRARIES = liblwpb.la
 
-liblwpb_ladir = lwpb
-
-liblwpb_la_HEADERS = \
-include/lwpb/lwpb.h \
-include/lwpb/core/debug.h \
-include/lwpb/core/decoder.h \
-include/lwpb/core/encoder.h \
-include/lwpb/core/misc.h \
-include/lwpb/core/types.h \
-include/lwpb/rpc/client.h \
-include/lwpb/rpc/direct.h \
-include/lwpb/rpc/server.h \
-include/lwpb/rpc/socket_client.h \
-include/lwpb/rpc/socket_server.h \
-include/lwpb/rpc/transport.h \
-include/lwpb/utils/struct_decoder.h \
-include/lwpb/utils/struct_map.h
-
 liblwpb_la_SOURCES = \
 lwpb/core/buf.c \
 lwpb/core/decoder.c \
