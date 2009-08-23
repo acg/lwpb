@@ -26,7 +26,7 @@ dump_message_bytes(google::protobuf::Message *message,
     assert(0);
   bytes = (unsigned char *) rv.data();
   len = rv.size();
-  printf ("static const uint8_t %s[%u] = { ", label, len);
+  printf ("static const u8_t %s[%u] = { ", label, len);
   for (unsigned i = 0; i < len; i++) {
     if (i)
       printf (", ");

@@ -18,7 +18,6 @@
  * limitations under the License.
  */
 
-#include <stdint.h>
 #include <string.h>
 
 #include <lwpb/lwpb.h>
@@ -26,12 +25,13 @@
 #include "socket_helper.h"
 #include "socket_protocol_pb2.h"
 
+
 #define PROTOCOL_MAGIC 0xdeadbeaf
 
 struct pre_header {
-    uint32_t magic;
-    uint32_t header_len;
-    uint32_t msg_len;
+    u32_t magic;
+    u32_t header_len;
+    u32_t msg_len;
 };
 
 
@@ -40,7 +40,7 @@ int send_request(int socket, const struct lwpb_method_desc *method_desc,
 {
     struct lwpb_encoder encoder;
     struct pre_header pre_header;
-    uint8_t header[128];
+    u8_t header[128];
     size_t len;
     
     lwpb_encoder_init(&encoder);
@@ -64,7 +64,7 @@ int send_response(int socket, const struct lwpb_method_desc *method_desc,
 {
     struct lwpb_encoder encoder;
     struct pre_header pre_header;
-    uint8_t header[128];
+    u8_t header[128];
     size_t len;
     
     lwpb_encoder_init(&encoder);
@@ -130,7 +130,7 @@ protocol_parse_err_t parse_request(void *buf, size_t len,
 {
     struct lwpb_decoder decoder;
     struct pre_header *pre_header;
-    uint32_t header_len;
+    u32_t header_len;
     
     if (len < sizeof(struct pre_header))
         return PARSE_ERR_END_OF_BUF;

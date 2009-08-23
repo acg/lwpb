@@ -18,14 +18,10 @@
  * limitations under the License.
  */
 
-#include <stdint.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
 #include <lwpb/lwpb.h>
 
 #include "private.h"
+
 
 #define MSG_RESERVE_BYTES 10
 
@@ -40,7 +36,7 @@
  * @return Returns LWPB_ERR_OK if successful or LWPB_ERR_END_OF_BUF if there
  * was not enough space left in the memory buffer. 
  */
-static lwpb_err_t encode_varint(struct lwpb_buf *buf, uint64_t varint)
+static lwpb_err_t encode_varint(struct lwpb_buf *buf, u64_t varint)
 {
     do {
         if (lwpb_buf_left(buf) < 1)
@@ -64,7 +60,7 @@ static lwpb_err_t encode_varint(struct lwpb_buf *buf, uint64_t varint)
  * @return Returns LWPB_ERR_OK if successful or LWPB_ERR_END_OF_BUF if there
  * was not enough space left in the memory buffer. 
  */
-static lwpb_err_t encode_32bit(struct lwpb_buf *buf, uint32_t value)
+static lwpb_err_t encode_32bit(struct lwpb_buf *buf, u32_t value)
 {
     if (lwpb_buf_left(buf) < 4)
         return LWPB_ERR_END_OF_BUF;
@@ -85,7 +81,7 @@ static lwpb_err_t encode_32bit(struct lwpb_buf *buf, uint32_t value)
  * @return Returns LWPB_ERR_OK if successful or LWPB_ERR_END_OF_BUF if there
  * was not enough space left in the memory buffer. 
  */
-static lwpb_err_t encode_64bit(struct lwpb_buf *buf, uint64_t value)
+static lwpb_err_t encode_64bit(struct lwpb_buf *buf, u64_t value)
 {
     if (lwpb_buf_left(buf) < 8)
         return LWPB_ERR_END_OF_BUF;
@@ -210,7 +206,7 @@ lwpb_err_t lwpb_encoder_add_field(struct lwpb_encoder *encoder,
     lwpb_err_t ret;
     struct lwpb_encoder_stack_frame *frame;
     int i;
-    uint64_t key;
+    u64_t key;
     enum wire_type wire_type;
     union wire_value wire_value;
     
@@ -229,11 +225,11 @@ lwpb_err_t lwpb_encoder_add_field(struct lwpb_encoder *encoder,
     switch (field_desc->opts.typ) {
     case LWPB_DOUBLE:
         wire_type = WT_64BIT;
-        wire_value.int64 = *((uint64_t *) &value->double_);
+        wire_value.int64 = *((u64_t *) &value->double_);
         break;
     case LWPB_FLOAT:
         wire_type = WT_32BIT;
-        wire_value.int32 = *((uint32_t *) &value->float_);
+        wire_value.int32 = *((u32_t *) &value->float_);
         break;
     case LWPB_INT32:
         wire_type = WT_VARINT;
@@ -246,7 +242,7 @@ lwpb_err_t lwpb_encoder_add_field(struct lwpb_encoder *encoder,
     case LWPB_SINT32:
         // Zig-zag encoding
         wire_type = WT_VARINT;
-        wire_value.varint = (uint32_t) ((value->int32 << 1) ^ (value->int32 >> 31));
+        wire_value.varint = (u32_t) ((value->int32 << 1) ^ (value->int32 >> 31));
         break;
     case LWPB_INT64:
         wire_type = WT_VARINT;
@@ -259,7 +255,7 @@ lwpb_err_t lwpb_encoder_add_field(struct lwpb_encoder *encoder,
     case LWPB_SINT64:
         // Zig-zag encoding
         wire_type = WT_VARINT;
-        wire_value.varint = (uint64_t) ((value->int64 << 1) ^ (value->int64 >> 63));
+        wire_value.varint = (u64_t) ((value->int64 << 1) ^ (value->int64 >> 63));
         break;
     case LWPB_FIXED32:
         wire_type = WT_32BIT;
@@ -327,9 +323,9 @@ lwpb_err_t lwpb_encoder_add_field(struct lwpb_encoder *encoder,
         // Use memmove() when writing a message field as the memory areas are
         // overlapping.
         if (field_desc->opts.typ == LWPB_MESSAGE) {
-            memmove(frame->buf.pos, wire_value.string.data, wire_value.string.len);
+            LWPB_MEMMOVE(frame->buf.pos, wire_value.string.data, wire_value.string.len);
         } else {
-            memcpy(frame->buf.pos, wire_value.string.data, wire_value.string.len);
+            LWPB_MEMCPY(frame->buf.pos, wire_value.string.data, wire_value.string.len);
         }
         frame->buf.pos += wire_value.string.len;
         break;
@@ -387,7 +383,7 @@ lwpb_err_t lwpb_encoder_add_float(struct lwpb_encoder *encoder,
  */
 lwpb_err_t lwpb_encoder_add_int32(struct lwpb_encoder *encoder,
                                   const struct lwpb_field_desc *field_desc,
-                                  int32_t int32)
+                                  s32_t int32)
 {
     union lwpb_value value;
     value.int32 = int32;
@@ -403,7 +399,7 @@ lwpb_err_t lwpb_encoder_add_int32(struct lwpb_encoder *encoder,
  */
 lwpb_err_t lwpb_encoder_add_uint32(struct lwpb_encoder *encoder,
                                    const struct lwpb_field_desc *field_desc,
-                                   uint32_t uint32)
+                                   u32_t uint32)
 {
     union lwpb_value value;
     value.uint32 = uint32;
@@ -419,7 +415,7 @@ lwpb_err_t lwpb_encoder_add_uint32(struct lwpb_encoder *encoder,
  */
 lwpb_err_t lwpb_encoder_add_int64(struct lwpb_encoder *encoder,
                                   const struct lwpb_field_desc *field_desc,
-                                  int64_t int64)
+                                  s64_t int64)
 {
     union lwpb_value value;
     value.int64 = int64;
@@ -435,7 +431,7 @@ lwpb_err_t lwpb_encoder_add_int64(struct lwpb_encoder *encoder,
  */
 lwpb_err_t lwpb_encoder_add_uint64(struct lwpb_encoder *encoder,
                                    const struct lwpb_field_desc *field_desc,
-                                   uint64_t uint64)
+                                   u64_t uint64)
 {
     union lwpb_value value;
     value.uint64 = uint64;
@@ -488,7 +484,7 @@ lwpb_err_t lwpb_encoder_add_string(struct lwpb_encoder *encoder,
 {
     union lwpb_value value;
     value.string.str = str;
-    value.string.len = strlen(str);
+    value.string.len = LWPB_STRLEN(str);
     return lwpb_encoder_add_field(encoder, field_desc, &value);
 }
 
@@ -502,7 +498,7 @@ lwpb_err_t lwpb_encoder_add_string(struct lwpb_encoder *encoder,
  */
 lwpb_err_t lwpb_encoder_add_bytes(struct lwpb_encoder *encoder,
                                   const struct lwpb_field_desc *field_desc,
-                                  uint8_t *data, size_t len)
+                                  u8_t *data, size_t len)
 {
     union lwpb_value value;
     value.string.str = (char *) data;

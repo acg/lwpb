@@ -21,10 +21,8 @@
 #ifndef __LWPB_UTILS_STRUCT_DECODER_H__
 #define __LWPB_UTILS_STRUCT_DECODER_H__
 
-#include <stdint.h>
-#include <stdlib.h>
-
 #include <lwpb/lwpb.h>
+
 
 /* Forward declaration */
 struct lwpb_struct_decoder;

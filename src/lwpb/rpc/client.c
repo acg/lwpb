@@ -18,12 +18,8 @@
  * limitations under the License.
  */
 
-#include <stdint.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
 #include <lwpb/lwpb.h>
+
 
 /**
  * Initializes the client.

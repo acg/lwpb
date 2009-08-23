@@ -18,14 +18,10 @@
  * limitations under the License.
  */
 
-#include <stdint.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
 #include <lwpb/lwpb.h>
 
 #include "private.h"
+
 
 static const struct lwpb_struct_map_field *find_map_field(
         const struct lwpb_struct_map *map,
@@ -71,27 +67,27 @@ static void unpack_field(struct lwpb_struct_decoder *sdecoder,
     case LWPB_INT32:
     case LWPB_SINT32:
     case LWPB_SFIXED32:
-        LWPB_ASSERT(field->len == sizeof(int32_t), "Field type mismatch");
-        *((int32_t *) FIELD_BASE(field, frame->base, frame->field_index)) = value->int32;
+        LWPB_ASSERT(field->len == sizeof(s32_t), "Field type mismatch");
+        *((s32_t *) FIELD_BASE(field, frame->base, frame->field_index)) = value->int32;
         frame->field_index++;
         break;
     case LWPB_UINT32:
     case LWPB_FIXED32:
-        LWPB_ASSERT(field->len == sizeof(uint32_t), "Field type mismatch");
-        *((uint32_t *) FIELD_BASE(field, frame->base, frame->field_index)) = value->uint32;
+        LWPB_ASSERT(field->len == sizeof(u32_t), "Field type mismatch");
+        *((u32_t *) FIELD_BASE(field, frame->base, frame->field_index)) = value->uint32;
         frame->field_index++;
         break;
     case LWPB_INT64:
     case LWPB_SINT64:
     case LWPB_SFIXED64:
-        LWPB_ASSERT(field->len == sizeof(int64_t), "Field type mismatch");
-        *((int64_t *) FIELD_BASE(field, frame->base, frame->field_index)) = value->int64;
+        LWPB_ASSERT(field->len == sizeof(s64_t), "Field type mismatch");
+        *((s64_t *) FIELD_BASE(field, frame->base, frame->field_index)) = value->int64;
         frame->field_index++;
         break;
     case LWPB_UINT64:
     case LWPB_FIXED64:
-        LWPB_ASSERT(field->len == sizeof(uint64_t), "Field type mismatch");
-        *((uint64_t *) FIELD_BASE(field, frame->base, frame->field_index)) = value->uint64;
+        LWPB_ASSERT(field->len == sizeof(u64_t), "Field type mismatch");
+        *((u64_t *) FIELD_BASE(field, frame->base, frame->field_index)) = value->uint64;
         frame->field_index++;
         break;
     case LWPB_BOOL:
@@ -106,17 +102,17 @@ static void unpack_field(struct lwpb_struct_decoder *sdecoder,
         break;
     case LWPB_STRING:
         len = field->len < value->string.len + 1 ? field->len : value->string.len + 1;
-        memcpy(FIELD_BASE(field, frame->base, frame->field_index), value->string.str, len);
+        LWPB_MEMCPY(FIELD_BASE(field, frame->base, frame->field_index), value->string.str, len);
         ((char *) FIELD_BASE(field, frame->base, frame->field_index))[len - 1] = '\0';
         frame->field_index++;
         break;
     case LWPB_BYTES:
         len = field->len < value->bytes.len ? field->len : value->bytes.len;
-        memcpy(FIELD_BASE(field, frame->base, frame->field_index), value->bytes.data, len);
+        LWPB_MEMCPY(FIELD_BASE(field, frame->base, frame->field_index), value->bytes.data, len);
         frame->field_index++;
         break;
     case LWPB_MESSAGE:
-        printf("submessage\n");
+        LWPB_DIAG_PRINTF("submessage\n");
         break;
     }
     
@@ -129,7 +125,7 @@ static void sdecoder_msg_start_handler(struct lwpb_decoder *decoder,
     struct lwpb_struct_decoder *sdecoder = arg;
     struct lwpb_struct_decoder_stack_frame *frame, *last_frame;
 
-    printf("msg start\n");
+    LWPB_DIAG_PRINTF("msg start\n");
 
     sdecoder->depth++;
     frame = &sdecoder->stack[sdecoder->depth];
@@ -157,7 +153,7 @@ static void sdecoder_msg_end_handler(struct lwpb_decoder *decoder,
     struct lwpb_struct_decoder *sdecoder = arg;
     struct lwpb_struct_decoder_stack_frame *frame;
     
-    printf("msg end\n");
+    LWPB_DIAG_PRINTF("msg end\n");
     
     sdecoder->depth--;
     frame = &sdecoder->stack[sdecoder->depth];

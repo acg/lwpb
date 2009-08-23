@@ -18,9 +18,6 @@
  * limitations under the License.
  */
 
-#include <stdint.h>
-#include <stdio.h>
-
 #include <lwpb/lwpb.h>
 #include <lwpb/rpc/direct.h>
 

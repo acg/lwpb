@@ -21,9 +21,6 @@
 #ifndef __LWPB_CORE_DECODER_H__
 #define __LWPB_CORE_DECODER_H__
 
-#include <stdint.h>
-#include <stdlib.h>
-
 #include <lwpb/lwpb.h>
 
 

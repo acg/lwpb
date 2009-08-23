@@ -21,9 +21,8 @@
 #ifndef __LWPB_RPC_SOCKET_CLIENT_H__
 #define __LWPB_RPC_SOCKET_CLIENT_H__
 
-#include <stdint.h>
-
 #include <lwpb/lwpb.h>
+
 
 /** Socket client RPC transport implementation */
 struct lwpb_transport_socket_client {
@@ -39,7 +38,7 @@ struct lwpb_transport_socket_client {
 lwpb_transport_t lwpb_transport_socket_client_init(struct lwpb_transport_socket_client *socket_client);
 
 lwpb_err_t lwpb_transport_socket_client_open(lwpb_transport_t transport,
-                                             const char *host, uint16_t port);
+                                             const char *host, u16_t port);
 
 void lwpb_transport_socket_client_close(lwpb_transport_t transport);
 

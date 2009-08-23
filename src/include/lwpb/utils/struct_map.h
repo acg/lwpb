@@ -21,10 +21,8 @@
 #ifndef __LWPB_UTILS_STRUCT_MAP_H__
 #define __LWPB_UTILS_STRUCT_MAP_H__
 
-#include <stdint.h>
-#include <stdlib.h>
-
 #include <lwpb/lwpb.h>
+
 
 #define LWPB_STRUCT_MAP_BEGIN(_name_, _msg_desc_, _struct_)                 \
 const struct lwpb_struct_map _name_ = {                                     \
@@ -39,16 +37,16 @@ const struct lwpb_struct_map _name_ = {                                     \
     LWPB_STRUCT_MAP_FIELD(_field_desc_, _struct_, _field_, sizeof(float)), _count_)
 
 #define LWPB_STRUCT_MAP_INT32(_field_desc_, _struct_, _field_, _count_)     \
-    LWPB_STRUCT_MAP_FIELD(_field_desc_, _struct_, _field_, sizeof(int32_t), _count_)
+    LWPB_STRUCT_MAP_FIELD(_field_desc_, _struct_, _field_, sizeof(s32_t), _count_)
 
 #define LWPB_STRUCT_MAP_UINT32(_field_desc_, _struct_, _field_, _count_)    \
-    LWPB_STRUCT_MAP_FIELD(_field_desc_, _struct_, _field_, sizeof(uint32_t), _count_)
+    LWPB_STRUCT_MAP_FIELD(_field_desc_, _struct_, _field_, sizeof(u32_t), _count_)
 
 #define LWPB_STRUCT_MAP_INT64(_field_desc_, _struct_, _field_, _count_)     \
-    LWPB_STRUCT_MAP_FIELD(_field_desc_, _struct_, _field_, sizeof(int64_t), _count_)
+    LWPB_STRUCT_MAP_FIELD(_field_desc_, _struct_, _field_, sizeof(s64_t), _count_)
 
 #define LWPB_STRUCT_MAP_UINT64(_field_desc_, _struct_, _field_, _count_)    \
-    LWPB_STRUCT_MAP_FIELD(_field_desc_, _struct_, _field_, sizeof(uint64_t), _count_)
+    LWPB_STRUCT_MAP_FIELD(_field_desc_, _struct_, _field_, sizeof(u64_t), _count_)
 
 #define LWPB_STRUCT_MAP_BOOL(_field_desc_, _struct_, _field_, _count_)  \
     LWPB_STRUCT_MAP_FIELD(_field_desc_, _struct_, _field_, sizeof(lwpb_bool_t), _count_)

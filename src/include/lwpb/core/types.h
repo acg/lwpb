@@ -21,8 +21,7 @@
 #ifndef __LWPB_CORE_TYPES_H__
 #define __LWPB_CORE_TYPES_H__
 
-#include <stdint.h>
-#include <stdlib.h>
+#include <lwpb/lwpb.h>
 
 
 /* Maximum depth of message embedding */
@@ -117,17 +116,17 @@ typedef int lwpb_enum_t;
 union lwpb_value {
     double double_;
     float float_;
-    int32_t int32;
-    int64_t int64;
-    uint32_t uint32;
-    uint64_t uint64;
+    s32_t int32;
+    s64_t int64;
+    u32_t uint32;
+    u64_t uint64;
     lwpb_bool_t bool;
     struct {
         char *str;
         size_t len;
     } string;
     struct {
-        uint8_t *data;
+        u8_t *data;
         size_t len;
     } bytes;
     struct {
@@ -143,7 +142,7 @@ struct lwpb_msg_desc;
 
 /** Protocol buffer field descriptor */
 struct lwpb_field_desc {
-    uint32_t number;            /**< Field number */
+    u32_t number;               /**< Field number */
     lwpb_field_opts_t opts;     /**< Field options (label, value type, flags) */
     const struct lwpb_msg_desc *msg_desc; /**< Message descriptor, if field is message */
 #if LWPB_FIELD_NAMES
@@ -156,7 +155,7 @@ struct lwpb_field_desc {
 
 /** Protocol buffer message descriptor */
 struct lwpb_msg_desc {
-    uint32_t num_fields;        /**< Number of fields */
+    u32_t num_fields;           /**< Number of fields */
     const struct lwpb_field_desc *fields; /**< Array of field descriptors */
 #if LWPB_MESSAGE_NAMES
     const char *name;
@@ -178,7 +177,7 @@ struct lwpb_method_desc {
 
 /** Protocol buffer service descriptor */
 struct lwpb_service_desc {
-    const uint32_t num_methods; /**< Number of methods */
+    const u32_t num_methods;    /**< Number of methods */
     const struct lwpb_method_desc *methods; /**< Array of method descriptors */
 #if LWPB_SERVICE_NAMES
     const char *name;           /**< Service name */
@@ -194,9 +193,9 @@ typedef enum {
 
 /** Simple memory buffer */
 struct lwpb_buf {
-    uint8_t *base;  /**< Buffers base address */
-    uint8_t *pos;   /**< Buffers current position */
-    uint8_t *end;   /**< Buffers end address (first invalid byte) */
+    u8_t *base;     /**< Buffers base address */
+    u8_t *pos;      /**< Buffers current position */
+    u8_t *end;      /**< Buffers end address (first invalid byte) */
 };
 
 #endif // __LWPB_CORE_TYPES_H__

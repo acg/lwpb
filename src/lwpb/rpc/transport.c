@@ -18,12 +18,8 @@
  * limitations under the License.
  */
 
-#include <stdint.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
 #include <lwpb/lwpb.h>
+
 
 // Default allocator implementation
 
@@ -38,7 +34,7 @@ static lwpb_err_t default_alloc_buf(lwpb_transport_t transport,
                                     void **buf, size_t *len)
 {
     *len = 1024;
-    *buf = malloc(*len);
+    *buf = LWPB_MALLOC(*len);
     
     return *buf ? LWPB_ERR_OK : LWPB_ERR_MEM;
 }
@@ -50,7 +46,7 @@ static lwpb_err_t default_alloc_buf(lwpb_transport_t transport,
  */
 static void default_free_buf(lwpb_transport_t transport, void *buf)
 {
-    free(buf);
+    LWPB_FREE(buf);
 };
 
 /** Default allocator functions */

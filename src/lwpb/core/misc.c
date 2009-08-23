@@ -20,6 +20,7 @@
 
 #include <lwpb/lwpb.h>
 
+
 /**
  * Returns a textual description of an lwpb error code.
  * @param err Error code

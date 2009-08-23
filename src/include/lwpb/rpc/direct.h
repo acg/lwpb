@@ -21,9 +21,8 @@
 #ifndef __LWPB_RPC_DIRECT_H__
 #define __LWPB_RPC_DIRECT_H__
 
-#include <stdint.h>
-
 #include <lwpb/lwpb.h>
+
 
 /** Direct RPC transport implementation */
 struct lwpb_transport_direct {

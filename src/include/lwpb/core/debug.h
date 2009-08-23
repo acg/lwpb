@@ -21,28 +21,31 @@
 #ifndef __LWPB_CORE_DEBUG_H__
 #define __LWPB_CORE_DEBUG_H__
 
-#include <stdint.h>
-#include <stdlib.h>
+#include <lwpb/lwpb.h>
+
 
 /** Simple assert macro */
 #define LWPB_ASSERT(_expr_, _msg_)                                          \
     do {                                                                    \
         if (!(_expr_)) {                                                    \
-            printf(_msg_ "\n");                                             \
-            exit(0);                                                        \
+            LWPB_DIAG_PRINTF(_msg_ "\n");                                   \
+            LWPB_EXIT();                                                    \
         }                                                                   \
     } while (0)
 
 /** Simple failure macro */
 #define LWPB_FAIL(_msg_)                                                    \
     do {                                                                    \
-        printf(_msg_ "\n");                                                 \
-        exit(0);                                                            \
+        LWPB_DIAG_PRINTF(_msg_ "\n");                                       \
+        LWPB_EXIT();                                                        \
     } while(0)
 
 /* Logging macros */
-#define LWPB_DEBUG(_format_, _args_...) printf("DBG: " _format_ "\n", ##_args_)
-#define LWPB_INFO(_format_, _args_...) printf("INF: " _format_ "\n", ##_args_)
-#define LWPB_ERR(_format_, _args_...) printf("ERR: " _format_ "\n", ##_args_)
+#define LWPB_DEBUG(_format_, _args_...) \
+    LWPB_DIAG_PRINTF("DBG: " _format_ "\n", ##_args_)
+#define LWPB_INFO(_format_, _args_...) \
+    LWPB_DIAG_PRINTF("INF: " _format_ "\n", ##_args_)
+#define LWPB_ERR(_format_, _args_...) \
+    LWPB_DIAG_PRINTF("ERR: " _format_ "\n", ##_args_)
 
 #endif // __LWPB_CORE_DEBUG_H__

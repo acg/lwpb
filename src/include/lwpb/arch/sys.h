@@ -1,7 +1,7 @@
 /**
- * @file lwpb.h
+ * @file sys.h
  * 
- * Lightweight protocol buffers.
+ * System specifics.
  * 
  * Copyright 2009 Simon Kallweit
  * 
@@ -18,19 +18,20 @@
  * limitations under the License.
  */
 
-#ifndef __LWPB_H__
-#define __LWPB_H__
+#ifndef __LWPB_ARCH_SYS_H__
+#define __LWPB_ARCH_SYS_H__
 
-#include <lwpb/core/arch.h>
-#include <lwpb/core/debug.h>
-#include <lwpb/core/types.h>
-#include <lwpb/core/decoder.h>
-#include <lwpb/core/encoder.h>
-#include <lwpb/core/misc.h>
-#include <lwpb/rpc/transport.h>
-#include <lwpb/rpc/client.h>
-#include <lwpb/rpc/server.h>
-#include <lwpb/utils/struct_decoder.h>
-#include <lwpb/utils/struct_map.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
-#endif // __LWPB_H__
+#define LWPB_MALLOC(size) malloc(size)
+#define LWPB_FREE(ptr) free(ptr)
+#define LWPB_MEMCPY(dest, src, n) memcpy(dest, src, n)
+#define LWPB_MEMMOVE(dest, src, n) memmove(dest, src, n)
+#define LWPB_STRLEN(s) strlen(s)
+
+#define LWPB_DIAG_PRINTF(fmt, args...) printf(fmt, ##args)
+#define LWPB_EXIT() abort()
+
+#endif // __LWPB_ARCH_CC_H__

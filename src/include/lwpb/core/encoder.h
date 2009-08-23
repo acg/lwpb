@@ -21,9 +21,6 @@
 #ifndef __LWPB_CORE_ENCODER_H__
 #define __LWPB_CORE_ENCODER_H__
 
-#include <stdint.h>
-#include <stdlib.h>
-
 #include <lwpb/lwpb.h>
 
 
@@ -66,19 +63,19 @@ lwpb_err_t lwpb_encoder_add_float(struct lwpb_encoder *encoder,
 
 lwpb_err_t lwpb_encoder_add_int32(struct lwpb_encoder *encoder,
                                   const struct lwpb_field_desc *field_desc,
-                                  int32_t int32);
+                                  s32_t int32);
 
 lwpb_err_t lwpb_encoder_add_uint32(struct lwpb_encoder *encoder,
                                    const struct lwpb_field_desc *field_desc,
-                                   uint32_t uint32);
+                                   u32_t uint32);
 
 lwpb_err_t lwpb_encoder_add_int64(struct lwpb_encoder *encoder,
                                   const struct lwpb_field_desc *field_desc,
-                                  int64_t int64);
+                                  s64_t int64);
 
 lwpb_err_t lwpb_encoder_add_uint64(struct lwpb_encoder *encoder,
                                    const struct lwpb_field_desc *field_desc,
-                                   uint64_t uint64);
+                                   u64_t uint64);
 
 lwpb_err_t lwpb_encoder_add_bool(struct lwpb_encoder *encoder,
                                  const struct lwpb_field_desc *field_desc,
@@ -94,7 +91,7 @@ lwpb_err_t lwpb_encoder_add_string(struct lwpb_encoder *encoder,
 
 lwpb_err_t lwpb_encoder_add_bytes(struct lwpb_encoder *encoder,
                                   const struct lwpb_field_desc *field_desc,
-                                  uint8_t *data, size_t len);
+                                  u8_t *data, size_t len);
 
 
 #endif // __LWPB_CORE_ENCODER_H__

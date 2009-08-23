@@ -6,8 +6,8 @@
 #include "generated/test_struct_map_pb2.h"
 
 struct test_struct_nested1 {
-    int32_t field_int32;
-    int64_t field_int64;
+    s32_t field_int32;
+    s64_t field_int64;
 };
 
 struct test_struct_nested2 {
@@ -15,12 +15,12 @@ struct test_struct_nested2 {
 };
 
 struct test_struct {
-    int32_t field_int32;
-    int64_t field_int64;
+    s32_t field_int32;
+    s64_t field_int64;
     lwpb_bool_t field_bool;
     lwpb_enum_t field_enum;
     char field_string[32];
-    int8_t field_bytes[8];
+    u8_t field_bytes[8];
     struct test_struct_nested1 nested1;
     struct test_struct_nested2 nested2[8];
 };
@@ -47,19 +47,19 @@ LWPB_STRUCT_MAP_END
 
 
 
-void print_buf(uint8_t *buf, size_t len)
+void print_buf(u8_t *buf, size_t len)
 {
     int i = 0;
     
-    printf("{ ");
+    LWPB_DIAG_PRINTF("{ ");
     while (i < len) {
-        printf("0x%02x", buf[i]);
+        LWPB_DIAG_PRINTF("0x%02x", buf[i]);
         if (i < len - 1)
-            printf(", ");
+            LWPB_DIAG_PRINTF(", ");
         i++;
     }
     
-    printf(" }");
+    LWPB_DIAG_PRINTF(" }");
 }
 
 int main()
@@ -68,7 +68,7 @@ int main()
     char buf[4096];
     size_t len;
     lwpb_err_t ret;
-    uint8_t bytes[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 };
+    u8_t bytes[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 };
     struct test_struct test_struct_instance;
     int i;
     
@@ -90,36 +90,36 @@ int main()
     lwpb_encoder_nested_end(&encoder);
     
     for (i = 0; i < 8; i++) {
-        char tmp[32];
+        char tmp[] = "test string x";
         lwpb_encoder_nested_start(&encoder, test_StructTest_nested2);
-        snprintf(tmp, sizeof(tmp), "test string %d", i);
+        tmp[12] = '0' + i;
         lwpb_encoder_add_string(&encoder, test_StructTest_Nested2_field_string, tmp);
         lwpb_encoder_nested_end(&encoder);
     }
     
     len = lwpb_encoder_finish(&encoder);
 
-    printf("encoded message length = %d\n", len);
+    LWPB_DIAG_PRINTF("encoded message length = %d\n", len);
     
     lwpb_struct_decoder_init(&sdecoder);
     ret = lwpb_struct_decoder_decode(&sdecoder, &test_struct_map, &test_struct_instance, buf, len, NULL);
     
-    printf("ret = %d\n", ret);
+    LWPB_DIAG_PRINTF("ret = %d\n", ret);
     
-    printf("test_struct.field_int32 = %d\n", test_struct_instance.field_int32);
-    printf("test_struct.field_int64 = %lld\n", test_struct_instance.field_int64);
-    printf("test_struct.field_bool = %d\n", test_struct_instance.field_bool);
-    printf("test_struct.field_enum = %d\n", test_struct_instance.field_enum);
-    printf("test_struct.field_string = '%s'\n", test_struct_instance.field_string);
-    printf("test_struct.field_bytes = ");
+    LWPB_DIAG_PRINTF("test_struct.field_int32 = %d\n", test_struct_instance.field_int32);
+    LWPB_DIAG_PRINTF("test_struct.field_int64 = %lld\n", test_struct_instance.field_int64);
+    LWPB_DIAG_PRINTF("test_struct.field_bool = %d\n", test_struct_instance.field_bool);
+    LWPB_DIAG_PRINTF("test_struct.field_enum = %d\n", test_struct_instance.field_enum);
+    LWPB_DIAG_PRINTF("test_struct.field_string = '%s'\n", test_struct_instance.field_string);
+    LWPB_DIAG_PRINTF("test_struct.field_bytes = ");
     print_buf(test_struct_instance.field_bytes, sizeof(test_struct_instance.field_bytes));
-    printf("\n");
+    LWPB_DIAG_PRINTF("\n");
     
-    printf("test_struct.nested1.field_int32 = %d\n", test_struct_instance.nested1.field_int32);
-    printf("test_struct.nested1.field_int64 = %lld\n", test_struct_instance.nested1.field_int64);
+    LWPB_DIAG_PRINTF("test_struct.nested1.field_int32 = %d\n", test_struct_instance.nested1.field_int32);
+    LWPB_DIAG_PRINTF("test_struct.nested1.field_int64 = %lld\n", test_struct_instance.nested1.field_int64);
     
     for (i = 0; i < 8; i++)
-        printf("test_struct.nested2[%d].field_string = '%s'\n", i, test_struct_instance.nested2[i].field_string);
+        LWPB_DIAG_PRINTF("test_struct.nested2[%d].field_string = '%s'\n", i, test_struct_instance.nested2[i].field_string);
     
     return 0;
 }

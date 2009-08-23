@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <limits.h>
 
 #include <lwpb/lwpb.h>
 
@@ -32,8 +33,8 @@ static int verbose = 0;
     } while (0)
 
 /** Returns !0 if buffers are equal. */
-static int buf_equal(const uint8_t *buf1, size_t len1,
-                     const uint8_t *buf2, size_t len2)
+static int buf_equal(const u8_t *buf1, size_t len1,
+                     const u8_t *buf2, size_t len2)
 {
     if (len1 != len2)
         return 0;
@@ -42,7 +43,7 @@ static int buf_equal(const uint8_t *buf1, size_t len1,
 }
 
 /** Dumps a buffer. */
-static void dump_buf(const uint8_t *buf, size_t len)
+static void dump_buf(const u8_t *buf, size_t len)
 {
     size_t i;
     
@@ -52,9 +53,9 @@ static void dump_buf(const uint8_t *buf, size_t len)
 }
 
 /** Checks a buffer vs. it's static test vector. */
-static void check_buf(const uint8_t *actual_data,
+static void check_buf(const u8_t *actual_data,
                       size_t actual_len,
-                      const uint8_t *expected_data,
+                      const u8_t *expected_data,
                       size_t expected_len,
                       const char *static_buf_name,
                       const char *filename,
@@ -78,8 +79,8 @@ static void check_buf(const uint8_t *actual_data,
     check_buf(buf, len, vector, sizeof(vector), #vector, __FILE__, __LINE__)
 
 
-static void check_value(uint64_t actual_value,
-                        uint64_t expected_value,
+static void check_value(u64_t actual_value,
+                        u64_t expected_value,
                         const char *filename,
                         unsigned lineno)
 {
@@ -95,7 +96,7 @@ static void check_value(uint64_t actual_value,
 }
 
 #define CHECK_VALUE(actual_value, expected_value) \
-    check_value((int64_t) (actual_value), (int64_t) (expected_value), \
+    check_value((s64_t) (actual_value), (s64_t) (expected_value), \
                 __FILE__, __LINE__)
 
 static void check_fvalue(double actual_value,
@@ -161,58 +162,58 @@ struct testing_fields {
         struct { lwpb_enum_t test; } TestMessRequiredEnumSmall;
         struct { lwpb_enum_t test; } TestMessRequiredEnum;
         struct { char *test; } TestFieldNo;
-        struct { int32_t test; } TestMessRequiredInt32;
-        struct { int32_t test; } TestMessRequiredSInt32;
-        struct { int32_t test; } TestMessRequiredSFixed32;
-        struct { uint32_t test; } TestMessRequiredUInt32;
-        struct { uint32_t test; } TestMessRequiredFixed32;
-        struct { int64_t test; } TestMessRequiredInt64;
-        struct { int64_t test; } TestMessRequiredSInt64;
-        struct { int64_t test; } TestMessRequiredSFixed64;
-        struct { uint64_t test; } TestMessRequiredUInt64;
-        struct { uint64_t test; } TestMessRequiredFixed64;
+        struct { s32_t test; } TestMessRequiredInt32;
+        struct { s32_t test; } TestMessRequiredSInt32;
+        struct { s32_t test; } TestMessRequiredSFixed32;
+        struct { u32_t test; } TestMessRequiredUInt32;
+        struct { u32_t test; } TestMessRequiredFixed32;
+        struct { s64_t test; } TestMessRequiredInt64;
+        struct { s64_t test; } TestMessRequiredSInt64;
+        struct { s64_t test; } TestMessRequiredSFixed64;
+        struct { u64_t test; } TestMessRequiredUInt64;
+        struct { u64_t test; } TestMessRequiredFixed64;
         struct { float test; } TestMessRequiredFloat;
         struct { double test; } TestMessRequiredDouble;
         struct { lwpb_bool_t test; } TestMessRequiredBool;
         struct { char *test; } TestMessRequiredString;
-        struct { uint8_t *test; } TestMessRequiredBytes;
+        struct { u8_t *test; } TestMessRequiredBytes;
         struct {
-            int32_t test_int32;
-            int32_t test_sint32;
-            int32_t test_sfixed32;
-            uint32_t test_uint32;
-            uint32_t test_fixed32;
-            int64_t test_int64;
-            int64_t test_sint64;
-            int64_t test_sfixed64;
-            uint64_t test_uint64;
-            uint64_t test_fixed64;
+            s32_t test_int32;
+            s32_t test_sint32;
+            s32_t test_sfixed32;
+            u32_t test_uint32;
+            u32_t test_fixed32;
+            s64_t test_int64;
+            s64_t test_sint64;
+            s64_t test_sfixed64;
+            u64_t test_uint64;
+            u64_t test_fixed64;
             float test_float;
             double test_double;
             lwpb_bool_t test_boolean;
             lwpb_enum_t test_enum_small;
             lwpb_enum_t test_enum;
             char *test_string;
-            uint8_t *test_bytes;
+            u8_t *test_bytes;
         } TestMessOptional;
         struct {
-            int32_t *test_int32;
-            int32_t *test_sint32;
-            int32_t *test_sfixed32;
-            uint32_t *test_uint32;
-            uint32_t *test_fixed32;
-            int64_t *test_int64;
-            int64_t *test_sint64;
-            int64_t *test_sfixed64;
-            uint64_t *test_uint64;
-            uint64_t *test_fixed64;
+            s32_t *test_int32;
+            s32_t *test_sint32;
+            s32_t *test_sfixed32;
+            u32_t *test_uint32;
+            u32_t *test_fixed32;
+            s64_t *test_int64;
+            s64_t *test_sint64;
+            s64_t *test_sfixed64;
+            u64_t *test_uint64;
+            u64_t *test_fixed64;
             float *test_float;
             double *test_double;
             lwpb_bool_t *test_boolean;
             lwpb_enum_t *test_enum_small;
             lwpb_enum_t *test_enum;
             char **test_string;
-            uint8_t *test_bytes;
+            u8_t *test_bytes;
         } TestMess;
     } u;
 };
@@ -393,7 +394,7 @@ static void test_enum_small(void)
         struct lwpb_encoder encoder;                                        \
         struct lwpb_decoder decoder;                                        \
         struct testing_fields fields;                                       \
-        uint8_t buf[128];                                                   \
+        u8_t buf[128];                                                   \
         size_t len, used;                                                   \
         lwpb_encoder_init(&encoder);                                        \
         lwpb_encoder_start(&encoder, foo_TestMessRequiredEnumSmall, buf, sizeof(buf)); \
@@ -424,7 +425,7 @@ static void test_enum_big(void)
         struct lwpb_encoder encoder;                                        \
         struct lwpb_decoder decoder;                                        \
         struct testing_fields fields;                                       \
-        uint8_t buf[128];                                                   \
+        u8_t buf[128];                                                   \
         size_t len, used;                                                   \
         lwpb_encoder_init(&encoder);                                        \
         lwpb_encoder_start(&encoder, foo_TestMessRequiredEnum, buf, sizeof(buf)); \
@@ -462,7 +463,7 @@ static void test_field_numbers(void)
         struct lwpb_encoder encoder;                                        \
         struct lwpb_decoder decoder;                                        \
         struct testing_fields fields;                                       \
-        uint8_t buf[128];                                                   \
+        u8_t buf[128];                                                   \
         size_t len, used;                                                   \
         lwpb_encoder_init(&encoder);                                        \
         lwpb_encoder_start(&encoder, foo_TestFieldNo##field, buf, sizeof(buf)); \
@@ -497,7 +498,7 @@ static void test_field_numbers(void)
         struct lwpb_encoder encoder;                                        \
         struct lwpb_decoder decoder;                                        \
         struct testing_fields fields;                                       \
-        uint8_t buf[256];                                                   \
+        u8_t buf[256];                                                   \
         size_t len, used;                                                   \
         lwpb_encoder_init(&encoder);                                        \
         lwpb_encoder_start(&encoder, foo_TestMessRequired##msg_type, buf, sizeof(buf)); \
@@ -516,67 +517,67 @@ static void test_field_numbers(void)
 
 static void test_required_int32(void)
 {
-    DO_TEST_REQUIRED(Int32, int32, INT32_MIN, test_required_int32_min);
+    DO_TEST_REQUIRED(Int32, int32, S32_MIN, test_required_int32_min);
     DO_TEST_REQUIRED(Int32, int32, -1000, test_required_int32_m1000);
     DO_TEST_REQUIRED(Int32, int32, 0, test_required_int32_0);
-    DO_TEST_REQUIRED(Int32, int32, INT32_MAX, test_required_int32_max);
+    DO_TEST_REQUIRED(Int32, int32, S32_MAX, test_required_int32_max);
 }
 
 static void test_required_sint32(void)
 {
-    DO_TEST_REQUIRED(SInt32, int32, INT32_MIN, test_required_sint32_min);
+    DO_TEST_REQUIRED(SInt32, int32, S32_MIN, test_required_sint32_min);
     DO_TEST_REQUIRED(SInt32, int32, -1000, test_required_sint32_m1000);
     DO_TEST_REQUIRED(SInt32, int32, 0, test_required_sint32_0);
-    DO_TEST_REQUIRED(SInt32, int32, INT32_MAX, test_required_sint32_max);
+    DO_TEST_REQUIRED(SInt32, int32, S32_MAX, test_required_sint32_max);
 }
 
 static void test_required_sfixed32(void)
 {
-    DO_TEST_REQUIRED(SFixed32, int32, INT32_MIN, test_required_sfixed32_min);
+    DO_TEST_REQUIRED(SFixed32, int32, S32_MIN, test_required_sfixed32_min);
     DO_TEST_REQUIRED(SFixed32, int32, -1000, test_required_sfixed32_m1000);
     DO_TEST_REQUIRED(SFixed32, int32, 0, test_required_sfixed32_0);
-    DO_TEST_REQUIRED(SFixed32, int32, INT32_MAX, test_required_sfixed32_max);
+    DO_TEST_REQUIRED(SFixed32, int32, S32_MAX, test_required_sfixed32_max);
 }
 
 static void test_required_uint32(void)
 {
     DO_TEST_REQUIRED(UInt32, uint32, 0, test_required_uint32_0);
     DO_TEST_REQUIRED(UInt32, uint32, MILLION, test_required_uint32_million);
-    DO_TEST_REQUIRED(UInt32, uint32, UINT32_MAX, test_required_uint32_max);
+    DO_TEST_REQUIRED(UInt32, uint32, U32_MAX, test_required_uint32_max);
 }
 
 static void test_required_fixed32(void)
 {
     DO_TEST_REQUIRED(Fixed32, uint32, 0, test_required_fixed32_0);
     DO_TEST_REQUIRED(Fixed32, uint32, MILLION, test_required_fixed32_million);
-    DO_TEST_REQUIRED(Fixed32, uint32, UINT32_MAX, test_required_fixed32_max);
+    DO_TEST_REQUIRED(Fixed32, uint32, U32_MAX, test_required_fixed32_max);
 }
 
 static void test_required_int64(void)
 {
-    DO_TEST_REQUIRED(Int64, int64, INT64_MIN, test_required_int64_min);
+    DO_TEST_REQUIRED(Int64, int64, S64_MIN, test_required_int64_min);
     DO_TEST_REQUIRED(Int64, int64, -TRILLION, test_required_int64_mtril);
     DO_TEST_REQUIRED(Int64, int64, 0, test_required_int64_0);
     DO_TEST_REQUIRED(Int64, int64, QUADRILLION, test_required_int64_quad);
-    DO_TEST_REQUIRED(Int64, int64, INT64_MAX, test_required_int64_max);
+    DO_TEST_REQUIRED(Int64, int64, S64_MAX, test_required_int64_max);
 }
 
 static void test_required_sint64(void)
 {
-    DO_TEST_REQUIRED(SInt64, int64, INT64_MIN, test_required_sint64_min);
+    DO_TEST_REQUIRED(SInt64, int64, S64_MIN, test_required_sint64_min);
     DO_TEST_REQUIRED(SInt64, int64, -TRILLION, test_required_sint64_mtril);
     DO_TEST_REQUIRED(SInt64, int64, 0, test_required_sint64_0);
     DO_TEST_REQUIRED(SInt64, int64, QUADRILLION, test_required_sint64_quad);
-    DO_TEST_REQUIRED(SInt64, int64, INT64_MAX, test_required_sint64_max);
+    DO_TEST_REQUIRED(SInt64, int64, S64_MAX, test_required_sint64_max);
 }
 
 static void test_required_sfixed64(void)
 {
-    DO_TEST_REQUIRED(SFixed64, int64, INT64_MIN, test_required_sfixed64_min);
+    DO_TEST_REQUIRED(SFixed64, int64, S64_MIN, test_required_sfixed64_min);
     DO_TEST_REQUIRED(SFixed64, int64, -TRILLION, test_required_sfixed64_mtril);
     DO_TEST_REQUIRED(SFixed64, int64, 0, test_required_sfixed64_0);
     DO_TEST_REQUIRED(SFixed64, int64, QUADRILLION, test_required_sfixed64_quad);
-    DO_TEST_REQUIRED(SFixed64, int64, INT64_MAX, test_required_sfixed64_max);
+    DO_TEST_REQUIRED(SFixed64, int64, S64_MAX, test_required_sfixed64_max);
 }
 
 static void test_required_uint64(void)
@@ -588,7 +589,7 @@ static void test_required_uint64(void)
     DO_TEST_REQUIRED(UInt64, uint64, TRILLION, test_required_uint64_tril);
     DO_TEST_REQUIRED(UInt64, uint64, QUADRILLION, test_required_uint64_quad);
     DO_TEST_REQUIRED(UInt64, uint64, QUINTILLION, test_required_uint64_quint);
-    DO_TEST_REQUIRED(UInt64, uint64, UINT64_MAX, test_required_uint64_max);
+    DO_TEST_REQUIRED(UInt64, uint64, U64_MAX, test_required_uint64_max);
 }
 
 static void test_required_fixed64(void)
@@ -600,7 +601,7 @@ static void test_required_fixed64(void)
     DO_TEST_REQUIRED(Fixed64, uint64, TRILLION, test_required_fixed64_tril);
     DO_TEST_REQUIRED(Fixed64, uint64, QUADRILLION, test_required_fixed64_quad);
     DO_TEST_REQUIRED(Fixed64, uint64, QUINTILLION, test_required_fixed64_quint);
-    DO_TEST_REQUIRED(Fixed64, uint64, UINT64_MAX, test_required_fixed64_max);
+    DO_TEST_REQUIRED(Fixed64, uint64, U64_MAX, test_required_fixed64_max);
 }
 
 static void test_required_float(void)
@@ -686,7 +687,7 @@ static void test_empty_optional(void)
     struct lwpb_encoder encoder;
     struct lwpb_decoder decoder;
     struct testing_fields fields;
-    uint8_t buf[256];
+    u8_t buf[256];
     size_t len, used;
     lwpb_encoder_init(&encoder);
     lwpb_encoder_start(&encoder, foo_TestMessOptional, buf, sizeof(buf));
@@ -704,7 +705,7 @@ static void test_empty_optional(void)
         struct lwpb_encoder encoder;                                        \
         struct lwpb_decoder decoder;                                        \
         struct testing_fields fields;                                       \
-        uint8_t buf[256];                                                   \
+        u8_t buf[256];                                                   \
         size_t len, used;                                                   \
         lwpb_encoder_init(&encoder);                                        \
         lwpb_encoder_start(&encoder, foo_TestMessOptional, buf, sizeof(buf)); \
@@ -724,84 +725,84 @@ static void test_empty_optional(void)
 
 static void test_optional_int32(void)
 {
-    DO_TEST_OPTIONAL(int32, int32, INT32_MIN, test_optional_int32_min);
+    DO_TEST_OPTIONAL(int32, int32, S32_MIN, test_optional_int32_min);
     DO_TEST_OPTIONAL(int32, int32, -1, test_optional_int32_m1);
     DO_TEST_OPTIONAL(int32, int32, 0, test_optional_int32_0);
     DO_TEST_OPTIONAL(int32, int32, 666, test_optional_int32_666);
-    DO_TEST_OPTIONAL(int32, int32, INT32_MAX, test_optional_int32_max);
+    DO_TEST_OPTIONAL(int32, int32, S32_MAX, test_optional_int32_max);
 }
 
 static void test_optional_sint32(void)
 {
-    DO_TEST_OPTIONAL(int32, sint32, INT32_MIN, test_optional_sint32_min);
+    DO_TEST_OPTIONAL(int32, sint32, S32_MIN, test_optional_sint32_min);
     DO_TEST_OPTIONAL(int32, sint32, -1, test_optional_sint32_m1);
     DO_TEST_OPTIONAL(int32, sint32, 0, test_optional_sint32_0);
     DO_TEST_OPTIONAL(int32, sint32, 666, test_optional_sint32_666);
-    DO_TEST_OPTIONAL(int32, sint32, INT32_MAX, test_optional_sint32_max);
+    DO_TEST_OPTIONAL(int32, sint32, S32_MAX, test_optional_sint32_max);
 }
 
 static void test_optional_sfixed32(void)
 {
-    DO_TEST_OPTIONAL(int32, sfixed32, INT32_MIN, test_optional_sfixed32_min);
+    DO_TEST_OPTIONAL(int32, sfixed32, S32_MIN, test_optional_sfixed32_min);
     DO_TEST_OPTIONAL(int32, sfixed32, -1, test_optional_sfixed32_m1);
     DO_TEST_OPTIONAL(int32, sfixed32, 0, test_optional_sfixed32_0);
     DO_TEST_OPTIONAL(int32, sfixed32, 666, test_optional_sfixed32_666);
-    DO_TEST_OPTIONAL(int32, sfixed32, INT32_MAX, test_optional_sfixed32_max);
+    DO_TEST_OPTIONAL(int32, sfixed32, S32_MAX, test_optional_sfixed32_max);
 }
 
 static void test_optional_uint32(void)
 {
     DO_TEST_OPTIONAL(uint32, uint32, 0, test_optional_uint32_0);
     DO_TEST_OPTIONAL(uint32, uint32, 669, test_optional_uint32_669);
-    DO_TEST_OPTIONAL(uint32, uint32, UINT32_MAX, test_optional_uint32_max);
+    DO_TEST_OPTIONAL(uint32, uint32, U32_MAX, test_optional_uint32_max);
 }
 
 static void test_optional_fixed32(void)
 {
     DO_TEST_OPTIONAL(uint32, fixed32, 0, test_optional_fixed32_0);
     DO_TEST_OPTIONAL(uint32, fixed32, 669, test_optional_fixed32_669);
-    DO_TEST_OPTIONAL(uint32, fixed32, UINT32_MAX, test_optional_fixed32_max);
+    DO_TEST_OPTIONAL(uint32, fixed32, U32_MAX, test_optional_fixed32_max);
 }
 
 static void test_optional_int64(void)
 {
-    DO_TEST_OPTIONAL(int64, int64, INT64_MIN, test_optional_int64_min);
+    DO_TEST_OPTIONAL(int64, int64, S64_MIN, test_optional_int64_min);
     DO_TEST_OPTIONAL(int64, int64, -1111111111LL, test_optional_int64_m1111111111LL);
     DO_TEST_OPTIONAL(int64, int64, 0, test_optional_int64_0);
     DO_TEST_OPTIONAL(int64, int64, QUINTILLION, test_optional_int64_quintillion);
-    DO_TEST_OPTIONAL(int64, int64, INT64_MAX, test_optional_int64_max);
+    DO_TEST_OPTIONAL(int64, int64, S64_MAX, test_optional_int64_max);
 }
 
 static void test_optional_sint64(void)
 {
-    DO_TEST_OPTIONAL(int64, sint64, INT64_MIN, test_optional_sint64_min);
+    DO_TEST_OPTIONAL(int64, sint64, S64_MIN, test_optional_sint64_min);
     DO_TEST_OPTIONAL(int64, sint64, -1111111111LL, test_optional_sint64_m1111111111LL);
     DO_TEST_OPTIONAL(int64, sint64, 0, test_optional_sint64_0);
     DO_TEST_OPTIONAL(int64, sint64, QUINTILLION, test_optional_sint64_quintillion);
-    DO_TEST_OPTIONAL(int64, sint64, INT64_MAX, test_optional_sint64_max);
+    DO_TEST_OPTIONAL(int64, sint64, S64_MAX, test_optional_sint64_max);
 }
 
 static void test_optional_sfixed64(void)
 {
-    DO_TEST_OPTIONAL(int64, sfixed64, INT64_MIN, test_optional_sfixed64_min);
+    DO_TEST_OPTIONAL(int64, sfixed64, S64_MIN, test_optional_sfixed64_min);
     DO_TEST_OPTIONAL(int64, sfixed64, -1111111111LL, test_optional_sfixed64_m1111111111LL);
     DO_TEST_OPTIONAL(int64, sfixed64, 0, test_optional_sfixed64_0);
     DO_TEST_OPTIONAL(int64, sfixed64, QUINTILLION, test_optional_sfixed64_quintillion);
-    DO_TEST_OPTIONAL(int64, sfixed64, INT64_MAX, test_optional_sfixed64_max);
+    DO_TEST_OPTIONAL(int64, sfixed64, S64_MAX, test_optional_sfixed64_max);
 }
 
 static void test_optional_uint64(void)
 {
     DO_TEST_OPTIONAL(uint64, uint64, 0, test_optional_uint64_0);
     DO_TEST_OPTIONAL(uint64, uint64, 669669669669669ULL, test_optional_uint64_669669669669669);
-    DO_TEST_OPTIONAL(uint64, uint64, UINT64_MAX, test_optional_uint64_max);
+    DO_TEST_OPTIONAL(uint64, uint64, U64_MAX, test_optional_uint64_max);
 }
 
 static void test_optional_fixed64(void)
 {
     DO_TEST_OPTIONAL(uint64, fixed64, 0, test_optional_fixed64_0);
     DO_TEST_OPTIONAL(uint64, fixed64, 669669669669669ULL, test_optional_fixed64_669669669669669);
-    DO_TEST_OPTIONAL(uint64, fixed64, UINT64_MAX, test_optional_fixed64_max);
+    DO_TEST_OPTIONAL(uint64, fixed64, U64_MAX, test_optional_fixed64_max);
 }
 
 static void test_optional_float(void)
@@ -853,9 +854,9 @@ static void test_optional_string(void)
 static void test_optional_bytes(void)
 {
     /* TODO: implement
-  static ProtobufCBinaryData bd_empty = { 0, (uint8_t*)"" };
-  static ProtobufCBinaryData bd_hello = { 5, (uint8_t*)"hello" };
-  static ProtobufCBinaryData bd_random = { 5, (uint8_t*)"\1\0\375\2\4" };
+  static ProtobufCBinaryData bd_empty = { 0, (u8_t*)"" };
+  static ProtobufCBinaryData bd_hello = { 5, (u8_t*)"hello" };
+  static ProtobufCBinaryData bd_random = { 5, (u8_t*)"\1\0\375\2\4" };
 #define DO_TEST(value, example_packed_data) \
   DO_TEST_OPTIONAL (test_bytes, value, example_packed_data, binary_data_equals)
   DO_TEST (bd_empty, test_optional_bytes_empty);
@@ -875,7 +876,7 @@ static void test_empty_repeated(void)
     struct lwpb_encoder encoder;
     struct lwpb_decoder decoder;
     struct testing_fields fields;
-    uint8_t buf[256];
+    u8_t buf[256];
     size_t len, used;
     lwpb_encoder_init(&encoder);
     lwpb_encoder_start(&encoder, foo_TestMess, buf, sizeof(buf));
@@ -893,7 +894,7 @@ static void test_empty_repeated(void)
         struct lwpb_encoder encoder;                                        \
         struct lwpb_decoder decoder;                                        \
         struct testing_fields fields;                                       \
-        uint8_t buf[512];                                                   \
+        u8_t buf[512];                                                   \
         size_t len, used;                                                   \
         int i;                                                              \
         lwpb_encoder_init(&encoder);                                        \
@@ -1042,9 +1043,9 @@ static void test_optional_default_values(void)
 static void test_repeated_bytes (void)
 {
   static ProtobufCBinaryData test_binary_data_0[] = {
-    { 4, (uint8_t *) "text" },
-    { 9, (uint8_t *) "str\1\2\3\4\5\0" },
-    { 10, (uint8_t *) "gobble\0foo" }
+    { 4, (u8_t *) "text" },
+    { 9, (u8_t *) "str\1\2\3\4\5\0" },
+    { 10, (u8_t *) "gobble\0foo" }
   };
 #define DO_TEST(static_array, example_packed_data) \
   DO_TEST_REPEATED(test_bytes, , \
@@ -1084,7 +1085,7 @@ test_required_default_values (void)
 {
   Foo__DefaultRequiredValues mess = FOO__DEFAULT_REQUIRED_VALUES__INIT;
   Foo__DefaultRequiredValues *mess2;
-  size_t len; uint8_t *data;
+  size_t len; u8_t *data;
   assert_required_default_values_are_default (&mess);
   mess2 = test_compare_pack_methods (&mess.base, &len, &data);
   free (data);
@@ -1122,7 +1123,7 @@ test_optional_default_values (void)
 {
   Foo__DefaultOptionalValues mess = FOO__DEFAULT_OPTIONAL_VALUES__INIT;
   Foo__DefaultOptionalValues *mess2;
-  size_t len; uint8_t *data;
+  size_t len; u8_t *data;
   assert_optional_default_values_are_default (&mess);
   mess2 = test_compare_pack_methods (&mess.base, &len, &data);
   assert (len == 0);            /* no non-default values */

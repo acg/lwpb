@@ -23,6 +23,7 @@
 
 #include <lwpb/lwpb.h>
 
+
 const char *lwpb_err_text(lwpb_err_t err);
 
 #endif // __LWPB_CORE_MISC_H__

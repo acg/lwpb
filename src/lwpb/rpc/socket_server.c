@@ -18,7 +18,6 @@
  * limitations under the License.
  */
 
-#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -324,7 +323,7 @@ lwpb_transport_t lwpb_transport_socket_server_init(
  * @return Returns LWPB_ERR_OK if successful.
  */
 lwpb_err_t lwpb_transport_socket_server_open(lwpb_transport_t transport,
-                                           const char *host, uint16_t port)
+                                           const char *host, u16_t port)
 {
     struct lwpb_transport_socket_server *socket_server =
         (struct lwpb_transport_socket_server *) transport;

@@ -18,14 +18,10 @@
  * limitations under the License.
  */
 
-#include <stdint.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
 #include <lwpb/lwpb.h>
 
 #include "private.h"
+
 
 // Debug handlers
 
@@ -36,7 +32,7 @@ static void debug_print_indent(void)
     int i;
     
     for (i = 0; i < debug_indent; i++)
-        printf("  ");
+        LWPB_DIAG_PRINTF("  ");
 }
 
 static void debug_msg_start_handler(struct lwpb_decoder *decoder,
@@ -52,7 +48,7 @@ static void debug_msg_start_handler(struct lwpb_decoder *decoder,
 #endif
     
     debug_print_indent();
-    printf("%s:\n", name);
+    LWPB_DIAG_PRINTF("%s:\n", name);
     debug_indent++;
 }
 
@@ -97,52 +93,52 @@ static void debug_field_handler(struct lwpb_decoder *decoder,
 #endif
     
     debug_print_indent();
-    printf("%-20s %-10s = ", name, typ_names[field_desc->opts.typ]);
+    LWPB_DIAG_PRINTF("%-20s %-10s = ", name, typ_names[field_desc->opts.typ]);
     
     switch (field_desc->opts.typ) {
     case LWPB_DOUBLE:
-        printf("%f", value->double_);
+        LWPB_DIAG_PRINTF("%f", value->double_);
         break;
     case LWPB_FLOAT:
-        printf("%f", value->float_);
+        LWPB_DIAG_PRINTF("%f", value->float_);
         break;
     case LWPB_INT32:
     case LWPB_SINT32:
     case LWPB_SFIXED32:
-        printf("%d", value->int32);
+        LWPB_DIAG_PRINTF("%d", value->int32);
         break;
     case LWPB_INT64:
     case LWPB_SINT64:
     case LWPB_SFIXED64:
-        printf("%lld", value->int64);
+        LWPB_DIAG_PRINTF("%lld", value->int64);
         break;
     case LWPB_UINT32:
     case LWPB_FIXED32:
-        printf("%u", value->int32);
+        LWPB_DIAG_PRINTF("%u", value->int32);
         break;
     case LWPB_UINT64:
     case LWPB_FIXED64:
-        printf("%llu", value->int64);
+        LWPB_DIAG_PRINTF("%llu", value->int64);
         break;
     case LWPB_BOOL:
-        printf("%s", value->bool ? "true" : "false");
+        LWPB_DIAG_PRINTF("%s", value->bool ? "true" : "false");
         break;
     case LWPB_ENUM:
-        printf("%d", value->enum_);
+        LWPB_DIAG_PRINTF("%d", value->enum_);
         break;
     case LWPB_STRING:
         while (value->string.len--)
-            printf("%c", *value->string.str++);
+            LWPB_DIAG_PRINTF("%c", *value->string.str++);
         break;
     case LWPB_BYTES:
         while (value->bytes.len--)
-            printf("%02x ", *value->bytes.data++);
+            LWPB_DIAG_PRINTF("%02x ", *value->bytes.data++);
         break;
     default:
         break;
     }
     
-    printf("\n");
+    LWPB_DIAG_PRINTF("\n");
 }
 
 // Decoder utilities
@@ -156,17 +152,17 @@ static void debug_field_handler(struct lwpb_decoder *decoder,
  * @return Returns LWPB_ERR_OK if successful or LWPB_ERR_END_OF_BUF if there
  * were not enough bytes in the memory buffer. 
  */
-static lwpb_err_t decode_varint(struct lwpb_buf *buf, uint64_t *varint)
+static lwpb_err_t decode_varint(struct lwpb_buf *buf, u64_t *varint)
 {
     int bitpos;
     
     *varint = 0;
     for (bitpos = 0; *buf->pos & 0x80 && bitpos < 64; bitpos += 7, buf->pos++) {
-        *varint |= (uint64_t) (*buf->pos & 0x7f) << bitpos;
+        *varint |= (u64_t) (*buf->pos & 0x7f) << bitpos;
         if (buf->end - buf->pos < 2)
             return LWPB_ERR_END_OF_BUF;
     }
-    *varint |= (uint64_t) (*buf->pos & 0x7f) << bitpos;
+    *varint |= (u64_t) (*buf->pos & 0x7f) << bitpos;
     buf->pos++;
     
     return LWPB_ERR_OK;
@@ -179,7 +175,7 @@ static lwpb_err_t decode_varint(struct lwpb_buf *buf, uint64_t *varint)
  * @return Returns LWPB_ERR_OK if successful or LWPB_ERR_END_OF_BUF if there
  * were not enough bytes in the memory buffer. 
  */
-static lwpb_err_t decode_32bit(struct lwpb_buf *buf, uint32_t *value)
+static lwpb_err_t decode_32bit(struct lwpb_buf *buf, u32_t *value)
 {
     if (lwpb_buf_left(buf) < 4)
         return LWPB_ERR_END_OF_BUF;
@@ -198,7 +194,7 @@ static lwpb_err_t decode_32bit(struct lwpb_buf *buf, uint32_t *value)
  * @return Returns LWPB_ERR_OK if successful or LWPB_ERR_END_OF_BUF if there
  * were not enough bytes in the memory buffer. 
  */
-static lwpb_err_t decode_64bit(struct lwpb_buf *buf, uint64_t *value)
+static lwpb_err_t decode_64bit(struct lwpb_buf *buf, u64_t *value)
 {
     int i;
     
@@ -290,7 +286,7 @@ lwpb_err_t lwpb_decoder_decode(struct lwpb_decoder *decoder,
     lwpb_err_t ret;
     int i;
     struct lwpb_buf buf;
-    uint64_t key;
+    u64_t key;
     int number;
     const struct lwpb_field_desc *field_desc = NULL;
     enum wire_type wire_type;
@@ -355,10 +351,10 @@ lwpb_err_t lwpb_decoder_decode(struct lwpb_decoder *decoder,
         
         switch (field_desc->opts.typ) {
         case LWPB_DOUBLE:
-            *((uint64_t *) &value.double_) = wire_value.int64;
+            *((u64_t *) &value.double_) = wire_value.int64;
             break;
         case LWPB_FLOAT:
-            *((uint32_t *) &value.float_) = wire_value.int32;
+            *((u32_t *) &value.float_) = wire_value.int32;
             break;
         case LWPB_INT32:
             value.int32 = wire_value.varint;
@@ -374,11 +370,11 @@ lwpb_err_t lwpb_decoder_decode(struct lwpb_decoder *decoder,
             break;
         case LWPB_SINT32:
             // Zig-zag encoding
-            value.int32 = (wire_value.varint >> 1) ^ -((int32_t) (wire_value.varint & 1));
+            value.int32 = (wire_value.varint >> 1) ^ -((s32_t) (wire_value.varint & 1));
             break;
         case LWPB_SINT64:
             // Zig-zag encoding
-            value.int64 = (wire_value.varint >> 1) ^ -((int64_t) (wire_value.varint & 1));
+            value.int64 = (wire_value.varint >> 1) ^ -((s64_t) (wire_value.varint & 1));
             break;
         case LWPB_FIXED32:
             value.uint32 = wire_value.int32;

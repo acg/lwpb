@@ -21,10 +21,8 @@
 #ifndef __LWPB_RPC_SERVER_H__
 #define __LWPB_RPC_SERVER_H__
 
-#include <stdint.h>
-#include <stdlib.h>
-
 #include <lwpb/lwpb.h>
+
 
 /* Forward declaration */
 struct lwpb_server;

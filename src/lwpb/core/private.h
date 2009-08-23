@@ -21,7 +21,8 @@
 #ifndef __LWPB_CORE_PRIVATE_H__
 #define __LWPB_CORE_PRIVATE_H__
 
-#include <stdint.h>
+#include <lwpb/lwpb.h>
+
 
 /** Protocol buffer wire types */
 enum wire_type {
@@ -33,13 +34,13 @@ enum wire_type {
 
 /** Protocol buffer wire values */
 union wire_value {
-    uint64_t varint;
-    uint64_t int64;
+    u64_t varint;
+    u64_t int64;
     struct {
-        uint64_t len;
+        u64_t len;
         void *data;
     } string;
-    uint32_t int32;
+    u32_t int32;
 };
 
 void lwpb_buf_init(struct lwpb_buf *buf, void *data, size_t len);

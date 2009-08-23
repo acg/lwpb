@@ -21,9 +21,8 @@
 #ifndef __LWPB_RPC_SOCKET_HELPER_H__
 #define __LWPB_RPC_SOCKET_HELPER_H__
 
-#include <stdint.h>
-
 #include <lwpb/lwpb.h>
+
 
 typedef enum {
     MSG_TYPE_REQUEST = 0,
