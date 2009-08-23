@@ -1,7 +1,3 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <limits.h>
 
 #include <lwpb/lwpb.h>
 
@@ -24,11 +20,11 @@ static int verbose = 0;
 #define CHECK_LWPB(err)                                                     \
     do {                                                                    \
         if (verbose)                                                        \
-            printf("checking lwpb result\n");                               \
+            LWPB_DIAG_PRINTF("checking lwpb result\n");                     \
         if ((err) != LWPB_ERR_OK) {                                         \
-            printf("%s [%d]: lwpb function returned with: %d (%s)\n",       \
+            LWPB_DIAG_PRINTF("%s [%d]: lwpb function returned with: %d (%s)\n",\
                    __FILE__, __LINE__, err, lwpb_err_text(err));            \
-            abort();                                                        \
+            LWPB_EXIT();                                                        \
         }                                                                   \
     } while (0)
 
@@ -48,8 +44,8 @@ static void dump_buf(const u8_t *buf, size_t len)
     size_t i;
     
     for (i = 0; i < len; i++)
-        printf(" %02x", buf[i]);
-    printf("\n");
+        LWPB_DIAG_PRINTF(" %02x", buf[i]);
+    LWPB_DIAG_PRINTF("\n");
 }
 
 /** Checks a buffer vs. it's static test vector. */
@@ -62,17 +58,17 @@ static void check_buf(const u8_t *actual_data,
                       unsigned lineno)
 {
     if (verbose)
-        printf("checking buffer\n");
+        LWPB_DIAG_PRINTF("checking buffer\n");
     
     if (buf_equal(actual_data, actual_len, expected_data, expected_len))
         return;
     
-    printf("%s [%d]: buffer is not as expected\n", filename, lineno);
-    printf("actual (length = %u):\n", actual_len);
+    LWPB_DIAG_PRINTF("%s [%d]: buffer is not as expected\n", filename, lineno);
+    LWPB_DIAG_PRINTF("actual (length = %u):\n", actual_len);
     dump_buf(actual_data, actual_len);
-    printf("expected (length = %u) (%s):\n", expected_len, static_buf_name);
+    LWPB_DIAG_PRINTF("expected (length = %u) (%s):\n", expected_len, static_buf_name);
     dump_buf(expected_data, expected_len);
-    abort();
+    LWPB_EXIT();
 }
 
 #define CHECK_BUF(buf, len, vector) \
@@ -85,14 +81,14 @@ static void check_value(u64_t actual_value,
                         unsigned lineno)
 {
     if (verbose)
-        printf("checking value\n");
+        LWPB_DIAG_PRINTF("checking value\n");
     
     if (actual_value == expected_value)
         return;
     
-    printf("%s [%d]: value not as expected (actual = %lld expected = %lld)\n",
+    LWPB_DIAG_PRINTF("%s [%d]: value not as expected (actual = %lld expected = %lld)\n",
            filename, lineno, actual_value, expected_value);
-    abort();
+    LWPB_EXIT();
 }
 
 #define CHECK_VALUE(actual_value, expected_value) \
@@ -105,14 +101,14 @@ static void check_fvalue(double actual_value,
                          unsigned lineno)
 {
     if (verbose)
-        printf("checking floating point value\n");
+        LWPB_DIAG_PRINTF("checking floating point value\n");
     
     if (actual_value == expected_value)
         return;
     
-    printf("%s [%d]: value not as expected (actual = %f expected = %f)\n",
+    LWPB_DIAG_PRINTF("%s [%d]: value not as expected (actual = %f expected = %f)\n",
            filename, lineno, actual_value, expected_value);
-    abort();
+    LWPB_EXIT();
 }
 
 #define CHECK_FVALUE(actual_value, expected_value) \
@@ -124,20 +120,20 @@ static void check_string(const char *actual_string, size_t actual_len,
                          const char *filename, unsigned lineno)
 {
     if (verbose)
-        printf("checking string\n");
+        LWPB_DIAG_PRINTF("checking string\n");
     
     if (actual_len == strlen(expected_string))
         if (memcmp(actual_string, expected_string, actual_len) == 0)
             return;
     
-    printf("%s [%d]: string value not as expected\n", filename, lineno);
-    printf("actual (length = %u):\n", actual_len);
+    LWPB_DIAG_PRINTF("%s [%d]: string value not as expected\n", filename, lineno);
+    LWPB_DIAG_PRINTF("actual (length = %u):\n", actual_len);
     while (actual_len--)
-        printf("%c", *actual_string++);
-    printf("\n");
-    printf("expected (length = %u):\n", strlen(expected_string));
-    printf("%s\n", expected_string);
-    abort();
+        LWPB_DIAG_PRINTF("%c", *actual_string++);
+    LWPB_DIAG_PRINTF("\n");
+    LWPB_DIAG_PRINTF("expected (length = %u):\n", strlen(expected_string));
+    LWPB_DIAG_PRINTF("%s\n", expected_string);
+    LWPB_EXIT();
 }
 
 #define CHECK_STRING(actual_string, actual_len, expected_string) \
@@ -146,8 +142,8 @@ static void check_string(const char *actual_string, size_t actual_len,
 static void do_assert(const char *msg,
                       const char *filename, unsigned lineno)
 {
-    printf("%s [%d]: %s\n", filename, lineno, msg);
-    abort();
+    LWPB_DIAG_PRINTF("%s [%d]: %s\n", filename, lineno, msg);
+    LWPB_EXIT();
 }
 
 #define CHECK_ASSERT(expr, msg)                                             \
@@ -382,8 +378,8 @@ static void generic_field_handler(struct lwpb_decoder *decoder,
         }
     }
     
-    printf("Decoded unhandled field\n");
-    abort();
+    LWPB_DIAG_PRINTF("Decoded unhandled field\n");
+    LWPB_EXIT();
 }
 
 static void test_enum_small(void)
@@ -1218,11 +1214,11 @@ int main()
     int i;
     
     for (i = 0; i < ARRAY_SIZE(tests); i++) {
-        printf("Test: %s\n", tests[i].name);
+        LWPB_DIAG_PRINTF("Test: %s\n", tests[i].name);
         tests[i].func();
     }
     
-    printf("All tests successful\n");
+    LWPB_DIAG_PRINTF("All tests successful\n");
 
     return 0;
 }

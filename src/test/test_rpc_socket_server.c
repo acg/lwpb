@@ -1,6 +1,4 @@
 
-#include <stdio.h>
-
 #include <lwpb/lwpb.h>
 #include <lwpb/rpc/socket_server.h>
 
@@ -23,10 +21,10 @@ static lwpb_err_t server_request_handler(
     lwpb_encoder_init(&encoder);
     
     if (method_desc == test_Search_search_by_name) {
-        printf("Server: Received request\n");
+        LWPB_DIAG_PRINTF("Server: Received request\n");
         lwpb_decoder_decode(&decoder, req_desc, req_buf, req_len, NULL);
         
-        printf("Server: Preparing response\n");
+        LWPB_DIAG_PRINTF("Server: Preparing response\n");
         lwpb_encoder_start(&encoder, test_LookupResult, res_buf, *res_len);
         lwpb_encoder_nested_start(&encoder, test_LookupResult_person);
         lwpb_encoder_add_string(&encoder, test_Person_name, "Simon Kallweit");
@@ -64,14 +62,14 @@ int main()
     
     ret = lwpb_transport_socket_server_open(transport, "localhost", 12345);
     if (ret != LWPB_ERR_OK) {
-        printf("Cannot open socket server\n");
+        LWPB_DIAG_PRINTF("Cannot open socket server\n");
         return 1;
     }
     
     while (1) {
         ret = lwpb_transport_socket_server_update(transport);
         if (ret != LWPB_ERR_OK) {
-            printf("Socket server failed\n");
+            LWPB_DIAG_PRINTF("Socket server failed\n");
             return 1;
         }
     }

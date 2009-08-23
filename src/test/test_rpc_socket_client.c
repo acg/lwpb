@@ -1,6 +1,4 @@
 
-#include <stdio.h>
-
 #include <lwpb/lwpb.h>
 #include <lwpb/rpc/socket_client.h>
 
@@ -17,7 +15,7 @@ static lwpb_err_t client_request_handler(
     lwpb_encoder_init(&encoder);
     
     if (method_desc == test_Search_search_by_name) {
-        printf("Client: Preparing request\n");
+        LWPB_DIAG_PRINTF("Client: Preparing request\n");
         lwpb_encoder_start(&encoder, msg_desc, buf, *len);
         lwpb_encoder_add_string(&encoder, test_Name_name, "some name");
         *len = lwpb_encoder_finish(&encoder);
@@ -38,7 +36,7 @@ static lwpb_err_t client_response_handler(
     lwpb_decoder_use_debug_handlers(&decoder);
     
     if (method_desc == test_Search_search_by_name) {
-        printf("Client: Received response\n");
+        LWPB_DIAG_PRINTF("Client: Received response\n");
     }
     
     return lwpb_decoder_decode(&decoder, msg_desc, buf, len, NULL);
@@ -49,9 +47,9 @@ static void client_call_done_handler(
     lwpb_rpc_result_t result, void *arg)
 {
     switch (result) {
-    case LWPB_RPC_OK: printf("Client: Result = OK\n"); break;
-    case LWPB_RPC_NOT_CONNECTED: printf("Client: Result = Not connected\n"); break;
-    case LWPB_RPC_FAILED: printf("Client: Result = Failed\n"); break;
+    case LWPB_RPC_OK: LWPB_DIAG_PRINTF("Client: Result = OK\n"); break;
+    case LWPB_RPC_NOT_CONNECTED: LWPB_DIAG_PRINTF("Client: Result = Not connected\n"); break;
+    case LWPB_RPC_FAILED: LWPB_DIAG_PRINTF("Client: Result = Failed\n"); break;
     }
 }
 
@@ -77,7 +75,7 @@ int main()
     
     ret = lwpb_transport_socket_client_open(service, "localhost", 12345);
     if (ret != LWPB_ERR_OK) {
-        printf("Cannot open socket client\n");
+        LWPB_DIAG_PRINTF("Cannot open socket client\n");
         return 1;
     }
     
@@ -86,7 +84,7 @@ int main()
     while (1) {
         ret = lwpb_transport_socket_client_update(service);
         if (ret != LWPB_ERR_OK) {
-            printf("Socket client failed\n");
+            LWPB_DIAG_PRINTF("Socket client failed\n");
             return 1;
         }
     }

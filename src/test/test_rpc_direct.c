@@ -1,6 +1,4 @@
 
-#include <stdio.h>
-
 #include <lwpb/lwpb.h>
 #include <lwpb/rpc/direct.h>
 
@@ -17,7 +15,7 @@ static lwpb_err_t client_request_handler(
     lwpb_encoder_init(&encoder);
     
     if (method_desc == test_Search_search_by_name) {
-        printf("Client: Preparing request\n");
+        LWPB_DIAG_PRINTF("Client: Preparing request\n");
         lwpb_encoder_start(&encoder, msg_desc, buf, *len);
         lwpb_encoder_add_string(&encoder, test_Name_name, "some name");
         *len = lwpb_encoder_finish(&encoder);
@@ -38,7 +36,7 @@ static lwpb_err_t client_response_handler(
     lwpb_decoder_use_debug_handlers(&decoder);
     
     if (method_desc == test_Search_search_by_name) {
-        printf("Client: Received response\n");
+        LWPB_DIAG_PRINTF("Client: Received response\n");
     }
     
     return lwpb_decoder_decode(&decoder, msg_desc, buf, len, NULL);
@@ -49,9 +47,9 @@ static void client_call_done_handler(
     lwpb_rpc_result_t result, void *arg)
 {
     switch (result) {
-    case LWPB_RPC_OK: printf("Client: Result = OK\n"); break;
-    case LWPB_RPC_NOT_CONNECTED: printf("Client: Result = Not connected\n"); break;
-    case LWPB_RPC_FAILED: printf("Client: Result = Failed\n"); break;
+    case LWPB_RPC_OK: LWPB_DIAG_PRINTF("Client: Result = OK\n"); break;
+    case LWPB_RPC_NOT_CONNECTED: LWPB_DIAG_PRINTF("Client: Result = Not connected\n"); break;
+    case LWPB_RPC_FAILED: LWPB_DIAG_PRINTF("Client: Result = Failed\n"); break;
     }
 }
 
@@ -72,10 +70,10 @@ static lwpb_err_t server_request_handler(
     lwpb_encoder_init(&encoder);
     
     if (method_desc == test_Search_search_by_name) {
-        printf("Server: Received request\n");
+        LWPB_DIAG_PRINTF("Server: Received request\n");
         lwpb_decoder_decode(&decoder, req_desc, req_buf, req_len, NULL);
         
-        printf("Server: Preparing response\n");
+        LWPB_DIAG_PRINTF("Server: Preparing response\n");
         lwpb_encoder_start(&encoder, test_LookupResult, res_buf, *res_len);
         lwpb_encoder_nested_start(&encoder, test_LookupResult_person);
         lwpb_encoder_add_string(&encoder, test_Person_name, "Simon Kallweit");

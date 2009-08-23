@@ -1,6 +1,4 @@
 
-#include <stdio.h>
-
 #include <lwpb/lwpb.h>
 
 #include "generated/test_struct_map_pb2.h"
@@ -64,7 +62,6 @@ void print_buf(u8_t *buf, size_t len)
 
 int main()
 {
-    FILE *f;
     char buf[4096];
     size_t len;
     lwpb_err_t ret;
