@@ -1,7 +1,4 @@
  * encoder/decoder
-   * issue: cannot assert that required fields are present
-   * issue: cannot assert that required/optional fields are not repeated
-   * issue: default values are not encoded if field are not present
    * implement packed repeated fields
  * struct map encoder/decoder
    * issue: interleaved repeated fields are not decoded correctly
