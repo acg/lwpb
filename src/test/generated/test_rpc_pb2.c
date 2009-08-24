@@ -16,7 +16,7 @@ const struct lwpb_field_desc lwpb_fields_test_phonenumber[] = {
         .name = "number",
 #endif
 #if LWPB_FIELD_DEFAULTS
-        .def.string = "",
+        .def.string.str = "",
 #endif
     },
     {
@@ -46,7 +46,7 @@ const struct lwpb_field_desc lwpb_fields_test_person[] = {
         .name = "name",
 #endif
 #if LWPB_FIELD_DEFAULTS
-        .def.string = "",
+        .def.string.str = "",
 #endif
     },
     {
@@ -72,7 +72,7 @@ const struct lwpb_field_desc lwpb_fields_test_person[] = {
         .name = "email",
 #endif
 #if LWPB_FIELD_DEFAULTS
-        .def.string = "",
+        .def.string.str = "",
 #endif
     },
     {
@@ -119,7 +119,7 @@ const struct lwpb_field_desc lwpb_fields_test_name[] = {
         .name = "name",
 #endif
 #if LWPB_FIELD_DEFAULTS
-        .def.string = "",
+        .def.string.str = "",
 #endif
     },
 };
