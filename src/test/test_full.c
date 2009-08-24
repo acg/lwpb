@@ -139,6 +139,31 @@ static void check_string(const char *actual_string, size_t actual_len,
 #define CHECK_STRING(actual_string, actual_len, expected_string) \
     check_string(actual_string, actual_len, expected_string, __FILE__, __LINE__)
 
+static void check_bytes(u8_t *actual_bytes, size_t actual_len,
+                        u8_t *expected_bytes, size_t expected_len,
+                        const char *filename, unsigned lineno)
+{
+    if (verbose)
+        LWPB_DIAG_PRINTF("checking bytes\n");
+    
+    if (actual_len == expected_len)
+        if (LWPB_MEMCMP(actual_bytes, expected_bytes, actual_len) == 0)
+            return;
+    
+    LWPB_DIAG_PRINTF("%s [%d]: bytes value not as expected\n", filename, lineno);
+    LWPB_DIAG_PRINTF("actual (length = %zu):\n", actual_len);
+    while (actual_len--)
+        LWPB_DIAG_PRINTF("0x%02x ", *actual_bytes++);
+    LWPB_DIAG_PRINTF("\n");
+    LWPB_DIAG_PRINTF("expected (length = %zu):\n", expected_len);
+    while (expected_len--)
+        LWPB_DIAG_PRINTF("0x%02x ", *expected_bytes++);
+    LWPB_ABORT();
+}
+
+#define CHECK_BYTES(actual_bytes, actual_len, expected_bytes, expected_len) \
+    check_bytes(actual_bytes, actual_len, expected_bytes, expected_len, __FILE__, __LINE__)
+
 static void do_assert(const char *msg,
                       const char *filename, unsigned lineno)
 {
@@ -172,7 +197,7 @@ struct testing_fields {
         struct { double test; } TestMessRequiredDouble;
         struct { lwpb_bool_t test; } TestMessRequiredBool;
         struct { char *test; } TestMessRequiredString;
-        struct { u8_t *test; } TestMessRequiredBytes;
+        struct { u8_t *test; size_t len; } TestMessRequiredBytes;
         struct {
             s32_t test_int32;
             s32_t test_sint32;
@@ -191,6 +216,7 @@ struct testing_fields {
             lwpb_enum_t test_enum;
             char *test_string;
             u8_t *test_bytes;
+            size_t test_bytes_len;
         } TestMessOptional;
         struct {
             s32_t *test_int32;
@@ -306,7 +332,7 @@ static void generic_field_handler(struct lwpb_decoder *decoder,
         }
     } else if (msg_desc == foo_TestMessRequiredBytes) {
         if (field_desc == foo_TestMessRequiredBytes_test) {
-            CHECK_STRING(value->string.str, value->string.len, (const char *) fields->u.TestMessRequiredBytes.test); return;
+            CHECK_BYTES(value->bytes.data, value->bytes.len, fields->u.TestMessRequiredBytes.test, fields->u.TestMessRequiredBytes.len); return;
         }
     } else if (msg_desc == foo_TestMessOptional) {
         if (field_desc == foo_TestMessOptional_test_int32) {
@@ -341,6 +367,8 @@ static void generic_field_handler(struct lwpb_decoder *decoder,
             CHECK_VALUE(value->enum_, fields->u.TestMessOptional.test_enum); return;
         } else if (field_desc == foo_TestMessOptional_test_string) {
             CHECK_STRING(value->string.str, value->string.len, fields->u.TestMessOptional.test_string); return;
+        } else if (field_desc == foo_TestMessOptional_test_bytes) {
+            CHECK_BYTES(value->bytes.data, value->bytes.len, fields->u.TestMessOptional.test_bytes, fields->u.TestMessOptional.test_bytes_len); return;
         }
     } else if (msg_desc == foo_TestMess) {
         if (field_desc == foo_TestMess_test_int32) {
@@ -511,6 +539,31 @@ static void test_field_numbers(void)
         CHECK_LWPB(ret);                                                    \
     } while (0);
 
+#define DO_TEST_REQUIRED_BYTES(msg_type, lwpb_type, value, value_len, vector) \
+    do {                                                                    \
+        lwpb_err_t ret;                                                     \
+        struct lwpb_encoder encoder;                                        \
+        struct lwpb_decoder decoder;                                        \
+        struct testing_fields fields;                                       \
+        u8_t buf[256];                                                      \
+        size_t len, used;                                                   \
+        lwpb_encoder_init(&encoder);                                        \
+        lwpb_encoder_start(&encoder, foo_TestMessRequired##msg_type, buf, sizeof(buf)); \
+        ret = lwpb_encoder_add_##lwpb_type(&encoder, foo_TestMessRequired##msg_type##_test, (u8_t *) value, value_len); \
+        CHECK_LWPB(ret);                                                    \
+        len = lwpb_encoder_finish(&encoder);                                \
+        CHECK_BUF(buf, len, vector);                                        \
+        fields.u.TestMessRequired##msg_type.test = (u8_t *) value;          \
+        fields.u.TestMessRequired##msg_type.len = value_len;                \
+        lwpb_decoder_init(&decoder);                                        \
+        lwpb_decoder_arg(&decoder, &fields);                                \
+        lwpb_decoder_field_handler(&decoder, generic_field_handler);        \
+        ret = lwpb_decoder_decode(&decoder, foo_TestMessRequired##msg_type, buf, len, &used); \
+        CHECK_ASSERT(used == sizeof(vector), "not decoded all bytes");      \
+        CHECK_LWPB(ret);                                                    \
+    } while (0);
+
+
 static void test_required_int32(void)
 {
     DO_TEST_REQUIRED(Int32, int32, S32_MIN, test_required_int32_min);
@@ -649,11 +702,9 @@ static void test_required_string(void)
 
 static void test_required_bytes(void)
 {
-    /* TODO: implement
-    DO_TEST_REQUIRED(Bytes, bytes, "", test_required_bytes_empty);
-    DO_TEST_REQUIRED(Bytes, bytes, "hello", test_required_bytes_hello);
-    DO_TEST_REQUIRED(Bytes, bytes, "\1\0\375\2\4", test_required_bytes_random);
-    */
+    DO_TEST_REQUIRED_BYTES(Bytes, bytes, "", 0, test_required_bytes_empty);
+    DO_TEST_REQUIRED_BYTES(Bytes, bytes, "hello", 5, test_required_bytes_hello);
+    DO_TEST_REQUIRED_BYTES(Bytes, bytes, "\1\0\375\2\4", 5, test_required_bytes_random);
 }
 
 static void test_required_submess(void)
@@ -709,6 +760,30 @@ static void test_empty_optional(void)
         len = lwpb_encoder_finish(&encoder);                                \
         CHECK_BUF(buf, len, vector);                                        \
         fields.u.TestMessOptional.test_##field = value;                     \
+        lwpb_decoder_init(&decoder);                                        \
+        lwpb_decoder_arg(&decoder, &fields);                                \
+        lwpb_decoder_field_handler(&decoder, generic_field_handler);        \
+        ret = lwpb_decoder_decode(&decoder, foo_TestMessOptional, buf, len, &used); \
+        CHECK_ASSERT(used == sizeof(vector), "not decoded all bytes");      \
+        CHECK_LWPB(ret);                                                    \
+    } while (0);
+
+#define DO_TEST_OPTIONAL_BYTES(lwpb_type, field, value, value_len, vector)  \
+    do {                                                                    \
+        lwpb_err_t ret;                                                     \
+        struct lwpb_encoder encoder;                                        \
+        struct lwpb_decoder decoder;                                        \
+        struct testing_fields fields;                                       \
+        u8_t buf[256];                                                      \
+        size_t len, used;                                                   \
+        lwpb_encoder_init(&encoder);                                        \
+        lwpb_encoder_start(&encoder, foo_TestMessOptional, buf, sizeof(buf)); \
+        ret = lwpb_encoder_add_##lwpb_type(&encoder, foo_TestMessOptional_test_##field, (u8_t *) value, value_len); \
+        CHECK_LWPB(ret);                                                    \
+        len = lwpb_encoder_finish(&encoder);                                \
+        CHECK_BUF(buf, len, vector);                                        \
+        fields.u.TestMessOptional.test_##field = (u8_t *) value;            \
+        fields.u.TestMessOptional.test_##field##_len = value_len;           \
         lwpb_decoder_init(&decoder);                                        \
         lwpb_decoder_arg(&decoder, &fields);                                \
         lwpb_decoder_field_handler(&decoder, generic_field_handler);        \
@@ -848,16 +923,9 @@ static void test_optional_string(void)
 
 static void test_optional_bytes(void)
 {
-    /* TODO: implement
-  static ProtobufCBinaryData bd_empty = { 0, (u8_t*)"" };
-  static ProtobufCBinaryData bd_hello = { 5, (u8_t*)"hello" };
-  static ProtobufCBinaryData bd_random = { 5, (u8_t*)"\1\0\375\2\4" };
-#define DO_TEST(value, example_packed_data) \
-  DO_TEST_OPTIONAL (test_bytes, value, example_packed_data, binary_data_equals)
-  DO_TEST (bd_empty, test_optional_bytes_empty);
-  DO_TEST (bd_hello, test_optional_bytes_hello);
-  DO_TEST (bd_random, test_optional_bytes_random);
-  */
+    DO_TEST_OPTIONAL_BYTES(bytes, bytes, "", 0, test_optional_bytes_empty);
+    DO_TEST_OPTIONAL_BYTES(bytes, bytes, "hello", 5, test_optional_bytes_hello);
+    DO_TEST_OPTIONAL_BYTES(bytes, bytes, "\1\0\375\2\4", 5, test_optional_bytes_random);
 }
 
 static void test_optional_submess(void)
