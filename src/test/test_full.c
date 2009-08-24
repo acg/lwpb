@@ -22,7 +22,7 @@ static int verbose = 0;
         if (verbose)                                                        \
             LWPB_DIAG_PRINTF("checking lwpb result\n");                     \
         if ((err) != LWPB_ERR_OK) {                                         \
-            LWPB_DIAG_PRINTF("%s [%d]: lwpb function returned with: %d (%s)\n",\
+            LWPB_DIAG_PRINTF("%s [%d]: function returned: %d (%s)\n",       \
                    __FILE__, __LINE__, err, lwpb_err_text(err));            \
             LWPB_ABORT();                                                   \
         }                                                                   \
@@ -390,7 +390,7 @@ static void test_enum_small(void)
         struct lwpb_encoder encoder;                                        \
         struct lwpb_decoder decoder;                                        \
         struct testing_fields fields;                                       \
-        u8_t buf[128];                                                   \
+        u8_t buf[128];                                                      \
         size_t len, used;                                                   \
         lwpb_encoder_init(&encoder);                                        \
         lwpb_encoder_start(&encoder, foo_TestMessRequiredEnumSmall, buf, sizeof(buf)); \
@@ -421,7 +421,7 @@ static void test_enum_big(void)
         struct lwpb_encoder encoder;                                        \
         struct lwpb_decoder decoder;                                        \
         struct testing_fields fields;                                       \
-        u8_t buf[128];                                                   \
+        u8_t buf[128];                                                      \
         size_t len, used;                                                   \
         lwpb_encoder_init(&encoder);                                        \
         lwpb_encoder_start(&encoder, foo_TestMessRequiredEnum, buf, sizeof(buf)); \
@@ -459,7 +459,7 @@ static void test_field_numbers(void)
         struct lwpb_encoder encoder;                                        \
         struct lwpb_decoder decoder;                                        \
         struct testing_fields fields;                                       \
-        u8_t buf[128];                                                   \
+        u8_t buf[128];                                                      \
         size_t len, used;                                                   \
         lwpb_encoder_init(&encoder);                                        \
         lwpb_encoder_start(&encoder, foo_TestFieldNo##field, buf, sizeof(buf)); \
@@ -494,7 +494,7 @@ static void test_field_numbers(void)
         struct lwpb_encoder encoder;                                        \
         struct lwpb_decoder decoder;                                        \
         struct testing_fields fields;                                       \
-        u8_t buf[256];                                                   \
+        u8_t buf[256];                                                      \
         size_t len, used;                                                   \
         lwpb_encoder_init(&encoder);                                        \
         lwpb_encoder_start(&encoder, foo_TestMessRequired##msg_type, buf, sizeof(buf)); \
@@ -700,7 +700,7 @@ static void test_empty_optional(void)
         struct lwpb_encoder encoder;                                        \
         struct lwpb_decoder decoder;                                        \
         struct testing_fields fields;                                       \
-        u8_t buf[256];                                                   \
+        u8_t buf[256];                                                      \
         size_t len, used;                                                   \
         lwpb_encoder_init(&encoder);                                        \
         lwpb_encoder_start(&encoder, foo_TestMessOptional, buf, sizeof(buf)); \
@@ -888,7 +888,7 @@ static void test_empty_repeated(void)
         struct lwpb_encoder encoder;                                        \
         struct lwpb_decoder decoder;                                        \
         struct testing_fields fields;                                       \
-        u8_t buf[512];                                                   \
+        u8_t buf[512];                                                      \
         size_t len, used;                                                   \
         int i;                                                              \
         lwpb_encoder_init(&encoder);                                        \
