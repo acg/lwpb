@@ -1,5 +1,4 @@
-/**
- * @file encoder.h
+/** @file encoder.h
  * 
  * Lightweight protocol buffers encoder interface.
  * 

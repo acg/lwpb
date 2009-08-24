@@ -1,5 +1,4 @@
-/**
- * @file utils.c
+/** @file utils.c
  * 
  * Implementation of some utility functions.
  * 

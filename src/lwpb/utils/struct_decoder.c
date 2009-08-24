@@ -1,5 +1,4 @@
-/**
- * @file struct_decoder.c
+/** @file struct_decoder.c
  * 
  * Implementation of the protocol buffers struct decoder.
  * 
@@ -185,7 +184,7 @@ static void sdecoder_field_handler(struct lwpb_decoder *decoder,
 
 /**
  * Initializes the struct decoder.
- * @param decoder Struct decoder
+ * @param sdecoder Struct decoder
  */
 void lwpb_struct_decoder_init(struct lwpb_struct_decoder *sdecoder)
 {
@@ -206,7 +205,7 @@ void lwpb_struct_decoder_init(struct lwpb_struct_decoder *sdecoder)
 
 /**
  * Sets the user argument to be passed back with the handlers.
- * @param decoder Struct decoder
+ * @param sdecoder Struct decoder
  * @param arg User argument
  */
 void lwpb_struct_decoder_arg(struct lwpb_struct_decoder *sdecoder, void *arg)
@@ -216,7 +215,7 @@ void lwpb_struct_decoder_arg(struct lwpb_struct_decoder *sdecoder, void *arg)
 
 /**
  * Sets the message start and end handlers.
- * @param decoder Struct decoder
+ * @param sdecoder Struct decoder
  * @param msg_start_handler Message start handler
  * @param msg_end_handler Message end handler
  */
@@ -230,7 +229,7 @@ void lwpb_struct_decoder_msg_handler(struct lwpb_struct_decoder *sdecoder,
 
 /**
  * Sets the field handler.
- * @param decoder Struct decoder
+ * @param sdecoder Struct decoder
  * @param field_handler Field handler
  */
 void lwpb_struct_decoder_field_handler(struct lwpb_struct_decoder *sdecoder,
@@ -241,9 +240,9 @@ void lwpb_struct_decoder_field_handler(struct lwpb_struct_decoder *sdecoder,
 
 /**
  * Decodes a protocol buffer into a struct.
- * @param decoder Struct decoder
+ * @param sdecoder Struct decoder
  * @param struct_map Struct map used for decoding
- * @param strcut_base Base of the struct to decode into
+ * @param struct_base Base of the struct to decode into
  * @param data Data to decode
  * @param len Length of data to decode
  * @param used Returns the number of decoded bytes when not NULL.

@@ -1,5 +1,4 @@
-/**
- * @file socket_helper.h
+/** @file socket_helper.h
  * 
  * Helper functions for the socket RPC protocol.
  * 

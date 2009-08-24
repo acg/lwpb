@@ -1,5 +1,4 @@
-/**
- * @file client.h
+/** @file client.h
  * 
  * Lightweight protocol buffers RPC client interface.
  * 

@@ -1,5 +1,4 @@
-/**
- * @file cc.h
+/** @file cc.h
  * 
  * Compiler specifics.
  * 

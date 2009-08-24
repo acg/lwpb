@@ -1,5 +1,4 @@
-/**
- * @file struct_map.h
+/** @file struct_map.h
  * 
  * Lightweight protocol buffers struct map interface.
  * 

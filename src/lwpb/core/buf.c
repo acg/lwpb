@@ -1,5 +1,4 @@
-/**
- * @file buf.c
+/** @file buf.c
  * 
  * Simple memory buffers.
  * 

@@ -1,5 +1,4 @@
-/**
- * @file lwpb.h
+/** @file lwpb.h
  * 
  * Lightweight protocol buffers.
  * 
@@ -16,6 +15,14 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ */
+
+/** @mainpage Lightweight protocol buffers
+ * 
+ * @section sec_introduction Introduction
+ * 
+ * @section sec_usage Usage
+ * 
  */
 
 #ifndef __LWPB_H__

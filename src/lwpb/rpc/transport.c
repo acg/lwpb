@@ -1,5 +1,4 @@
-/**
- * @file transport.c
+/** @file transport.c
  * 
  * Implementation of the protocol buffers RPC transport.
  * 

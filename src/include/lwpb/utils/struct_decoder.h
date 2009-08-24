@@ -1,5 +1,4 @@
-/**
- * @file struct_decoder.h
+/** @file struct_decoder.h
  * 
  * Lightweight protocol buffers struct decoder interface.
  * 

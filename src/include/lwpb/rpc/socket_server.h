@@ -1,5 +1,4 @@
-/**
- * @file socket_server.h
+/** @file socket_server.h
  * 
  * Socket server RPC transport implementation.
  * 

@@ -1,5 +1,4 @@
-/**
- * @file decoder.c
+/** @file decoder.c
  * 
  * Implementation of the protocol buffers decoder.
  * 

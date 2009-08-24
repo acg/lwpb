@@ -1,5 +1,4 @@
-/**
- * @file server.h
+/** @file server.h
  * 
  * Lightweight protocol buffers RPC server interface.
  * 

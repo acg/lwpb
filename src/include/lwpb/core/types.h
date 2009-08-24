@@ -1,5 +1,4 @@
-/**
- * @file types.h
+/** @file types.h
  * 
  * Public types and definitions needed by the library.
  * 

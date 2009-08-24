@@ -1,5 +1,4 @@
-/**
- * @file arch.h
+/** @file arch.h
  * 
  * Architecture specifics.
  * 

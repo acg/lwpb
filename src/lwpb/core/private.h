@@ -1,5 +1,4 @@
-/**
- * @file private.h
+/** @file private.h
  * 
  * Private types and definitions needed by the library.
  * 

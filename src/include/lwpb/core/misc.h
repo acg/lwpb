@@ -1,5 +1,4 @@
-/**
- * @file misc.h
+/** @file misc.h
  * 
  * Misc functions.
  * 

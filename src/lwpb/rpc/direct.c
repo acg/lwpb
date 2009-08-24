@@ -1,5 +1,4 @@
-/**
- * @file direct.c
+/** @file direct.c
  * 
  * Direct RPC transport implementation.
  * 

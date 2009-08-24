@@ -1,5 +1,4 @@
-/**
- * @file client.c
+/** @file client.c
  * 
  * Implementation of the protocol buffers RPC client.
  * 

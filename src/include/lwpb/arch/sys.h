@@ -1,5 +1,4 @@
-/**
- * @file sys.h
+/** @file sys.h
  * 
  * System specifics.
  * 

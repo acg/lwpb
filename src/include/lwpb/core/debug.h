@@ -1,5 +1,4 @@
-/**
- * @file debug.h
+/** @file debug.h
  * 
  * Debugging macros.
  * 

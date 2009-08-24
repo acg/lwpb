@@ -1,5 +1,4 @@
-/**
- * @file server.c
+/** @file server.c
  * 
  * Implementation of the protocol buffers RPC server.
  * 

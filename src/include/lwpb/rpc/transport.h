@@ -1,5 +1,4 @@
-/**
- * @file transport.h
+/** @file transport.h
  * 
  * Lightweight protocol buffers RPC transport interface.
  * 
