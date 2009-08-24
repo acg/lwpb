@@ -20,15 +20,6 @@
 
 #include <lwpb/lwpb.h>
 
-void *__lwpb_malloc(size_t size)
-{
-    
-}
-
-void __lwpb_free(void *ptr)
-{
-    
-}
 
 void *__lwpb_memcpy(void *dest, const void *src, size_t n)
 {
@@ -59,6 +50,21 @@ void *__lwpb_memmove(void *dest, const void *src, size_t n)
     }
     
     return dest;
+}
+
+int __lwpb_memcmp(const void *s1, const void *s2, size_t n)
+{
+    const u8_t *m1 = (const u8_t *) s1;
+    const u8_t *m2 = (const u8_t *) s2;
+    
+    while (n--) {
+        if (*m1 != *m2)
+            return *m1 - *m2;
+        m1++;
+        m2++;
+    }
+    
+    return 0;
 }
 
 size_t __lwpb_strlen(const char *s)

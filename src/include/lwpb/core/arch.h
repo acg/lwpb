@@ -31,22 +31,38 @@
 // Provide default implementations if none are given
 
 #ifndef LWPB_MALLOC
-#define LWPB_MALLOC(size) __lwpb_malloc(size)
+#define LWPB_MALLOC(size)                                                   \
+    do {                                                                    \
+        LWPB_DIAG_PRINTF("No LWPB_MALLOC() implementation\n");              \
+        LWPB_ABORT();                                                       \
+    } while (0)
 #endif
 
 #ifndef LWPB_FREE
-#define LWPB_FREE(ptr) __lwpb_free(ptr)
+#define LWPB_FREE(ptr)                                                      \
+    do {                                                                    \
+        LWPB_DIAG_PRINTF("No LWPB_FREE() implementation\n");                \
+        LWPB_ABORT();                                                       \
+    } while (0)
 #endif
 
 #ifndef LWPB_MEMCPY
+extern void *__lwpb_memcpy(void *, const void *, size_t);
 #define LWPB_MEMCPY(dest, src, n) __lwpb_memcpy(dest, src, n)
 #endif
 
 #ifndef LWPB_MEMMOVE
+extern void *__lwpb_memmove(void *, const void *, size_t);
 #define LWPB_MEMMOVE(dest, src, n) __lwpb_memmove(dest, src, n)
 #endif
 
+#ifndef LWPB_MEMCMP
+extern int __lwpb_memcmp(const void *, const void *, size_t);
+#define LWPB_MEMCMP(s1, s2, n) __lwpb_memcmp(s1, s2, n)
+#endif
+
 #ifndef LWPB_STRLEN
+extern size_t __lwpb_strlen(const char *);
 #define LWPB_STRLEN(s) __lwpb_strlen(s)
 #endif
 
@@ -54,8 +70,13 @@
 #define LWPB_DIAG_PRINTF(fmt, args...)
 #endif
 
-#ifndef LWPB_EXIT
-#define LWPB_EXIT() LWPB_DIAG_PRINTF("!!! A fatail failure was hit, system is unusable !!!\n")
+#ifndef LWPB_ABORT
+#define LWPB_ABORT()                                                        \
+    do {                                                                    \
+        LWPB_DIAG_PRINTF("lwpb was aborted!\n")                             \
+        while (1) {};                                                       \
+    } while (0)
+
 #endif
 
 #endif // __LWPB_CORE_ARCH_H__

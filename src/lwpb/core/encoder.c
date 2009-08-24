@@ -167,6 +167,8 @@ lwpb_err_t lwpb_encoder_nested_start(struct lwpb_encoder *encoder,
         return LWPB_ERR_END_OF_BUF;
     lwpb_buf_init(&new_frame->buf, frame->buf.pos + MSG_RESERVE_BYTES,
                   lwpb_buf_left(&frame->buf) - MSG_RESERVE_BYTES);
+    
+    return LWPB_ERR_OK;
 }
 
 /**
@@ -207,7 +209,7 @@ lwpb_err_t lwpb_encoder_add_field(struct lwpb_encoder *encoder,
     struct lwpb_encoder_stack_frame *frame;
     int i;
     u64_t key;
-    enum wire_type wire_type;
+    enum wire_type wire_type = 0;
     union wire_value wire_value;
     
     LWPB_ASSERT(encoder->depth > 0, "Fields can only be added inside a message");
@@ -225,11 +227,11 @@ lwpb_err_t lwpb_encoder_add_field(struct lwpb_encoder *encoder,
     switch (field_desc->opts.typ) {
     case LWPB_DOUBLE:
         wire_type = WT_64BIT;
-        wire_value.int64 = *((u64_t *) &value->double_);
+        LWPB_MEMCPY(&wire_value.int64, &value->double_, sizeof(double));
         break;
     case LWPB_FLOAT:
         wire_type = WT_32BIT;
-        wire_value.int32 = *((u32_t *) &value->float_);
+        LWPB_MEMCPY(&wire_value.int32, &value->float_, sizeof(float));
         break;
     case LWPB_INT32:
         wire_type = WT_VARINT;

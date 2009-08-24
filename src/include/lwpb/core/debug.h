@@ -29,7 +29,7 @@
     do {                                                                    \
         if (!(_expr_)) {                                                    \
             LWPB_DIAG_PRINTF(_msg_ "\n");                                   \
-            LWPB_EXIT();                                                    \
+            LWPB_ABORT();                                                   \
         }                                                                   \
     } while (0)
 
@@ -37,7 +37,7 @@
 #define LWPB_FAIL(_msg_)                                                    \
     do {                                                                    \
         LWPB_DIAG_PRINTF(_msg_ "\n");                                       \
-        LWPB_EXIT();                                                        \
+        LWPB_ABORT();                                                       \
     } while(0)
 
 /* Logging macros */

@@ -33,7 +33,7 @@ const struct lwpb_field_desc lwpb_fields_foo_testfieldno15[] = {
         .name = "test",
 #endif
 #if LWPB_FIELD_DEFAULTS
-        .def.string = "",
+        .def.string.str = "",
 #endif
     },
 };
@@ -50,7 +50,7 @@ const struct lwpb_field_desc lwpb_fields_foo_testfieldno16[] = {
         .name = "test",
 #endif
 #if LWPB_FIELD_DEFAULTS
-        .def.string = "",
+        .def.string.str = "",
 #endif
     },
 };
@@ -67,7 +67,7 @@ const struct lwpb_field_desc lwpb_fields_foo_testfieldno2047[] = {
         .name = "test",
 #endif
 #if LWPB_FIELD_DEFAULTS
-        .def.string = "",
+        .def.string.str = "",
 #endif
     },
 };
@@ -84,7 +84,7 @@ const struct lwpb_field_desc lwpb_fields_foo_testfieldno2048[] = {
         .name = "test",
 #endif
 #if LWPB_FIELD_DEFAULTS
-        .def.string = "",
+        .def.string.str = "",
 #endif
     },
 };
@@ -101,7 +101,7 @@ const struct lwpb_field_desc lwpb_fields_foo_testfieldno262143[] = {
         .name = "test",
 #endif
 #if LWPB_FIELD_DEFAULTS
-        .def.string = "",
+        .def.string.str = "",
 #endif
     },
 };
@@ -118,7 +118,7 @@ const struct lwpb_field_desc lwpb_fields_foo_testfieldno262144[] = {
         .name = "test",
 #endif
 #if LWPB_FIELD_DEFAULTS
-        .def.string = "",
+        .def.string.str = "",
 #endif
     },
 };
@@ -135,7 +135,7 @@ const struct lwpb_field_desc lwpb_fields_foo_testfieldno33554431[] = {
         .name = "test",
 #endif
 #if LWPB_FIELD_DEFAULTS
-        .def.string = "",
+        .def.string.str = "",
 #endif
     },
 };
@@ -152,7 +152,7 @@ const struct lwpb_field_desc lwpb_fields_foo_testfieldno33554432[] = {
         .name = "test",
 #endif
 #if LWPB_FIELD_DEFAULTS
-        .def.string = "",
+        .def.string.str = "",
 #endif
     },
 };
@@ -563,7 +563,7 @@ const struct lwpb_field_desc lwpb_fields_foo_testmessoptional[] = {
         .name = "test_boolean",
 #endif
 #if LWPB_FIELD_DEFAULTS
-        1,
+        .def.bool = 0,
 #endif
     },
     {
@@ -602,7 +602,7 @@ const struct lwpb_field_desc lwpb_fields_foo_testmessoptional[] = {
         .name = "test_string",
 #endif
 #if LWPB_FIELD_DEFAULTS
-        .def.string = "",
+        .def.string.str = "",
 #endif
     },
     {
@@ -615,7 +615,7 @@ const struct lwpb_field_desc lwpb_fields_foo_testmessoptional[] = {
         .name = "test_bytes",
 #endif
 #if LWPB_FIELD_DEFAULTS
-        .def.string = "",
+        .def.string.str = "",
 #endif
     },
     {
@@ -849,7 +849,7 @@ const struct lwpb_field_desc lwpb_fields_foo_testmessrequiredbool[] = {
         .name = "test",
 #endif
 #if LWPB_FIELD_DEFAULTS
-        1,
+        .def.bool = 0,
 #endif
     },
 };
@@ -900,7 +900,7 @@ const struct lwpb_field_desc lwpb_fields_foo_testmessrequiredstring[] = {
         .name = "test",
 #endif
 #if LWPB_FIELD_DEFAULTS
-        .def.string = "",
+        .def.string.str = "",
 #endif
     },
 };
@@ -917,7 +917,7 @@ const struct lwpb_field_desc lwpb_fields_foo_testmessrequiredbytes[] = {
         .name = "test",
 #endif
 #if LWPB_FIELD_DEFAULTS
-        .def.string = "",
+        .def.string.str = "",
 #endif
     },
 };
@@ -1033,7 +1033,7 @@ const struct lwpb_field_desc lwpb_fields_foo_defaultrequiredvalues[] = {
         .name = "v_string",
 #endif
 #if LWPB_FIELD_DEFAULTS
-        .def.string = "hi mom\n",
+        .def.string.str = "hi mom\n",
 #endif
     },
     {
@@ -1046,7 +1046,7 @@ const struct lwpb_field_desc lwpb_fields_foo_defaultrequiredvalues[] = {
         .name = "v_bytes",
 #endif
 #if LWPB_FIELD_DEFAULTS
-        .def.string = "a \000 character",
+        .def.string.str = "a \000 character",
 #endif
     },
 };
@@ -1141,7 +1141,7 @@ const struct lwpb_field_desc lwpb_fields_foo_defaultoptionalvalues[] = {
         .name = "v_string",
 #endif
 #if LWPB_FIELD_DEFAULTS
-        .def.string = "hi mom\n",
+        .def.string.str = "hi mom\n",
 #endif
     },
     {
@@ -1154,7 +1154,7 @@ const struct lwpb_field_desc lwpb_fields_foo_defaultoptionalvalues[] = {
         .name = "v_bytes",
 #endif
 #if LWPB_FIELD_DEFAULTS
-        .def.string = "a \000 character",
+        .def.string.str = "a \000 character",
 #endif
     },
 };
@@ -1171,7 +1171,7 @@ const struct lwpb_field_desc lwpb_fields_foo_allocvalues[] = {
         .name = "o_bytes",
 #endif
 #if LWPB_FIELD_DEFAULTS
-        .def.string = "",
+        .def.string.str = "",
 #endif
     },
     {
@@ -1197,7 +1197,7 @@ const struct lwpb_field_desc lwpb_fields_foo_allocvalues[] = {
         .name = "a_string",
 #endif
 #if LWPB_FIELD_DEFAULTS
-        .def.string = "",
+        .def.string.str = "",
 #endif
     },
     {
@@ -1210,7 +1210,7 @@ const struct lwpb_field_desc lwpb_fields_foo_allocvalues[] = {
         .name = "a_bytes",
 #endif
 #if LWPB_FIELD_DEFAULTS
-        .def.string = "",
+        .def.string.str = "",
 #endif
     },
     {

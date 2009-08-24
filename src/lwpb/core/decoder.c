@@ -351,10 +351,10 @@ lwpb_err_t lwpb_decoder_decode(struct lwpb_decoder *decoder,
         
         switch (field_desc->opts.typ) {
         case LWPB_DOUBLE:
-            *((u64_t *) &value.double_) = wire_value.int64;
+            LWPB_MEMCPY(&value.double_, &wire_value.int64, sizeof(double));
             break;
         case LWPB_FLOAT:
-            *((u32_t *) &value.float_) = wire_value.int32;
+            LWPB_MEMCPY(&value.float_, &wire_value.int32, sizeof(float));
             break;
         case LWPB_INT32:
             value.int32 = wire_value.varint;

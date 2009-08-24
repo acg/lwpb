@@ -24,7 +24,7 @@ static int verbose = 0;
         if ((err) != LWPB_ERR_OK) {                                         \
             LWPB_DIAG_PRINTF("%s [%d]: lwpb function returned with: %d (%s)\n",\
                    __FILE__, __LINE__, err, lwpb_err_text(err));            \
-            LWPB_EXIT();                                                        \
+            LWPB_ABORT();                                                   \
         }                                                                   \
     } while (0)
 
@@ -35,7 +35,7 @@ static int buf_equal(const u8_t *buf1, size_t len1,
     if (len1 != len2)
         return 0;
     
-    return memcmp(buf1, buf2, len1) == 0;
+    return LWPB_MEMCMP(buf1, buf2, len1) == 0;
 }
 
 /** Dumps a buffer. */
@@ -64,11 +64,11 @@ static void check_buf(const u8_t *actual_data,
         return;
     
     LWPB_DIAG_PRINTF("%s [%d]: buffer is not as expected\n", filename, lineno);
-    LWPB_DIAG_PRINTF("actual (length = %u):\n", actual_len);
+    LWPB_DIAG_PRINTF("actual (length = %zu):\n", actual_len);
     dump_buf(actual_data, actual_len);
-    LWPB_DIAG_PRINTF("expected (length = %u) (%s):\n", expected_len, static_buf_name);
+    LWPB_DIAG_PRINTF("expected (length = %zu) (%s):\n", expected_len, static_buf_name);
     dump_buf(expected_data, expected_len);
-    LWPB_EXIT();
+    LWPB_ABORT();
 }
 
 #define CHECK_BUF(buf, len, vector) \
@@ -88,7 +88,7 @@ static void check_value(u64_t actual_value,
     
     LWPB_DIAG_PRINTF("%s [%d]: value not as expected (actual = %lld expected = %lld)\n",
            filename, lineno, actual_value, expected_value);
-    LWPB_EXIT();
+    LWPB_ABORT();
 }
 
 #define CHECK_VALUE(actual_value, expected_value) \
@@ -108,7 +108,7 @@ static void check_fvalue(double actual_value,
     
     LWPB_DIAG_PRINTF("%s [%d]: value not as expected (actual = %f expected = %f)\n",
            filename, lineno, actual_value, expected_value);
-    LWPB_EXIT();
+    LWPB_ABORT();
 }
 
 #define CHECK_FVALUE(actual_value, expected_value) \
@@ -122,18 +122,18 @@ static void check_string(const char *actual_string, size_t actual_len,
     if (verbose)
         LWPB_DIAG_PRINTF("checking string\n");
     
-    if (actual_len == strlen(expected_string))
-        if (memcmp(actual_string, expected_string, actual_len) == 0)
+    if (actual_len == LWPB_STRLEN(expected_string))
+        if (LWPB_MEMCMP(actual_string, expected_string, actual_len) == 0)
             return;
     
     LWPB_DIAG_PRINTF("%s [%d]: string value not as expected\n", filename, lineno);
-    LWPB_DIAG_PRINTF("actual (length = %u):\n", actual_len);
+    LWPB_DIAG_PRINTF("actual (length = %zu):\n", actual_len);
     while (actual_len--)
         LWPB_DIAG_PRINTF("%c", *actual_string++);
     LWPB_DIAG_PRINTF("\n");
-    LWPB_DIAG_PRINTF("expected (length = %u):\n", strlen(expected_string));
+    LWPB_DIAG_PRINTF("expected (length = %zu):\n", LWPB_STRLEN(expected_string));
     LWPB_DIAG_PRINTF("%s\n", expected_string);
-    LWPB_EXIT();
+    LWPB_ABORT();
 }
 
 #define CHECK_STRING(actual_string, actual_len, expected_string) \
@@ -143,7 +143,7 @@ static void do_assert(const char *msg,
                       const char *filename, unsigned lineno)
 {
     LWPB_DIAG_PRINTF("%s [%d]: %s\n", filename, lineno, msg);
-    LWPB_EXIT();
+    LWPB_ABORT();
 }
 
 #define CHECK_ASSERT(expr, msg)                                             \
@@ -306,7 +306,7 @@ static void generic_field_handler(struct lwpb_decoder *decoder,
         }
     } else if (msg_desc == foo_TestMessRequiredBytes) {
         if (field_desc == foo_TestMessRequiredBytes_test) {
-            CHECK_STRING(value->string.str, value->string.len, fields->u.TestMessRequiredBytes.test); return;
+            CHECK_STRING(value->string.str, value->string.len, (const char *) fields->u.TestMessRequiredBytes.test); return;
         }
     } else if (msg_desc == foo_TestMessOptional) {
         if (field_desc == foo_TestMessOptional_test_int32) {
@@ -379,7 +379,7 @@ static void generic_field_handler(struct lwpb_decoder *decoder,
     }
     
     LWPB_DIAG_PRINTF("Decoded unhandled field\n");
-    LWPB_EXIT();
+    LWPB_ABORT();
 }
 
 static void test_enum_small(void)
@@ -682,7 +682,6 @@ static void test_empty_optional(void)
     lwpb_err_t ret;
     struct lwpb_encoder encoder;
     struct lwpb_decoder decoder;
-    struct testing_fields fields;
     u8_t buf[256];
     size_t len, used;
     lwpb_encoder_init(&encoder);
@@ -871,7 +870,6 @@ static void test_empty_repeated(void)
     lwpb_err_t ret;
     struct lwpb_encoder encoder;
     struct lwpb_decoder decoder;
-    struct testing_fields fields;
     u8_t buf[256];
     size_t len, used;
     lwpb_encoder_init(&encoder);
@@ -1209,7 +1207,7 @@ static struct test_entry tests[] = {
     
 };
 
-int main()
+int main(void)
 {
     int i;
     

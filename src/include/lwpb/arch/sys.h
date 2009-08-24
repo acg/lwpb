@@ -32,6 +32,6 @@
 #define LWPB_STRLEN(s) strlen(s)
 
 #define LWPB_DIAG_PRINTF(fmt, args...) printf(fmt, ##args)
-#define LWPB_EXIT() abort()
+#define LWPB_ABORT() abort()
 
 #endif // __LWPB_ARCH_CC_H__
