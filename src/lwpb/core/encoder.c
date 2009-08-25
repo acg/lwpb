@@ -204,8 +204,7 @@ lwpb_err_t lwpb_encoder_packed_repeated_start(struct lwpb_encoder *encoder,
 {
     struct lwpb_encoder_stack_frame *frame, *new_frame;
 
-    LWPB_ASSERT((field_desc->opts.label == LWPB_REPEATED) && 
-                (field_desc->opts.flags & LWPB_IS_PACKED),
+    LWPB_ASSERT(LWPB_IS_PACKED_REPEATED(field_desc),
                 "Field is not repeated packed");
     
     LWPB_ASSERT(!encoder->packed, "Packed repeated fields must not be nested");
@@ -378,7 +377,7 @@ lwpb_err_t lwpb_encoder_add_field(struct lwpb_encoder *encoder,
     // Do not encode field key for packed repeated fields
     if (!encoder->packed) {
         // Override wire value if this is a packed repeated field
-        if (field_desc->opts.flags & LWPB_IS_PACKED) {
+        if (LWPB_IS_PACKED_REPEATED(field_desc)) {
             wire_type = WT_STRING;
             wire_value.string.data = value->message.data;
             wire_value.string.len = value->message.len;
@@ -410,7 +409,7 @@ lwpb_err_t lwpb_encoder_add_field(struct lwpb_encoder *encoder,
         // Use memmove() when writing a message or packed repeated field as the
         // memory areas are overlapping.
         if ((field_desc->opts.typ == LWPB_MESSAGE) ||
-            (field_desc->opts.flags & LWPB_IS_PACKED)) {
+            LWPB_IS_PACKED_REPEATED(field_desc)) {
             LWPB_MEMMOVE(frame->buf.pos, wire_value.string.data, wire_value.string.len);
         } else {
             LWPB_MEMCPY(frame->buf.pos, wire_value.string.data, wire_value.string.len);

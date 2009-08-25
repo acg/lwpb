@@ -39,6 +39,8 @@ static void debug_msg_start_handler(struct lwpb_decoder *decoder,
                                     void *arg)
 {
     const char *name;
+    
+    LWPB_DIAG_PRINTF("%s start\n", msg_desc->name);
 
 #if LWPB_MESSAGE_NAMES
     name = msg_desc->name;
@@ -55,6 +57,7 @@ static void debug_msg_end_handler(struct lwpb_decoder *decoder,
                                   const struct lwpb_msg_desc *msg_desc,
                                   void *arg)
 {
+    LWPB_DIAG_PRINTF("%s end\n", msg_desc->name);
     debug_indent--;
 }
 
@@ -208,6 +211,38 @@ static lwpb_err_t decode_64bit(struct lwpb_buf *buf, u64_t *value)
     return LWPB_ERR_OK;
 }
 
+static enum wire_type field_wire_type(const struct lwpb_field_desc *field_desc)
+{
+    switch (field_desc->opts.typ) {
+    case LWPB_DOUBLE:
+        return WT_64BIT;
+    case LWPB_FLOAT:
+        return WT_32BIT;
+    case LWPB_INT32:
+    case LWPB_INT64:
+    case LWPB_UINT32:
+    case LWPB_UINT64:
+    case LWPB_SINT32:
+    case LWPB_SINT64:
+        return WT_VARINT;
+    case LWPB_FIXED32:
+        return WT_32BIT;
+    case LWPB_FIXED64:
+        return WT_64BIT;
+    case LWPB_SFIXED32:
+        return WT_32BIT;
+    case LWPB_SFIXED64:
+        return WT_64BIT;
+    case LWPB_BOOL:
+    case LWPB_ENUM:
+        return WT_VARINT;
+    case LWPB_STRING:
+    case LWPB_BYTES:
+    case LWPB_MESSAGE:
+        return WT_STRING;
+    }
+}
+
 // Decoder
 
 /**
@@ -284,142 +319,192 @@ lwpb_err_t lwpb_decoder_decode(struct lwpb_decoder *decoder,
 {
     lwpb_err_t ret;
     int i;
-    struct lwpb_buf buf;
     u64_t key;
     int number;
     const struct lwpb_field_desc *field_desc = NULL;
     enum wire_type wire_type;
     union wire_value wire_value;
     union lwpb_value value;
+    struct lwpb_decoder_stack_frame *frame, *new_frame;
+    int packed = 0;
     
-    lwpb_buf_init(&buf, data, len);
+    // Setup initial stack frame
+    decoder->depth = 0;
+    frame = &decoder->stack[decoder->depth];
+    lwpb_buf_init(&frame->buf, data, len);
+    frame->msg_desc = msg_desc;
+    
+    while (decoder->depth >= 0) {
+        
+decode_nested:
+        
+        // Get current frame
+        frame = &decoder->stack[decoder->depth];
+        
+        // Notify start message
+        if (frame->msg_desc && lwpb_buf_used(&frame->buf) == 0)
+            if (decoder->msg_start_handler)
+                decoder->msg_start_handler(decoder, frame->msg_desc, decoder->arg);
 
-    if (decoder->msg_start_handler)
-        decoder->msg_start_handler(decoder, msg_desc, decoder->arg);
-    
-    while (lwpb_buf_left(&buf) > 0) {
-        // Decode the field key
-        ret = decode_varint(&buf, &key);
-        if (ret != LWPB_ERR_OK)
-            return ret;
-        
-        number = key >> 3;
-        wire_type = key & 0x07;
-        
-        // Find the field descriptor
-        for (i = 0; i < msg_desc->num_fields; i++)
-            if (msg_desc->fields[i].number == number) {
-                field_desc = &msg_desc->fields[i];
+        // Process buffer
+        while (lwpb_buf_left(&frame->buf) > 0) {
+            
+            if (packed) {
+                wire_type = field_wire_type(field_desc);
+            } else {
+                // Decode the field key
+                ret = decode_varint(&frame->buf, &key);
+                if (ret != LWPB_ERR_OK)
+                    return ret;
+            
+                number = key >> 3;
+                wire_type = key & 0x07;
+            
+                // Find the field descriptor
+                for (i = 0; i < frame->msg_desc->num_fields; i++)
+                    if (frame->msg_desc->fields[i].number == number) {
+                        field_desc = &frame->msg_desc->fields[i];
+                        break;
+                    }
+            }
+            
+            // Decode field's wire value
+            switch(wire_type) {
+            case WT_VARINT:
+                ret = decode_varint(&frame->buf, &wire_value.varint);
+                if (ret != LWPB_ERR_OK)
+                    return ret;
+                break;
+            case WT_64BIT:
+                ret = decode_64bit(&frame->buf, &wire_value.int64);
+                if (ret != LWPB_ERR_OK)
+                    return ret;
+                break;
+            case WT_STRING:
+                ret = decode_varint(&frame->buf, &wire_value.string.len);
+                if (ret != LWPB_ERR_OK)
+                    return ret;
+                if (wire_value.string.len > lwpb_buf_left(&frame->buf))
+                    return LWPB_ERR_END_OF_BUF;
+                wire_value.string.data = frame->buf.pos;
+                frame->buf.pos += wire_value.string.len;
+                break;
+            case WT_32BIT:
+                ret = decode_32bit(&frame->buf, &wire_value.int32);
+                if (ret != LWPB_ERR_OK)
+                    return ret;
+                break;
+            default:
+                LWPB_ASSERT(1, "Unknown wire type");
                 break;
             }
-
-        // Decode field's wire value
-        switch(wire_type) {
-        case WT_VARINT:
-            ret = decode_varint(&buf, &wire_value.varint);
-            if (ret != LWPB_ERR_OK)
-                return ret;
-            break;
-        case WT_64BIT:
-            ret = decode_64bit(&buf, &wire_value.int64);
-            if (ret != LWPB_ERR_OK)
-                return ret;
-            break;
-        case WT_STRING:
-            ret = decode_varint(&buf, &wire_value.string.len);
-            if (ret != LWPB_ERR_OK)
-                return ret;
-            if (wire_value.string.len > lwpb_buf_left(&buf))
-                return LWPB_ERR_END_OF_BUF;
-            wire_value.string.data = buf.pos;
-            buf.pos += wire_value.string.len;
-            break;
-        case WT_32BIT:
-            ret = decode_32bit(&buf, &wire_value.int32);
-            if (ret != LWPB_ERR_OK)
-                return ret;
-            break;
-        default:
-            LWPB_ASSERT(1, "Unknown wire type");
-            break;
+            
+            // Skip unknown fields
+            if (!field_desc)
+                continue;
+            
+            // Handle packed repeated fields
+            if ((wire_type == WT_STRING) &&
+                LWPB_IS_PACKED_REPEATED(field_desc)) {
+                
+                // Add new stack frame
+                decoder->depth++;
+                LWPB_ASSERT(decoder->depth < LWPB_MAX_DEPTH, "Message nesting too deep");
+                
+                new_frame = &decoder->stack[decoder->depth];
+                lwpb_buf_init(&new_frame->buf, wire_value.string.data, wire_value.string.len);
+                new_frame->msg_desc = frame->msg_desc;
+                
+                packed = 1;
+                
+                goto decode_nested;
+            }
+            
+            switch (field_desc->opts.typ) {
+            case LWPB_DOUBLE:
+                LWPB_MEMCPY(&value.double_, &wire_value.int64, sizeof(double));
+                break;
+            case LWPB_FLOAT:
+                LWPB_MEMCPY(&value.float_, &wire_value.int32, sizeof(float));
+                break;
+            case LWPB_INT32:
+                value.int32 = wire_value.varint;
+                break;
+            case LWPB_INT64:
+                value.int64 = wire_value.varint;
+                break;
+            case LWPB_UINT32:
+                value.uint32 = wire_value.varint;
+                break;
+            case LWPB_UINT64:
+                value.uint64 = wire_value.varint;
+                break;
+            case LWPB_SINT32:
+                // Zig-zag encoding
+                value.int32 = (wire_value.varint >> 1) ^ -((s32_t) (wire_value.varint & 1));
+                break;
+            case LWPB_SINT64:
+                // Zig-zag encoding
+                value.int64 = (wire_value.varint >> 1) ^ -((s64_t) (wire_value.varint & 1));
+                break;
+            case LWPB_FIXED32:
+                value.uint32 = wire_value.int32;
+                break;
+            case LWPB_FIXED64:
+                value.uint64 = wire_value.int64;
+                break;
+            case LWPB_SFIXED32:
+                value.int32 = wire_value.int32;
+                break;
+            case LWPB_SFIXED64:
+                value.int64 = wire_value.int64;
+                break;
+            case LWPB_BOOL:
+                value.bool = wire_value.varint;
+                break;
+            case LWPB_ENUM:
+                value.enum_ = wire_value.varint;
+                break;
+            case LWPB_STRING:
+                value.string.len = wire_value.string.len;
+                value.string.str = wire_value.string.data;
+                break;
+            case LWPB_BYTES:
+                value.bytes.len = wire_value.string.len;
+                value.bytes.data = wire_value.string.data;
+                break;
+            case LWPB_MESSAGE:
+            default:
+                if (decoder->field_handler)
+                    decoder->field_handler(decoder, msg_desc, field_desc, NULL, decoder->arg);
+                
+                // Add new stack frame
+                decoder->depth++;
+                LWPB_ASSERT(decoder->depth < LWPB_MAX_DEPTH, "Message nesting too deep");
+                
+                new_frame = &decoder->stack[decoder->depth];
+                lwpb_buf_init(&new_frame->buf, wire_value.string.data, wire_value.string.len);
+                new_frame->msg_desc = field_desc->msg_desc;
+                
+                goto decode_nested;
+            }
+            
+            if (decoder->field_handler)
+                decoder->field_handler(decoder, frame->msg_desc, field_desc, &value, decoder->arg);
         }
         
-        // Skip unknown fields
-        if (!field_desc)
-            continue;
+        // Notify end message
+        if (frame->msg_desc)
+            if (decoder->msg_end_handler)
+                decoder->msg_end_handler(decoder, frame->msg_desc, decoder->arg);
         
-        switch (field_desc->opts.typ) {
-        case LWPB_DOUBLE:
-            LWPB_MEMCPY(&value.double_, &wire_value.int64, sizeof(double));
-            break;
-        case LWPB_FLOAT:
-            LWPB_MEMCPY(&value.float_, &wire_value.int32, sizeof(float));
-            break;
-        case LWPB_INT32:
-            value.int32 = wire_value.varint;
-            break;
-        case LWPB_INT64:
-            value.int64 = wire_value.varint;
-            break;
-        case LWPB_UINT32:
-            value.uint32 = wire_value.varint;
-            break;
-        case LWPB_UINT64:
-            value.uint64 = wire_value.varint;
-            break;
-        case LWPB_SINT32:
-            // Zig-zag encoding
-            value.int32 = (wire_value.varint >> 1) ^ -((s32_t) (wire_value.varint & 1));
-            break;
-        case LWPB_SINT64:
-            // Zig-zag encoding
-            value.int64 = (wire_value.varint >> 1) ^ -((s64_t) (wire_value.varint & 1));
-            break;
-        case LWPB_FIXED32:
-            value.uint32 = wire_value.int32;
-            break;
-        case LWPB_FIXED64:
-            value.uint64 = wire_value.int64;
-            break;
-        case LWPB_SFIXED32:
-            value.int32 = wire_value.int32;
-            break;
-        case LWPB_SFIXED64:
-            value.int64 = wire_value.int64;
-            break;
-        case LWPB_BOOL:
-            value.bool = wire_value.varint;
-            break;
-        case LWPB_ENUM:
-            value.enum_ = wire_value.varint;
-            break;
-        case LWPB_STRING:
-            value.string.len = wire_value.string.len;
-            value.string.str = wire_value.string.data;
-            break;
-        case LWPB_BYTES:
-            value.bytes.len = wire_value.string.len;
-            value.bytes.data = wire_value.string.data;
-            break;
-        case LWPB_MESSAGE:
-        default:
-            if (decoder->field_handler)
-                decoder->field_handler(decoder, msg_desc, field_desc, NULL, decoder->arg);
-            // Decode nested message
-            lwpb_decoder_decode(decoder, field_desc->msg_desc, wire_value.string.data, wire_value.string.len, NULL);
-            break;
-        }
-        
-        if (field_desc->opts.typ < LWPB_MESSAGE)
-            if (decoder->field_handler)
-                decoder->field_handler(decoder, msg_desc, field_desc, &value, decoder->arg);
+        // Goto previous frame
+        decoder->depth--;
+        packed = 0;
     }
     
-    if (decoder->msg_end_handler)
-        decoder->msg_end_handler(decoder, msg_desc, decoder->arg);
-    
     if (used)
-        *used = lwpb_buf_used(&buf);
+        *used = lwpb_buf_used(&decoder->stack[0].buf);
     
     return LWPB_ERR_OK;
 }

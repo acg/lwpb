@@ -153,6 +153,11 @@ struct lwpb_field_desc {
 #endif
 };
 
+/** Checks if a field is 'packed repeated' */
+#define LWPB_IS_PACKED_REPEATED(field_desc)                                 \
+    ((field_desc)->opts.label == LWPB_REPEATED &&                           \
+     (field_desc)->opts.flags & LWPB_IS_PACKED)
+
 /** Protocol buffer message descriptor */
 struct lwpb_msg_desc {
     u32_t num_fields;           /**< Number of fields */

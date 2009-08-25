@@ -60,12 +60,20 @@ typedef void (*lwpb_decoder_field_handler_t)
      const struct lwpb_field_desc *field_desc,
      union lwpb_value *value, void *arg);
 
+
+struct lwpb_decoder_stack_frame {
+    struct lwpb_buf buf;
+    const struct lwpb_msg_desc *msg_desc;
+};
+
 /** Protocol buffer decoder */
 struct lwpb_decoder {
     void *arg;
     lwpb_decoder_msg_start_handler_t msg_start_handler;
     lwpb_decoder_msg_end_handler_t msg_end_handler;
     lwpb_decoder_field_handler_t field_handler;
+    struct lwpb_decoder_stack_frame stack[LWPB_MAX_DEPTH];
+    int depth;
 };
 
 void lwpb_decoder_init(struct lwpb_decoder *decoder);
