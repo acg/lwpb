@@ -256,6 +256,23 @@ struct testing_fields {
             char **test_string;
             u8_t *test_bytes;
         } TestMess;
+        struct {
+            s32_t *test_int32;
+            s32_t *test_sint32;
+            s32_t *test_sfixed32;
+            u32_t *test_uint32;
+            u32_t *test_fixed32;
+            s64_t *test_int64;
+            s64_t *test_sint64;
+            s64_t *test_sfixed64;
+            u64_t *test_uint64;
+            u64_t *test_fixed64;
+            float *test_float;
+            double *test_double;
+            lwpb_bool_t *test_boolean;
+            lwpb_enum_t *test_enum_small;
+            lwpb_enum_t *test_enum;
+        } TestMessPacked;
     } u;
 };
 
@@ -422,6 +439,38 @@ static void generic_field_handler(struct lwpb_decoder *decoder,
             CHECK_VALUE(value->enum_, *fields->u.TestMess.test_enum++); return;
         } else if (field_desc == foo_TestMess_test_string) {
             CHECK_STRING(value->string.str, value->string.len, *fields->u.TestMess.test_string++); return;
+        }
+    } else if (msg_desc == foo_TestMessPacked) {
+        if (field_desc == foo_TestMessPacked_test_int32) {
+            CHECK_VALUE(value->int32, *fields->u.TestMessPacked.test_int32++); return;
+        } else if (field_desc == foo_TestMessPacked_test_sint32) {
+            CHECK_VALUE(value->int32, *fields->u.TestMessPacked.test_sint32++); return;
+        } else if (field_desc == foo_TestMessPacked_test_sfixed32) {
+            CHECK_VALUE(value->int32, *fields->u.TestMessPacked.test_sfixed32++); return;
+        } else if (field_desc == foo_TestMessPacked_test_uint32) {
+            CHECK_VALUE(value->uint32, *fields->u.TestMessPacked.test_uint32++); return;
+        } else if (field_desc == foo_TestMessPacked_test_fixed32) {
+            CHECK_VALUE(value->uint32, *fields->u.TestMessPacked.test_fixed32++); return;
+        } else if (field_desc == foo_TestMessPacked_test_int64) {
+            CHECK_VALUE(value->int64, *fields->u.TestMessPacked.test_int64++); return;
+        } else if (field_desc == foo_TestMessPacked_test_sint64) {
+            CHECK_VALUE(value->int64, *fields->u.TestMessPacked.test_sint64++); return;
+        } else if (field_desc == foo_TestMessPacked_test_sfixed64) {
+            CHECK_VALUE(value->int64, *fields->u.TestMessPacked.test_sfixed64++); return;
+        } else if (field_desc == foo_TestMessPacked_test_uint64) {
+            CHECK_VALUE(value->uint64, *fields->u.TestMessPacked.test_uint64++); return;
+        } else if (field_desc == foo_TestMessPacked_test_fixed64) {
+            CHECK_VALUE(value->uint64, *fields->u.TestMessPacked.test_fixed64++); return;
+        } else if (field_desc == foo_TestMessPacked_test_float) {
+            CHECK_FVALUE(value->float_, *fields->u.TestMessPacked.test_float++); return;
+        } else if (field_desc == foo_TestMessPacked_test_double) {
+            CHECK_FVALUE(value->double_, *fields->u.TestMessPacked.test_double++); return;
+        } else if (field_desc == foo_TestMessPacked_test_boolean) {
+            CHECK_VALUE(value->bool, *fields->u.TestMessPacked.test_boolean++); return;
+        } else if (field_desc == foo_TestMessPacked_test_enum_small) {
+            CHECK_VALUE(value->enum_, *fields->u.TestMessPacked.test_enum_small++); return;
+        } else if (field_desc == foo_TestMessPacked_test_enum) {
+            CHECK_VALUE(value->enum_, *fields->u.TestMessPacked.test_enum++); return;
         }
     }
     
@@ -1119,6 +1168,151 @@ static void test_optional_default_values(void)
     // TODO: implement
 }
 
+static void test_empty_packed_repeated(void)
+{
+    lwpb_err_t ret;
+    struct lwpb_encoder encoder;
+    struct lwpb_decoder decoder;
+    u8_t buf[256];
+    size_t len, used;
+    lwpb_encoder_init(&encoder);
+    lwpb_encoder_start(&encoder, foo_TestMessPacked, buf, sizeof(buf));
+    len = lwpb_encoder_finish(&encoder);
+    CHECK_ASSERT(len == 0, "length must be null");
+    lwpb_decoder_init(&decoder);
+    ret = lwpb_decoder_decode(&decoder, foo_TestMessPacked, buf, len, &used);
+    CHECK_ASSERT(used == 0, "not decoded all bytes");
+    CHECK_LWPB(ret);
+}
+
+#define DO_TEST_PACKED_REPEATED(lwpb_type, field, array, vector)            \
+    do {                                                                    \
+        lwpb_err_t ret;                                                     \
+        struct lwpb_encoder encoder;                                        \
+        struct lwpb_decoder decoder;                                        \
+        struct testing_fields fields;                                       \
+        u8_t buf[512];                                                      \
+        size_t len, used;                                                   \
+        int i;                                                              \
+        lwpb_encoder_init(&encoder);                                        \
+        lwpb_encoder_start(&encoder, foo_TestMessPacked, buf, sizeof(buf)); \
+        ret = lwpb_encoder_packed_repeated_start(&encoder, foo_TestMessPacked_test_##field); \
+        CHECK_LWPB(ret);                                                    \
+        for (i = 0; i < ARRAY_SIZE(array); i++)                             \
+            ret = lwpb_encoder_add_##lwpb_type(&encoder, foo_TestMessPacked_test_##field, array[i]); \
+        CHECK_LWPB(ret);                                                    \
+        ret = lwpb_encoder_packed_repeated_end(&encoder);                   \
+        CHECK_LWPB(ret);                                                    \
+        len = lwpb_encoder_finish(&encoder);                                \
+        CHECK_BUF(buf, len, vector);                                        \
+        fields.u.TestMessPacked.test_##field = array;                       \
+        lwpb_decoder_init(&decoder);                                        \
+        lwpb_decoder_arg(&decoder, &fields);                                \
+        lwpb_decoder_field_handler(&decoder, generic_field_handler);        \
+        ret = lwpb_decoder_decode(&decoder, foo_TestMessPacked, buf, len, &used); \
+        CHECK_ASSERT(used == sizeof(vector), "not decoded all bytes");      \
+        CHECK_LWPB(ret);                                                    \
+    } while (0);
+
+
+static void test_packed_repeated_int32(void)
+{
+    DO_TEST_PACKED_REPEATED(int32, int32, int32_arr0, test_packed_repeated_int32_arr0);
+    DO_TEST_PACKED_REPEATED(int32, int32, int32_arr1, test_packed_repeated_int32_arr1);
+    DO_TEST_PACKED_REPEATED(int32, int32, int32_arr_min_max, test_packed_repeated_int32_arr_min_max);
+}
+
+static void test_packed_repeated_sint32(void)
+{
+    DO_TEST_PACKED_REPEATED(int32, sint32, int32_arr0, test_packed_repeated_sint32_arr0);
+    DO_TEST_PACKED_REPEATED(int32, sint32, int32_arr1, test_packed_repeated_sint32_arr1);
+    DO_TEST_PACKED_REPEATED(int32, sint32, int32_arr_min_max, test_packed_repeated_sint32_arr_min_max);
+}
+
+static void test_packed_repeated_sfixed32(void)
+{
+    DO_TEST_PACKED_REPEATED(int32, sfixed32, int32_arr0, test_packed_repeated_sfixed32_arr0);
+    DO_TEST_PACKED_REPEATED(int32, sfixed32, int32_arr1, test_packed_repeated_sfixed32_arr1);
+    DO_TEST_PACKED_REPEATED(int32, sfixed32, int32_arr_min_max, test_packed_repeated_sfixed32_arr_min_max);
+}
+
+static void test_packed_repeated_uint32(void)
+{
+    DO_TEST_PACKED_REPEATED(uint32, uint32, uint32_roundnumbers, test_packed_repeated_uint32_roundnumbers);
+    DO_TEST_PACKED_REPEATED(uint32, uint32, uint32_0_max, test_packed_repeated_uint32_0_max);
+}
+
+static void test_packed_repeated_fixed32(void)
+{
+    DO_TEST_PACKED_REPEATED(uint32, fixed32, uint32_roundnumbers, test_packed_repeated_fixed32_roundnumbers);
+    DO_TEST_PACKED_REPEATED(uint32, fixed32, uint32_0_max, test_packed_repeated_fixed32_0_max);
+}
+
+static void test_packed_repeated_int64(void)
+{
+    DO_TEST_PACKED_REPEATED(int64, int64, int64_roundnumbers, test_packed_repeated_int64_roundnumbers);
+    DO_TEST_PACKED_REPEATED(int64, int64, int64_min_max, test_packed_repeated_int64_min_max);
+}
+
+static void test_packed_repeated_sint64(void)
+{
+    DO_TEST_PACKED_REPEATED(int64, sint64, int64_roundnumbers, test_packed_repeated_sint64_roundnumbers);
+    DO_TEST_PACKED_REPEATED(int64, sint64, int64_min_max, test_packed_repeated_sint64_min_max);
+}
+
+static void test_packed_repeated_sfixed64(void)
+{
+    DO_TEST_PACKED_REPEATED(int64, sfixed64, int64_roundnumbers, test_packed_repeated_sfixed64_roundnumbers);
+    DO_TEST_PACKED_REPEATED(int64, sfixed64, int64_min_max, test_packed_repeated_sfixed64_min_max);
+}
+
+static void test_packed_repeated_uint64(void)
+{
+    DO_TEST_PACKED_REPEATED(uint64, uint64, uint64_roundnumbers, test_packed_repeated_uint64_roundnumbers);
+    DO_TEST_PACKED_REPEATED(uint64, uint64, uint64_0_1_max, test_packed_repeated_uint64_0_1_max);
+    DO_TEST_PACKED_REPEATED(uint64, uint64, uint64_random, test_packed_repeated_uint64_random);
+}
+
+static void test_packed_repeated_fixed64(void)
+{
+    DO_TEST_PACKED_REPEATED(uint64, fixed64, uint64_roundnumbers, test_packed_repeated_fixed64_roundnumbers);
+    DO_TEST_PACKED_REPEATED(uint64, fixed64, uint64_0_1_max, test_packed_repeated_fixed64_0_1_max);
+    DO_TEST_PACKED_REPEATED(uint64, fixed64, uint64_random, test_packed_repeated_fixed64_random);
+}
+
+static void test_packed_repeated_float(void)
+{
+    DO_TEST_PACKED_REPEATED(float, float, float_random, test_packed_repeated_float_random);
+}
+
+static void test_packed_repeated_double(void)
+{
+    DO_TEST_PACKED_REPEATED(double, double, double_random, test_packed_repeated_double_random);
+}
+
+static void test_packed_repeated_bool(void)
+{
+    DO_TEST_PACKED_REPEATED(bool, boolean, boolean_0, test_packed_repeated_boolean_0);
+    DO_TEST_PACKED_REPEATED(bool, boolean, boolean_1, test_packed_repeated_boolean_1);
+    DO_TEST_PACKED_REPEATED(bool, boolean, boolean_random, test_packed_repeated_boolean_random);
+}
+
+static void test_packed_repeated_enum_small(void)
+{
+    DO_TEST_PACKED_REPEATED(enum, enum_small, enum_small_0, test_packed_repeated_enum_small_0);
+    DO_TEST_PACKED_REPEATED(enum, enum_small, enum_small_1, test_packed_repeated_enum_small_1);
+    DO_TEST_PACKED_REPEATED(enum, enum_small, enum_small_random, test_packed_repeated_enum_small_random);
+}
+
+static void test_packed_repeated_enum_big(void)
+{
+    DO_TEST_PACKED_REPEATED(enum, enum, enum_0, test_packed_repeated_enum_0);
+    DO_TEST_PACKED_REPEATED(enum, enum, enum_1, test_packed_repeated_enum_1);
+    DO_TEST_PACKED_REPEATED(enum, enum, enum_random, test_packed_repeated_enum_random);
+}
+
+
+
 #if 0
 
 static void test_repeated_bytes (void)
@@ -1288,6 +1482,23 @@ static struct test_entry tests[] = {
     { "repeated string", test_repeated_string },
     { "repeated bytes", test_repeated_bytes },
     { "repeated sub message", test_repeated_submess },
+    
+    { "empty packed repeated", test_empty_packed_repeated},
+    { "packed repeated int32", test_packed_repeated_int32 },
+    { "packed repeated sint32", test_packed_repeated_sint32 },
+    { "packed repeated sfixed32", test_packed_repeated_sfixed32 },
+    { "packed repeated uint32", test_packed_repeated_uint32 },
+    { "packed repeated fixed32", test_packed_repeated_fixed32 },
+    { "packed repeated int64", test_packed_repeated_int64 },
+    { "packed repeated sint64", test_packed_repeated_sint64 },
+    { "packed repeated sfixed64", test_packed_repeated_sfixed64 },
+    { "packed repeated uint64", test_packed_repeated_uint64 },
+    { "packed repeated fixed64", test_packed_repeated_fixed64 },
+    { "packed repeated float", test_packed_repeated_float },
+    { "packed repeated double", test_packed_repeated_double },
+    { "packed repeated bool", test_packed_repeated_bool },
+    { "packed repeated small enum", test_packed_repeated_enum_small },
+    { "packed repeated big enum", test_packed_repeated_enum_big },
 
     { "required default values", test_required_default_values },
     { "optional default values", test_optional_default_values },
