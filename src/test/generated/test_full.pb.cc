@@ -41,6 +41,9 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
 const ::google::protobuf::Descriptor* TestMess_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   TestMess_reflection_ = NULL;
+const ::google::protobuf::Descriptor* TestMessPacked_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  TestMessPacked_reflection_ = NULL;
 const ::google::protobuf::Descriptor* TestMessOptional_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   TestMessOptional_reflection_ = NULL;
@@ -290,7 +293,36 @@ void protobuf_AssignDesc_test_5ffull_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(TestMess));
-  TestMessOptional_descriptor_ = file->message_type(10);
+  TestMessPacked_descriptor_ = file->message_type(10);
+  static const int TestMessPacked_offsets_[15] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessPacked, test_int32_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessPacked, test_sint32_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessPacked, test_sfixed32_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessPacked, test_int64_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessPacked, test_sint64_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessPacked, test_sfixed64_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessPacked, test_uint32_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessPacked, test_fixed32_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessPacked, test_uint64_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessPacked, test_fixed64_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessPacked, test_float_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessPacked, test_double_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessPacked, test_boolean_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessPacked, test_enum_small_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessPacked, test_enum_),
+  };
+  TestMessPacked_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      TestMessPacked_descriptor_,
+      TestMessPacked::default_instance_,
+      TestMessPacked_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessPacked, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessPacked, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(TestMessPacked));
+  TestMessOptional_descriptor_ = file->message_type(11);
   static const int TestMessOptional_offsets_[18] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessOptional, test_int32_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessOptional, test_sint32_),
@@ -322,7 +354,7 @@ void protobuf_AssignDesc_test_5ffull_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(TestMessOptional));
-  TestMessRequiredInt32_descriptor_ = file->message_type(11);
+  TestMessRequiredInt32_descriptor_ = file->message_type(12);
   static const int TestMessRequiredInt32_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessRequiredInt32, test_),
   };
@@ -337,7 +369,7 @@ void protobuf_AssignDesc_test_5ffull_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(TestMessRequiredInt32));
-  TestMessRequiredSInt32_descriptor_ = file->message_type(12);
+  TestMessRequiredSInt32_descriptor_ = file->message_type(13);
   static const int TestMessRequiredSInt32_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessRequiredSInt32, test_),
   };
@@ -352,7 +384,7 @@ void protobuf_AssignDesc_test_5ffull_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(TestMessRequiredSInt32));
-  TestMessRequiredSFixed32_descriptor_ = file->message_type(13);
+  TestMessRequiredSFixed32_descriptor_ = file->message_type(14);
   static const int TestMessRequiredSFixed32_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessRequiredSFixed32, test_),
   };
@@ -367,7 +399,7 @@ void protobuf_AssignDesc_test_5ffull_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(TestMessRequiredSFixed32));
-  TestMessRequiredInt64_descriptor_ = file->message_type(14);
+  TestMessRequiredInt64_descriptor_ = file->message_type(15);
   static const int TestMessRequiredInt64_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessRequiredInt64, test_),
   };
@@ -382,7 +414,7 @@ void protobuf_AssignDesc_test_5ffull_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(TestMessRequiredInt64));
-  TestMessRequiredSInt64_descriptor_ = file->message_type(15);
+  TestMessRequiredSInt64_descriptor_ = file->message_type(16);
   static const int TestMessRequiredSInt64_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessRequiredSInt64, test_),
   };
@@ -397,7 +429,7 @@ void protobuf_AssignDesc_test_5ffull_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(TestMessRequiredSInt64));
-  TestMessRequiredSFixed64_descriptor_ = file->message_type(16);
+  TestMessRequiredSFixed64_descriptor_ = file->message_type(17);
   static const int TestMessRequiredSFixed64_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessRequiredSFixed64, test_),
   };
@@ -412,7 +444,7 @@ void protobuf_AssignDesc_test_5ffull_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(TestMessRequiredSFixed64));
-  TestMessRequiredUInt32_descriptor_ = file->message_type(17);
+  TestMessRequiredUInt32_descriptor_ = file->message_type(18);
   static const int TestMessRequiredUInt32_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessRequiredUInt32, test_),
   };
@@ -427,7 +459,7 @@ void protobuf_AssignDesc_test_5ffull_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(TestMessRequiredUInt32));
-  TestMessRequiredFixed32_descriptor_ = file->message_type(18);
+  TestMessRequiredFixed32_descriptor_ = file->message_type(19);
   static const int TestMessRequiredFixed32_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessRequiredFixed32, test_),
   };
@@ -442,7 +474,7 @@ void protobuf_AssignDesc_test_5ffull_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(TestMessRequiredFixed32));
-  TestMessRequiredUInt64_descriptor_ = file->message_type(19);
+  TestMessRequiredUInt64_descriptor_ = file->message_type(20);
   static const int TestMessRequiredUInt64_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessRequiredUInt64, test_),
   };
@@ -457,7 +489,7 @@ void protobuf_AssignDesc_test_5ffull_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(TestMessRequiredUInt64));
-  TestMessRequiredFixed64_descriptor_ = file->message_type(20);
+  TestMessRequiredFixed64_descriptor_ = file->message_type(21);
   static const int TestMessRequiredFixed64_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessRequiredFixed64, test_),
   };
@@ -472,7 +504,7 @@ void protobuf_AssignDesc_test_5ffull_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(TestMessRequiredFixed64));
-  TestMessRequiredFloat_descriptor_ = file->message_type(21);
+  TestMessRequiredFloat_descriptor_ = file->message_type(22);
   static const int TestMessRequiredFloat_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessRequiredFloat, test_),
   };
@@ -487,7 +519,7 @@ void protobuf_AssignDesc_test_5ffull_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(TestMessRequiredFloat));
-  TestMessRequiredDouble_descriptor_ = file->message_type(22);
+  TestMessRequiredDouble_descriptor_ = file->message_type(23);
   static const int TestMessRequiredDouble_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessRequiredDouble, test_),
   };
@@ -502,7 +534,7 @@ void protobuf_AssignDesc_test_5ffull_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(TestMessRequiredDouble));
-  TestMessRequiredBool_descriptor_ = file->message_type(23);
+  TestMessRequiredBool_descriptor_ = file->message_type(24);
   static const int TestMessRequiredBool_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessRequiredBool, test_),
   };
@@ -517,7 +549,7 @@ void protobuf_AssignDesc_test_5ffull_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(TestMessRequiredBool));
-  TestMessRequiredEnum_descriptor_ = file->message_type(24);
+  TestMessRequiredEnum_descriptor_ = file->message_type(25);
   static const int TestMessRequiredEnum_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessRequiredEnum, test_),
   };
@@ -532,7 +564,7 @@ void protobuf_AssignDesc_test_5ffull_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(TestMessRequiredEnum));
-  TestMessRequiredEnumSmall_descriptor_ = file->message_type(25);
+  TestMessRequiredEnumSmall_descriptor_ = file->message_type(26);
   static const int TestMessRequiredEnumSmall_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessRequiredEnumSmall, test_),
   };
@@ -547,7 +579,7 @@ void protobuf_AssignDesc_test_5ffull_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(TestMessRequiredEnumSmall));
-  TestMessRequiredString_descriptor_ = file->message_type(26);
+  TestMessRequiredString_descriptor_ = file->message_type(27);
   static const int TestMessRequiredString_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessRequiredString, test_),
   };
@@ -562,7 +594,7 @@ void protobuf_AssignDesc_test_5ffull_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(TestMessRequiredString));
-  TestMessRequiredBytes_descriptor_ = file->message_type(27);
+  TestMessRequiredBytes_descriptor_ = file->message_type(28);
   static const int TestMessRequiredBytes_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessRequiredBytes, test_),
   };
@@ -577,7 +609,7 @@ void protobuf_AssignDesc_test_5ffull_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(TestMessRequiredBytes));
-  TestMessRequiredMessage_descriptor_ = file->message_type(28);
+  TestMessRequiredMessage_descriptor_ = file->message_type(29);
   static const int TestMessRequiredMessage_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(TestMessRequiredMessage, test_),
   };
@@ -592,7 +624,7 @@ void protobuf_AssignDesc_test_5ffull_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(TestMessRequiredMessage));
-  EmptyMess_descriptor_ = file->message_type(29);
+  EmptyMess_descriptor_ = file->message_type(30);
   static const int EmptyMess_offsets_[1] = {
   };
   EmptyMess_reflection_ =
@@ -606,7 +638,7 @@ void protobuf_AssignDesc_test_5ffull_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(EmptyMess));
-  DefaultRequiredValues_descriptor_ = file->message_type(30);
+  DefaultRequiredValues_descriptor_ = file->message_type(31);
   static const int DefaultRequiredValues_offsets_[8] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DefaultRequiredValues, v_int32_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DefaultRequiredValues, v_uint32_),
@@ -628,7 +660,7 @@ void protobuf_AssignDesc_test_5ffull_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(DefaultRequiredValues));
-  DefaultOptionalValues_descriptor_ = file->message_type(31);
+  DefaultOptionalValues_descriptor_ = file->message_type(32);
   static const int DefaultOptionalValues_offsets_[8] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DefaultOptionalValues, v_int32_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DefaultOptionalValues, v_uint32_),
@@ -650,7 +682,7 @@ void protobuf_AssignDesc_test_5ffull_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(DefaultOptionalValues));
-  AllocValues_descriptor_ = file->message_type(32);
+  AllocValues_descriptor_ = file->message_type(33);
   static const int AllocValues_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(AllocValues, o_bytes_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(AllocValues, r_string_),
@@ -704,6 +736,8 @@ void protobuf_RegisterTypes() {
     TestFieldNo33554432_descriptor_, &TestFieldNo33554432::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     TestMess_descriptor_, &TestMess::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    TestMessPacked_descriptor_, &TestMessPacked::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     TestMessOptional_descriptor_, &TestMessOptional::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
@@ -775,6 +809,8 @@ void protobuf_ShutdownFile_test_5ffull_2eproto() {
   delete TestFieldNo33554432_reflection_;
   delete TestMess::default_instance_;
   delete TestMess_reflection_;
+  delete TestMessPacked::default_instance_;
+  delete TestMessPacked_reflection_;
   delete TestMessOptional::default_instance_;
   delete TestMessOptional_reflection_;
   delete TestMessRequiredInt32::default_instance_;
@@ -849,62 +885,73 @@ void protobuf_AddDesc_test_5ffull_2eproto() {
     "\030\016 \003(\0162\022.foo.TestEnumSmall\022 \n\ttest_enum\030"
     "\017 \003(\0162\r.foo.TestEnum\022\023\n\013test_string\030\020 \003("
     "\t\022\022\n\ntest_bytes\030\021 \003(\014\022\"\n\014test_message\030\022 "
-    "\003(\0132\014.foo.SubMess\"\303\003\n\020TestMessOptional\022\022"
-    "\n\ntest_int32\030\001 \001(\005\022\023\n\013test_sint32\030\002 \001(\021\022"
-    "\025\n\rtest_sfixed32\030\003 \001(\017\022\022\n\ntest_int64\030\004 \001"
-    "(\003\022\023\n\013test_sint64\030\005 \001(\022\022\025\n\rtest_sfixed64"
-    "\030\006 \001(\020\022\023\n\013test_uint32\030\007 \001(\r\022\024\n\014test_fixe"
-    "d32\030\010 \001(\007\022\023\n\013test_uint64\030\t \001(\004\022\024\n\014test_f"
-    "ixed64\030\n \001(\006\022\022\n\ntest_float\030\013 \001(\002\022\023\n\013test"
-    "_double\030\014 \001(\001\022\024\n\014test_boolean\030\r \001(\010\022+\n\017t"
-    "est_enum_small\030\016 \001(\0162\022.foo.TestEnumSmall"
-    "\022 \n\ttest_enum\030\017 \001(\0162\r.foo.TestEnum\022\023\n\013te"
-    "st_string\030\020 \001(\t\022\022\n\ntest_bytes\030\021 \001(\014\022\"\n\014t"
-    "est_message\030\022 \001(\0132\014.foo.SubMess\"%\n\025TestM"
-    "essRequiredInt32\022\014\n\004test\030* \002(\005\"&\n\026TestMe"
-    "ssRequiredSInt32\022\014\n\004test\030+ \002(\021\"(\n\030TestMe"
-    "ssRequiredSFixed32\022\014\n\004test\030d \002(\017\"%\n\025Test"
-    "MessRequiredInt64\022\014\n\004test\030\001 \002(\003\"&\n\026TestM"
-    "essRequiredSInt64\022\014\n\004test\030\013 \002(\022\"(\n\030TestM"
-    "essRequiredSFixed64\022\014\n\004test\030\014 \002(\020\"&\n\026Tes"
-    "tMessRequiredUInt32\022\014\n\004test\030\001 \002(\r\"\'\n\027Tes"
-    "tMessRequiredFixed32\022\014\n\004test\030\001 \002(\007\"&\n\026Te"
-    "stMessRequiredUInt64\022\014\n\004test\030\001 \002(\004\"\'\n\027Te"
-    "stMessRequiredFixed64\022\014\n\004test\030\001 \002(\006\"%\n\025T"
-    "estMessRequiredFloat\022\014\n\004test\030\001 \002(\002\"&\n\026Te"
-    "stMessRequiredDouble\022\014\n\004test\030\001 \002(\001\"$\n\024Te"
-    "stMessRequiredBool\022\014\n\004test\030\001 \002(\010\"3\n\024Test"
-    "MessRequiredEnum\022\033\n\004test\030\001 \002(\0162\r.foo.Tes"
-    "tEnum\"=\n\031TestMessRequiredEnumSmall\022 \n\004te"
-    "st\030\001 \002(\0162\022.foo.TestEnumSmall\"&\n\026TestMess"
-    "RequiredString\022\014\n\004test\030\001 \002(\t\"%\n\025TestMess"
-    "RequiredBytes\022\014\n\004test\030\001 \002(\014\"5\n\027TestMessR"
-    "equiredMessage\022\032\n\004test\030\001 \002(\0132\014.foo.SubMe"
-    "ss\"\013\n\tEmptyMess\"\342\001\n\025DefaultRequiredValue"
-    "s\022\024\n\007v_int32\030\001 \002(\005:\003-42\022\025\n\010v_uint32\030\002 \002("
-    "\r:\003666\022\027\n\007v_int64\030\003 \002(\005:\006100000\022\030\n\010v_uin"
-    "t64\030\004 \002(\r:\006100001\022\024\n\007v_float\030\005 \002(\002:\0032.5\022"
-    "\025\n\010v_double\030\006 \002(\001:\0034.5\022\031\n\010v_string\030\007 \002(\t"
-    ":\007hi mom\n\022!\n\007v_bytes\030\010 \002(\014:\020a \\000 chara"
-    "cter\"\342\001\n\025DefaultOptionalValues\022\024\n\007v_int3"
-    "2\030\001 \001(\005:\003-42\022\025\n\010v_uint32\030\002 \001(\r:\003666\022\027\n\007v"
-    "_int64\030\003 \001(\005:\006100000\022\030\n\010v_uint64\030\004 \001(\r:\006"
-    "100001\022\024\n\007v_float\030\005 \001(\002:\0032.5\022\025\n\010v_double"
-    "\030\006 \001(\001:\0034.5\022\031\n\010v_string\030\007 \001(\t:\007hi mom\n\022!"
-    "\n\007v_bytes\030\010 \001(\014:\020a \\000 character\"\177\n\013All"
-    "ocValues\022\017\n\007o_bytes\030\001 \001(\014\022\020\n\010r_string\030\002 "
-    "\003(\t\022\020\n\010a_string\030\003 \002(\t\022\017\n\007a_bytes\030\004 \002(\014\022*"
-    "\n\006a_mess\030\005 \002(\0132\032.foo.DefaultRequiredValu"
-    "es*+\n\rTestEnumSmall\022\t\n\005VALUE\020\000\022\017\n\013OTHER_"
-    "VALUE\020\001*\272\001\n\010TestEnum\022\n\n\006VALUE0\020\000\022\n\n\006VALU"
-    "E1\020\001\022\014\n\010VALUE127\020\177\022\r\n\010VALUE128\020\200\001\022\017\n\nVAL"
-    "UE16383\020\377\177\022\020\n\nVALUE16384\020\200\200\001\022\022\n\014VALUE209"
-    "7151\020\377\377\177\022\023\n\014VALUE2097152\020\200\200\200\001\022\025\n\016VALUE26"
-    "8435455\020\377\377\377\177\022\026\n\016VALUE268435456\020\200\200\200\200\001*\202\001\n"
-    "\021TestEnumDupValues\022\013\n\007VALUE_A\020*\022\013\n\007VALUE"
-    "_B\020*\022\013\n\007VALUE_C\020*\022\014\n\007VALUE_D\020\232\005\022\014\n\007VALUE"
-    "_E\020\232\005\022\014\n\007VALUE_F\020\350\007\022\r\n\010VALUE_AA\020\350\007\022\r\n\010VA"
-    "LUE_BB\020\351\007", 2969);
+    "\003(\0132\014.foo.SubMess\"\260\003\n\016TestMessPacked\022\026\n\n"
+    "test_int32\030\001 \003(\005B\002\020\001\022\027\n\013test_sint32\030\002 \003("
+    "\021B\002\020\001\022\031\n\rtest_sfixed32\030\003 \003(\017B\002\020\001\022\026\n\ntest"
+    "_int64\030\004 \003(\003B\002\020\001\022\027\n\013test_sint64\030\005 \003(\022B\002\020"
+    "\001\022\031\n\rtest_sfixed64\030\006 \003(\020B\002\020\001\022\027\n\013test_uin"
+    "t32\030\007 \003(\rB\002\020\001\022\030\n\014test_fixed32\030\010 \003(\007B\002\020\001\022"
+    "\027\n\013test_uint64\030\t \003(\004B\002\020\001\022\030\n\014test_fixed64"
+    "\030\n \003(\006B\002\020\001\022\026\n\ntest_float\030\013 \003(\002B\002\020\001\022\027\n\013te"
+    "st_double\030\014 \003(\001B\002\020\001\022\030\n\014test_boolean\030\r \003("
+    "\010B\002\020\001\022/\n\017test_enum_small\030\016 \003(\0162\022.foo.Tes"
+    "tEnumSmallB\002\020\001\022$\n\ttest_enum\030\017 \003(\0162\r.foo."
+    "TestEnumB\002\020\001\"\303\003\n\020TestMessOptional\022\022\n\ntes"
+    "t_int32\030\001 \001(\005\022\023\n\013test_sint32\030\002 \001(\021\022\025\n\rte"
+    "st_sfixed32\030\003 \001(\017\022\022\n\ntest_int64\030\004 \001(\003\022\023\n"
+    "\013test_sint64\030\005 \001(\022\022\025\n\rtest_sfixed64\030\006 \001("
+    "\020\022\023\n\013test_uint32\030\007 \001(\r\022\024\n\014test_fixed32\030\010"
+    " \001(\007\022\023\n\013test_uint64\030\t \001(\004\022\024\n\014test_fixed6"
+    "4\030\n \001(\006\022\022\n\ntest_float\030\013 \001(\002\022\023\n\013test_doub"
+    "le\030\014 \001(\001\022\024\n\014test_boolean\030\r \001(\010\022+\n\017test_e"
+    "num_small\030\016 \001(\0162\022.foo.TestEnumSmall\022 \n\tt"
+    "est_enum\030\017 \001(\0162\r.foo.TestEnum\022\023\n\013test_st"
+    "ring\030\020 \001(\t\022\022\n\ntest_bytes\030\021 \001(\014\022\"\n\014test_m"
+    "essage\030\022 \001(\0132\014.foo.SubMess\"%\n\025TestMessRe"
+    "quiredInt32\022\014\n\004test\030* \002(\005\"&\n\026TestMessReq"
+    "uiredSInt32\022\014\n\004test\030+ \002(\021\"(\n\030TestMessReq"
+    "uiredSFixed32\022\014\n\004test\030d \002(\017\"%\n\025TestMessR"
+    "equiredInt64\022\014\n\004test\030\001 \002(\003\"&\n\026TestMessRe"
+    "quiredSInt64\022\014\n\004test\030\013 \002(\022\"(\n\030TestMessRe"
+    "quiredSFixed64\022\014\n\004test\030\014 \002(\020\"&\n\026TestMess"
+    "RequiredUInt32\022\014\n\004test\030\001 \002(\r\"\'\n\027TestMess"
+    "RequiredFixed32\022\014\n\004test\030\001 \002(\007\"&\n\026TestMes"
+    "sRequiredUInt64\022\014\n\004test\030\001 \002(\004\"\'\n\027TestMes"
+    "sRequiredFixed64\022\014\n\004test\030\001 \002(\006\"%\n\025TestMe"
+    "ssRequiredFloat\022\014\n\004test\030\001 \002(\002\"&\n\026TestMes"
+    "sRequiredDouble\022\014\n\004test\030\001 \002(\001\"$\n\024TestMes"
+    "sRequiredBool\022\014\n\004test\030\001 \002(\010\"3\n\024TestMessR"
+    "equiredEnum\022\033\n\004test\030\001 \002(\0162\r.foo.TestEnum"
+    "\"=\n\031TestMessRequiredEnumSmall\022 \n\004test\030\001 "
+    "\002(\0162\022.foo.TestEnumSmall\"&\n\026TestMessRequi"
+    "redString\022\014\n\004test\030\001 \002(\t\"%\n\025TestMessRequi"
+    "redBytes\022\014\n\004test\030\001 \002(\014\"5\n\027TestMessRequir"
+    "edMessage\022\032\n\004test\030\001 \002(\0132\014.foo.SubMess\"\013\n"
+    "\tEmptyMess\"\342\001\n\025DefaultRequiredValues\022\024\n\007"
+    "v_int32\030\001 \002(\005:\003-42\022\025\n\010v_uint32\030\002 \002(\r:\00366"
+    "6\022\027\n\007v_int64\030\003 \002(\005:\006100000\022\030\n\010v_uint64\030\004"
+    " \002(\r:\006100001\022\024\n\007v_float\030\005 \002(\002:\0032.5\022\025\n\010v_"
+    "double\030\006 \002(\001:\0034.5\022\031\n\010v_string\030\007 \002(\t:\007hi "
+    "mom\n\022!\n\007v_bytes\030\010 \002(\014:\020a \\000 character\""
+    "\342\001\n\025DefaultOptionalValues\022\024\n\007v_int32\030\001 \001"
+    "(\005:\003-42\022\025\n\010v_uint32\030\002 \001(\r:\003666\022\027\n\007v_int6"
+    "4\030\003 \001(\005:\006100000\022\030\n\010v_uint64\030\004 \001(\r:\00610000"
+    "1\022\024\n\007v_float\030\005 \001(\002:\0032.5\022\025\n\010v_double\030\006 \001("
+    "\001:\0034.5\022\031\n\010v_string\030\007 \001(\t:\007hi mom\n\022!\n\007v_b"
+    "ytes\030\010 \001(\014:\020a \\000 character\"\177\n\013AllocVal"
+    "ues\022\017\n\007o_bytes\030\001 \001(\014\022\020\n\010r_string\030\002 \003(\t\022\020"
+    "\n\010a_string\030\003 \002(\t\022\017\n\007a_bytes\030\004 \002(\014\022*\n\006a_m"
+    "ess\030\005 \002(\0132\032.foo.DefaultRequiredValues*+\n"
+    "\rTestEnumSmall\022\t\n\005VALUE\020\000\022\017\n\013OTHER_VALUE"
+    "\020\001*\272\001\n\010TestEnum\022\n\n\006VALUE0\020\000\022\n\n\006VALUE1\020\001\022"
+    "\014\n\010VALUE127\020\177\022\r\n\010VALUE128\020\200\001\022\017\n\nVALUE163"
+    "83\020\377\177\022\020\n\nVALUE16384\020\200\200\001\022\022\n\014VALUE2097151\020"
+    "\377\377\177\022\023\n\014VALUE2097152\020\200\200\200\001\022\025\n\016VALUE2684354"
+    "55\020\377\377\377\177\022\026\n\016VALUE268435456\020\200\200\200\200\001*\202\001\n\021Test"
+    "EnumDupValues\022\013\n\007VALUE_A\020*\022\013\n\007VALUE_B\020*\022"
+    "\013\n\007VALUE_C\020*\022\014\n\007VALUE_D\020\232\005\022\014\n\007VALUE_E\020\232\005"
+    "\022\014\n\007VALUE_F\020\350\007\022\r\n\010VALUE_AA\020\350\007\022\r\n\010VALUE_B"
+    "B\020\351\007", 3404);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "test_full.proto", &protobuf_RegisterTypes);
   SubMess::default_instance_ = new SubMess();
@@ -917,6 +964,7 @@ void protobuf_AddDesc_test_5ffull_2eproto() {
   TestFieldNo33554431::default_instance_ = new TestFieldNo33554431();
   TestFieldNo33554432::default_instance_ = new TestFieldNo33554432();
   TestMess::default_instance_ = new TestMess();
+  TestMessPacked::default_instance_ = new TestMessPacked();
   TestMessOptional::default_instance_ = new TestMessOptional();
   TestMessRequiredInt32::default_instance_ = new TestMessRequiredInt32();
   TestMessRequiredSInt32::default_instance_ = new TestMessRequiredSInt32();
@@ -950,6 +998,7 @@ void protobuf_AddDesc_test_5ffull_2eproto() {
   TestFieldNo33554431::default_instance_->InitAsDefaultInstance();
   TestFieldNo33554432::default_instance_->InitAsDefaultInstance();
   TestMess::default_instance_->InitAsDefaultInstance();
+  TestMessPacked::default_instance_->InitAsDefaultInstance();
   TestMessOptional::default_instance_->InitAsDefaultInstance();
   TestMessRequiredInt32::default_instance_->InitAsDefaultInstance();
   TestMessRequiredSInt32::default_instance_->InitAsDefaultInstance();
@@ -3751,6 +3800,1014 @@ const ::google::protobuf::Descriptor* TestMess::GetDescriptor() const {
 const ::google::protobuf::Reflection* TestMess::GetReflection() const {
   protobuf_AssignDescriptorsOnce();
   return TestMess_reflection_;
+}
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int TestMessPacked::kTestInt32FieldNumber;
+const int TestMessPacked::kTestSint32FieldNumber;
+const int TestMessPacked::kTestSfixed32FieldNumber;
+const int TestMessPacked::kTestInt64FieldNumber;
+const int TestMessPacked::kTestSint64FieldNumber;
+const int TestMessPacked::kTestSfixed64FieldNumber;
+const int TestMessPacked::kTestUint32FieldNumber;
+const int TestMessPacked::kTestFixed32FieldNumber;
+const int TestMessPacked::kTestUint64FieldNumber;
+const int TestMessPacked::kTestFixed64FieldNumber;
+const int TestMessPacked::kTestFloatFieldNumber;
+const int TestMessPacked::kTestDoubleFieldNumber;
+const int TestMessPacked::kTestBooleanFieldNumber;
+const int TestMessPacked::kTestEnumSmallFieldNumber;
+const int TestMessPacked::kTestEnumFieldNumber;
+#endif  // !_MSC_VER
+
+TestMessPacked::TestMessPacked()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+}
+
+void TestMessPacked::InitAsDefaultInstance() {}
+
+TestMessPacked::TestMessPacked(const TestMessPacked& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void TestMessPacked::SharedCtor() {
+  _cached_size_ = 0;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+TestMessPacked::~TestMessPacked() {
+  SharedDtor();
+}
+
+void TestMessPacked::SharedDtor() {
+  if (this != default_instance_) {
+  }
+}
+
+const ::google::protobuf::Descriptor* TestMessPacked::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return TestMessPacked_descriptor_;
+}
+
+const TestMessPacked& TestMessPacked::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_test_5ffull_2eproto();  return *default_instance_;
+}
+
+TestMessPacked* TestMessPacked::default_instance_ = NULL;
+
+TestMessPacked* TestMessPacked::New() const {
+  return new TestMessPacked;
+}
+
+void TestMessPacked::Clear() {
+  test_int32_.Clear();
+  test_sint32_.Clear();
+  test_sfixed32_.Clear();
+  test_int64_.Clear();
+  test_sint64_.Clear();
+  test_sfixed64_.Clear();
+  test_uint32_.Clear();
+  test_fixed32_.Clear();
+  test_uint64_.Clear();
+  test_fixed64_.Clear();
+  test_float_.Clear();
+  test_double_.Clear();
+  test_boolean_.Clear();
+  test_enum_small_.Clear();
+  test_enum_.Clear();
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool TestMessPacked::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormat::GetTagFieldNumber(tag)) {
+      // repeated int32 test_int32 = 1 [packed = true];
+      case 1: {
+        if (::google::protobuf::internal::WireFormat::GetTagWireType(tag) !=
+            ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED) {
+          goto handle_uninterpreted;
+        }
+        {
+          ::google::protobuf::uint32 length;
+          DO_(input->ReadVarint32(&length));
+          ::google::protobuf::io::CodedInputStream::Limit limit = input->PushLimit(length);
+          while (input->BytesUntilLimit() > 0) {
+            ::google::protobuf::int32 value;
+            DO_(::google::protobuf::internal::WireFormat::ReadInt32(input, &value));
+            add_test_int32(value);
+          }
+          input->PopLimit(limit);
+        }
+        if (input->ExpectTag(18)) goto parse_test_sint32;
+        break;
+      }
+      
+      // repeated sint32 test_sint32 = 2 [packed = true];
+      case 2: {
+        if (::google::protobuf::internal::WireFormat::GetTagWireType(tag) !=
+            ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED) {
+          goto handle_uninterpreted;
+        }
+       parse_test_sint32:
+        {
+          ::google::protobuf::uint32 length;
+          DO_(input->ReadVarint32(&length));
+          ::google::protobuf::io::CodedInputStream::Limit limit = input->PushLimit(length);
+          while (input->BytesUntilLimit() > 0) {
+            ::google::protobuf::int32 value;
+            DO_(::google::protobuf::internal::WireFormat::ReadSInt32(input, &value));
+            add_test_sint32(value);
+          }
+          input->PopLimit(limit);
+        }
+        if (input->ExpectTag(26)) goto parse_test_sfixed32;
+        break;
+      }
+      
+      // repeated sfixed32 test_sfixed32 = 3 [packed = true];
+      case 3: {
+        if (::google::protobuf::internal::WireFormat::GetTagWireType(tag) !=
+            ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED) {
+          goto handle_uninterpreted;
+        }
+       parse_test_sfixed32:
+        {
+          ::google::protobuf::uint32 length;
+          DO_(input->ReadVarint32(&length));
+          ::google::protobuf::io::CodedInputStream::Limit limit = input->PushLimit(length);
+          while (input->BytesUntilLimit() > 0) {
+            ::google::protobuf::int32 value;
+            DO_(::google::protobuf::internal::WireFormat::ReadSFixed32(input, &value));
+            add_test_sfixed32(value);
+          }
+          input->PopLimit(limit);
+        }
+        if (input->ExpectTag(34)) goto parse_test_int64;
+        break;
+      }
+      
+      // repeated int64 test_int64 = 4 [packed = true];
+      case 4: {
+        if (::google::protobuf::internal::WireFormat::GetTagWireType(tag) !=
+            ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED) {
+          goto handle_uninterpreted;
+        }
+       parse_test_int64:
+        {
+          ::google::protobuf::uint32 length;
+          DO_(input->ReadVarint32(&length));
+          ::google::protobuf::io::CodedInputStream::Limit limit = input->PushLimit(length);
+          while (input->BytesUntilLimit() > 0) {
+            ::google::protobuf::int64 value;
+            DO_(::google::protobuf::internal::WireFormat::ReadInt64(input, &value));
+            add_test_int64(value);
+          }
+          input->PopLimit(limit);
+        }
+        if (input->ExpectTag(42)) goto parse_test_sint64;
+        break;
+      }
+      
+      // repeated sint64 test_sint64 = 5 [packed = true];
+      case 5: {
+        if (::google::protobuf::internal::WireFormat::GetTagWireType(tag) !=
+            ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED) {
+          goto handle_uninterpreted;
+        }
+       parse_test_sint64:
+        {
+          ::google::protobuf::uint32 length;
+          DO_(input->ReadVarint32(&length));
+          ::google::protobuf::io::CodedInputStream::Limit limit = input->PushLimit(length);
+          while (input->BytesUntilLimit() > 0) {
+            ::google::protobuf::int64 value;
+            DO_(::google::protobuf::internal::WireFormat::ReadSInt64(input, &value));
+            add_test_sint64(value);
+          }
+          input->PopLimit(limit);
+        }
+        if (input->ExpectTag(50)) goto parse_test_sfixed64;
+        break;
+      }
+      
+      // repeated sfixed64 test_sfixed64 = 6 [packed = true];
+      case 6: {
+        if (::google::protobuf::internal::WireFormat::GetTagWireType(tag) !=
+            ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED) {
+          goto handle_uninterpreted;
+        }
+       parse_test_sfixed64:
+        {
+          ::google::protobuf::uint32 length;
+          DO_(input->ReadVarint32(&length));
+          ::google::protobuf::io::CodedInputStream::Limit limit = input->PushLimit(length);
+          while (input->BytesUntilLimit() > 0) {
+            ::google::protobuf::int64 value;
+            DO_(::google::protobuf::internal::WireFormat::ReadSFixed64(input, &value));
+            add_test_sfixed64(value);
+          }
+          input->PopLimit(limit);
+        }
+        if (input->ExpectTag(58)) goto parse_test_uint32;
+        break;
+      }
+      
+      // repeated uint32 test_uint32 = 7 [packed = true];
+      case 7: {
+        if (::google::protobuf::internal::WireFormat::GetTagWireType(tag) !=
+            ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED) {
+          goto handle_uninterpreted;
+        }
+       parse_test_uint32:
+        {
+          ::google::protobuf::uint32 length;
+          DO_(input->ReadVarint32(&length));
+          ::google::protobuf::io::CodedInputStream::Limit limit = input->PushLimit(length);
+          while (input->BytesUntilLimit() > 0) {
+            ::google::protobuf::uint32 value;
+            DO_(::google::protobuf::internal::WireFormat::ReadUInt32(input, &value));
+            add_test_uint32(value);
+          }
+          input->PopLimit(limit);
+        }
+        if (input->ExpectTag(66)) goto parse_test_fixed32;
+        break;
+      }
+      
+      // repeated fixed32 test_fixed32 = 8 [packed = true];
+      case 8: {
+        if (::google::protobuf::internal::WireFormat::GetTagWireType(tag) !=
+            ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED) {
+          goto handle_uninterpreted;
+        }
+       parse_test_fixed32:
+        {
+          ::google::protobuf::uint32 length;
+          DO_(input->ReadVarint32(&length));
+          ::google::protobuf::io::CodedInputStream::Limit limit = input->PushLimit(length);
+          while (input->BytesUntilLimit() > 0) {
+            ::google::protobuf::uint32 value;
+            DO_(::google::protobuf::internal::WireFormat::ReadFixed32(input, &value));
+            add_test_fixed32(value);
+          }
+          input->PopLimit(limit);
+        }
+        if (input->ExpectTag(74)) goto parse_test_uint64;
+        break;
+      }
+      
+      // repeated uint64 test_uint64 = 9 [packed = true];
+      case 9: {
+        if (::google::protobuf::internal::WireFormat::GetTagWireType(tag) !=
+            ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED) {
+          goto handle_uninterpreted;
+        }
+       parse_test_uint64:
+        {
+          ::google::protobuf::uint32 length;
+          DO_(input->ReadVarint32(&length));
+          ::google::protobuf::io::CodedInputStream::Limit limit = input->PushLimit(length);
+          while (input->BytesUntilLimit() > 0) {
+            ::google::protobuf::uint64 value;
+            DO_(::google::protobuf::internal::WireFormat::ReadUInt64(input, &value));
+            add_test_uint64(value);
+          }
+          input->PopLimit(limit);
+        }
+        if (input->ExpectTag(82)) goto parse_test_fixed64;
+        break;
+      }
+      
+      // repeated fixed64 test_fixed64 = 10 [packed = true];
+      case 10: {
+        if (::google::protobuf::internal::WireFormat::GetTagWireType(tag) !=
+            ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED) {
+          goto handle_uninterpreted;
+        }
+       parse_test_fixed64:
+        {
+          ::google::protobuf::uint32 length;
+          DO_(input->ReadVarint32(&length));
+          ::google::protobuf::io::CodedInputStream::Limit limit = input->PushLimit(length);
+          while (input->BytesUntilLimit() > 0) {
+            ::google::protobuf::uint64 value;
+            DO_(::google::protobuf::internal::WireFormat::ReadFixed64(input, &value));
+            add_test_fixed64(value);
+          }
+          input->PopLimit(limit);
+        }
+        if (input->ExpectTag(90)) goto parse_test_float;
+        break;
+      }
+      
+      // repeated float test_float = 11 [packed = true];
+      case 11: {
+        if (::google::protobuf::internal::WireFormat::GetTagWireType(tag) !=
+            ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED) {
+          goto handle_uninterpreted;
+        }
+       parse_test_float:
+        {
+          ::google::protobuf::uint32 length;
+          DO_(input->ReadVarint32(&length));
+          ::google::protobuf::io::CodedInputStream::Limit limit = input->PushLimit(length);
+          while (input->BytesUntilLimit() > 0) {
+            float value;
+            DO_(::google::protobuf::internal::WireFormat::ReadFloat(input, &value));
+            add_test_float(value);
+          }
+          input->PopLimit(limit);
+        }
+        if (input->ExpectTag(98)) goto parse_test_double;
+        break;
+      }
+      
+      // repeated double test_double = 12 [packed = true];
+      case 12: {
+        if (::google::protobuf::internal::WireFormat::GetTagWireType(tag) !=
+            ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED) {
+          goto handle_uninterpreted;
+        }
+       parse_test_double:
+        {
+          ::google::protobuf::uint32 length;
+          DO_(input->ReadVarint32(&length));
+          ::google::protobuf::io::CodedInputStream::Limit limit = input->PushLimit(length);
+          while (input->BytesUntilLimit() > 0) {
+            double value;
+            DO_(::google::protobuf::internal::WireFormat::ReadDouble(input, &value));
+            add_test_double(value);
+          }
+          input->PopLimit(limit);
+        }
+        if (input->ExpectTag(106)) goto parse_test_boolean;
+        break;
+      }
+      
+      // repeated bool test_boolean = 13 [packed = true];
+      case 13: {
+        if (::google::protobuf::internal::WireFormat::GetTagWireType(tag) !=
+            ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED) {
+          goto handle_uninterpreted;
+        }
+       parse_test_boolean:
+        {
+          ::google::protobuf::uint32 length;
+          DO_(input->ReadVarint32(&length));
+          ::google::protobuf::io::CodedInputStream::Limit limit = input->PushLimit(length);
+          while (input->BytesUntilLimit() > 0) {
+            bool value;
+            DO_(::google::protobuf::internal::WireFormat::ReadBool(input, &value));
+            add_test_boolean(value);
+          }
+          input->PopLimit(limit);
+        }
+        if (input->ExpectTag(114)) goto parse_test_enum_small;
+        break;
+      }
+      
+      // repeated .foo.TestEnumSmall test_enum_small = 14 [packed = true];
+      case 14: {
+        if (::google::protobuf::internal::WireFormat::GetTagWireType(tag) !=
+            ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED) {
+          goto handle_uninterpreted;
+        }
+       parse_test_enum_small:
+        ::google::protobuf::uint32 length;
+        DO_(input->ReadVarint32(&length));
+        ::google::protobuf::io::CodedInputStream::Limit limit = input->PushLimit(length);
+        while (input->BytesUntilLimit() > 0) {
+          int value;
+          DO_(::google::protobuf::internal::WireFormat::ReadEnum(input, &value));
+          if (foo::TestEnumSmall_IsValid(value)) {
+            add_test_enum_small(static_cast< foo::TestEnumSmall >(value));
+          }
+        }
+        input->PopLimit(limit);
+        if (input->ExpectTag(122)) goto parse_test_enum;
+        break;
+      }
+      
+      // repeated .foo.TestEnum test_enum = 15 [packed = true];
+      case 15: {
+        if (::google::protobuf::internal::WireFormat::GetTagWireType(tag) !=
+            ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED) {
+          goto handle_uninterpreted;
+        }
+       parse_test_enum:
+        ::google::protobuf::uint32 length;
+        DO_(input->ReadVarint32(&length));
+        ::google::protobuf::io::CodedInputStream::Limit limit = input->PushLimit(length);
+        while (input->BytesUntilLimit() > 0) {
+          int value;
+          DO_(::google::protobuf::internal::WireFormat::ReadEnum(input, &value));
+          if (foo::TestEnum_IsValid(value)) {
+            add_test_enum(static_cast< foo::TestEnum >(value));
+          }
+        }
+        input->PopLimit(limit);
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+      
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormat::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormat::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void TestMessPacked::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  ::google::protobuf::uint8* raw_buffer = output->GetDirectBufferForNBytesAndAdvance(_cached_size_);
+  if (raw_buffer != NULL) {
+    TestMessPacked::SerializeWithCachedSizesToArray(raw_buffer);
+    return;
+  }
+  
+  // repeated int32 test_int32 = 1 [packed = true];
+  if (this->test_int32_size() > 0) {
+    ::google::protobuf::internal::WireFormat::WriteTag(1, ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED, output);
+    output->WriteVarint32(_test_int32_cached_byte_size_);
+  }
+  for (int i = 0; i < this->test_int32_size(); i++) {
+    ::google::protobuf::internal::WireFormat::WriteInt32NoTag(this->test_int32(i), output);
+  }
+  
+  // repeated sint32 test_sint32 = 2 [packed = true];
+  if (this->test_sint32_size() > 0) {
+    ::google::protobuf::internal::WireFormat::WriteTag(2, ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED, output);
+    output->WriteVarint32(_test_sint32_cached_byte_size_);
+  }
+  for (int i = 0; i < this->test_sint32_size(); i++) {
+    ::google::protobuf::internal::WireFormat::WriteSInt32NoTag(this->test_sint32(i), output);
+  }
+  
+  // repeated sfixed32 test_sfixed32 = 3 [packed = true];
+  if (this->test_sfixed32_size() > 0) {
+    ::google::protobuf::internal::WireFormat::WriteTag(3, ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED, output);
+    output->WriteVarint32(_test_sfixed32_cached_byte_size_);
+  }
+  for (int i = 0; i < this->test_sfixed32_size(); i++) {
+    ::google::protobuf::internal::WireFormat::WriteSFixed32NoTag(this->test_sfixed32(i), output);
+  }
+  
+  // repeated int64 test_int64 = 4 [packed = true];
+  if (this->test_int64_size() > 0) {
+    ::google::protobuf::internal::WireFormat::WriteTag(4, ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED, output);
+    output->WriteVarint32(_test_int64_cached_byte_size_);
+  }
+  for (int i = 0; i < this->test_int64_size(); i++) {
+    ::google::protobuf::internal::WireFormat::WriteInt64NoTag(this->test_int64(i), output);
+  }
+  
+  // repeated sint64 test_sint64 = 5 [packed = true];
+  if (this->test_sint64_size() > 0) {
+    ::google::protobuf::internal::WireFormat::WriteTag(5, ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED, output);
+    output->WriteVarint32(_test_sint64_cached_byte_size_);
+  }
+  for (int i = 0; i < this->test_sint64_size(); i++) {
+    ::google::protobuf::internal::WireFormat::WriteSInt64NoTag(this->test_sint64(i), output);
+  }
+  
+  // repeated sfixed64 test_sfixed64 = 6 [packed = true];
+  if (this->test_sfixed64_size() > 0) {
+    ::google::protobuf::internal::WireFormat::WriteTag(6, ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED, output);
+    output->WriteVarint32(_test_sfixed64_cached_byte_size_);
+  }
+  for (int i = 0; i < this->test_sfixed64_size(); i++) {
+    ::google::protobuf::internal::WireFormat::WriteSFixed64NoTag(this->test_sfixed64(i), output);
+  }
+  
+  // repeated uint32 test_uint32 = 7 [packed = true];
+  if (this->test_uint32_size() > 0) {
+    ::google::protobuf::internal::WireFormat::WriteTag(7, ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED, output);
+    output->WriteVarint32(_test_uint32_cached_byte_size_);
+  }
+  for (int i = 0; i < this->test_uint32_size(); i++) {
+    ::google::protobuf::internal::WireFormat::WriteUInt32NoTag(this->test_uint32(i), output);
+  }
+  
+  // repeated fixed32 test_fixed32 = 8 [packed = true];
+  if (this->test_fixed32_size() > 0) {
+    ::google::protobuf::internal::WireFormat::WriteTag(8, ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED, output);
+    output->WriteVarint32(_test_fixed32_cached_byte_size_);
+  }
+  for (int i = 0; i < this->test_fixed32_size(); i++) {
+    ::google::protobuf::internal::WireFormat::WriteFixed32NoTag(this->test_fixed32(i), output);
+  }
+  
+  // repeated uint64 test_uint64 = 9 [packed = true];
+  if (this->test_uint64_size() > 0) {
+    ::google::protobuf::internal::WireFormat::WriteTag(9, ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED, output);
+    output->WriteVarint32(_test_uint64_cached_byte_size_);
+  }
+  for (int i = 0; i < this->test_uint64_size(); i++) {
+    ::google::protobuf::internal::WireFormat::WriteUInt64NoTag(this->test_uint64(i), output);
+  }
+  
+  // repeated fixed64 test_fixed64 = 10 [packed = true];
+  if (this->test_fixed64_size() > 0) {
+    ::google::protobuf::internal::WireFormat::WriteTag(10, ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED, output);
+    output->WriteVarint32(_test_fixed64_cached_byte_size_);
+  }
+  for (int i = 0; i < this->test_fixed64_size(); i++) {
+    ::google::protobuf::internal::WireFormat::WriteFixed64NoTag(this->test_fixed64(i), output);
+  }
+  
+  // repeated float test_float = 11 [packed = true];
+  if (this->test_float_size() > 0) {
+    ::google::protobuf::internal::WireFormat::WriteTag(11, ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED, output);
+    output->WriteVarint32(_test_float_cached_byte_size_);
+  }
+  for (int i = 0; i < this->test_float_size(); i++) {
+    ::google::protobuf::internal::WireFormat::WriteFloatNoTag(this->test_float(i), output);
+  }
+  
+  // repeated double test_double = 12 [packed = true];
+  if (this->test_double_size() > 0) {
+    ::google::protobuf::internal::WireFormat::WriteTag(12, ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED, output);
+    output->WriteVarint32(_test_double_cached_byte_size_);
+  }
+  for (int i = 0; i < this->test_double_size(); i++) {
+    ::google::protobuf::internal::WireFormat::WriteDoubleNoTag(this->test_double(i), output);
+  }
+  
+  // repeated bool test_boolean = 13 [packed = true];
+  if (this->test_boolean_size() > 0) {
+    ::google::protobuf::internal::WireFormat::WriteTag(13, ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED, output);
+    output->WriteVarint32(_test_boolean_cached_byte_size_);
+  }
+  for (int i = 0; i < this->test_boolean_size(); i++) {
+    ::google::protobuf::internal::WireFormat::WriteBoolNoTag(this->test_boolean(i), output);
+  }
+  
+  // repeated .foo.TestEnumSmall test_enum_small = 14 [packed = true];
+  if (this->test_enum_small_size() > 0) {
+    ::google::protobuf::internal::WireFormat::WriteTag(14, ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED, output);
+    output->WriteVarint32(_test_enum_small_cached_byte_size_);
+  }
+  for (int i = 0; i < this->test_enum_small_size(); i++) {
+    ::google::protobuf::internal::WireFormat::WriteEnumNoTag(this->test_enum_small(i), output);
+  }
+  
+  // repeated .foo.TestEnum test_enum = 15 [packed = true];
+  if (this->test_enum_size() > 0) {
+    ::google::protobuf::internal::WireFormat::WriteTag(15, ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED, output);
+    output->WriteVarint32(_test_enum_cached_byte_size_);
+  }
+  for (int i = 0; i < this->test_enum_size(); i++) {
+    ::google::protobuf::internal::WireFormat::WriteEnumNoTag(this->test_enum(i), output);
+  }
+  
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+}
+
+::google::protobuf::uint8* TestMessPacked::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // repeated int32 test_int32 = 1 [packed = true];
+  if (this->test_int32_size() > 0) {
+    target = ::google::protobuf::internal::WireFormat::WriteTagToArray(1, ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED, target);
+    target = ::google::protobuf::io::CodedOutputStream::WriteVarint32ToArray(_test_int32_cached_byte_size_, target);
+  }
+  for (int i = 0; i < this->test_int32_size(); i++) {
+    target = ::google::protobuf::internal::WireFormat::WriteInt32NoTagToArray(this->test_int32(i), target);
+  }
+  
+  // repeated sint32 test_sint32 = 2 [packed = true];
+  if (this->test_sint32_size() > 0) {
+    target = ::google::protobuf::internal::WireFormat::WriteTagToArray(2, ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED, target);
+    target = ::google::protobuf::io::CodedOutputStream::WriteVarint32ToArray(_test_sint32_cached_byte_size_, target);
+  }
+  for (int i = 0; i < this->test_sint32_size(); i++) {
+    target = ::google::protobuf::internal::WireFormat::WriteSInt32NoTagToArray(this->test_sint32(i), target);
+  }
+  
+  // repeated sfixed32 test_sfixed32 = 3 [packed = true];
+  if (this->test_sfixed32_size() > 0) {
+    target = ::google::protobuf::internal::WireFormat::WriteTagToArray(3, ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED, target);
+    target = ::google::protobuf::io::CodedOutputStream::WriteVarint32ToArray(_test_sfixed32_cached_byte_size_, target);
+  }
+  for (int i = 0; i < this->test_sfixed32_size(); i++) {
+    target = ::google::protobuf::internal::WireFormat::WriteSFixed32NoTagToArray(this->test_sfixed32(i), target);
+  }
+  
+  // repeated int64 test_int64 = 4 [packed = true];
+  if (this->test_int64_size() > 0) {
+    target = ::google::protobuf::internal::WireFormat::WriteTagToArray(4, ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED, target);
+    target = ::google::protobuf::io::CodedOutputStream::WriteVarint32ToArray(_test_int64_cached_byte_size_, target);
+  }
+  for (int i = 0; i < this->test_int64_size(); i++) {
+    target = ::google::protobuf::internal::WireFormat::WriteInt64NoTagToArray(this->test_int64(i), target);
+  }
+  
+  // repeated sint64 test_sint64 = 5 [packed = true];
+  if (this->test_sint64_size() > 0) {
+    target = ::google::protobuf::internal::WireFormat::WriteTagToArray(5, ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED, target);
+    target = ::google::protobuf::io::CodedOutputStream::WriteVarint32ToArray(_test_sint64_cached_byte_size_, target);
+  }
+  for (int i = 0; i < this->test_sint64_size(); i++) {
+    target = ::google::protobuf::internal::WireFormat::WriteSInt64NoTagToArray(this->test_sint64(i), target);
+  }
+  
+  // repeated sfixed64 test_sfixed64 = 6 [packed = true];
+  if (this->test_sfixed64_size() > 0) {
+    target = ::google::protobuf::internal::WireFormat::WriteTagToArray(6, ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED, target);
+    target = ::google::protobuf::io::CodedOutputStream::WriteVarint32ToArray(_test_sfixed64_cached_byte_size_, target);
+  }
+  for (int i = 0; i < this->test_sfixed64_size(); i++) {
+    target = ::google::protobuf::internal::WireFormat::WriteSFixed64NoTagToArray(this->test_sfixed64(i), target);
+  }
+  
+  // repeated uint32 test_uint32 = 7 [packed = true];
+  if (this->test_uint32_size() > 0) {
+    target = ::google::protobuf::internal::WireFormat::WriteTagToArray(7, ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED, target);
+    target = ::google::protobuf::io::CodedOutputStream::WriteVarint32ToArray(_test_uint32_cached_byte_size_, target);
+  }
+  for (int i = 0; i < this->test_uint32_size(); i++) {
+    target = ::google::protobuf::internal::WireFormat::WriteUInt32NoTagToArray(this->test_uint32(i), target);
+  }
+  
+  // repeated fixed32 test_fixed32 = 8 [packed = true];
+  if (this->test_fixed32_size() > 0) {
+    target = ::google::protobuf::internal::WireFormat::WriteTagToArray(8, ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED, target);
+    target = ::google::protobuf::io::CodedOutputStream::WriteVarint32ToArray(_test_fixed32_cached_byte_size_, target);
+  }
+  for (int i = 0; i < this->test_fixed32_size(); i++) {
+    target = ::google::protobuf::internal::WireFormat::WriteFixed32NoTagToArray(this->test_fixed32(i), target);
+  }
+  
+  // repeated uint64 test_uint64 = 9 [packed = true];
+  if (this->test_uint64_size() > 0) {
+    target = ::google::protobuf::internal::WireFormat::WriteTagToArray(9, ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED, target);
+    target = ::google::protobuf::io::CodedOutputStream::WriteVarint32ToArray(_test_uint64_cached_byte_size_, target);
+  }
+  for (int i = 0; i < this->test_uint64_size(); i++) {
+    target = ::google::protobuf::internal::WireFormat::WriteUInt64NoTagToArray(this->test_uint64(i), target);
+  }
+  
+  // repeated fixed64 test_fixed64 = 10 [packed = true];
+  if (this->test_fixed64_size() > 0) {
+    target = ::google::protobuf::internal::WireFormat::WriteTagToArray(10, ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED, target);
+    target = ::google::protobuf::io::CodedOutputStream::WriteVarint32ToArray(_test_fixed64_cached_byte_size_, target);
+  }
+  for (int i = 0; i < this->test_fixed64_size(); i++) {
+    target = ::google::protobuf::internal::WireFormat::WriteFixed64NoTagToArray(this->test_fixed64(i), target);
+  }
+  
+  // repeated float test_float = 11 [packed = true];
+  if (this->test_float_size() > 0) {
+    target = ::google::protobuf::internal::WireFormat::WriteTagToArray(11, ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED, target);
+    target = ::google::protobuf::io::CodedOutputStream::WriteVarint32ToArray(_test_float_cached_byte_size_, target);
+  }
+  for (int i = 0; i < this->test_float_size(); i++) {
+    target = ::google::protobuf::internal::WireFormat::WriteFloatNoTagToArray(this->test_float(i), target);
+  }
+  
+  // repeated double test_double = 12 [packed = true];
+  if (this->test_double_size() > 0) {
+    target = ::google::protobuf::internal::WireFormat::WriteTagToArray(12, ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED, target);
+    target = ::google::protobuf::io::CodedOutputStream::WriteVarint32ToArray(_test_double_cached_byte_size_, target);
+  }
+  for (int i = 0; i < this->test_double_size(); i++) {
+    target = ::google::protobuf::internal::WireFormat::WriteDoubleNoTagToArray(this->test_double(i), target);
+  }
+  
+  // repeated bool test_boolean = 13 [packed = true];
+  if (this->test_boolean_size() > 0) {
+    target = ::google::protobuf::internal::WireFormat::WriteTagToArray(13, ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED, target);
+    target = ::google::protobuf::io::CodedOutputStream::WriteVarint32ToArray(_test_boolean_cached_byte_size_, target);
+  }
+  for (int i = 0; i < this->test_boolean_size(); i++) {
+    target = ::google::protobuf::internal::WireFormat::WriteBoolNoTagToArray(this->test_boolean(i), target);
+  }
+  
+  // repeated .foo.TestEnumSmall test_enum_small = 14 [packed = true];
+  if (this->test_enum_small_size() > 0) {
+    target = ::google::protobuf::internal::WireFormat::WriteTagToArray(14, ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED, target);
+    target = ::google::protobuf::io::CodedOutputStream::WriteVarint32ToArray(_test_enum_small_cached_byte_size_, target);
+  }
+  for (int i = 0; i < this->test_enum_small_size(); i++) {
+    target = ::google::protobuf::internal::WireFormat::WriteEnumNoTagToArray(this->test_enum_small(i), target);
+  }
+  
+  // repeated .foo.TestEnum test_enum = 15 [packed = true];
+  if (this->test_enum_size() > 0) {
+    target = ::google::protobuf::internal::WireFormat::WriteTagToArray(15, ::google::protobuf::internal::WireFormat::WIRETYPE_LENGTH_DELIMITED, target);
+    target = ::google::protobuf::io::CodedOutputStream::WriteVarint32ToArray(_test_enum_cached_byte_size_, target);
+  }
+  for (int i = 0; i < this->test_enum_size(); i++) {
+    target = ::google::protobuf::internal::WireFormat::WriteEnumNoTagToArray(this->test_enum(i), target);
+  }
+  
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  return target;
+}
+
+int TestMessPacked::ByteSize() const {
+  int total_size = 0;
+  
+  // repeated int32 test_int32 = 1 [packed = true];
+  {
+    int data_size = 0;
+    for (int i = 0; i < this->test_int32_size(); i++) {
+      data_size += ::google::protobuf::internal::WireFormat::Int32Size(
+        this->test_int32(i));
+    }
+    if (data_size > 0) {
+      total_size += 1 + ::google::protobuf::internal::WireFormat::Int32Size(data_size);
+    }
+    _test_int32_cached_byte_size_ = data_size;
+    total_size += data_size;
+  }
+  
+  // repeated sint32 test_sint32 = 2 [packed = true];
+  {
+    int data_size = 0;
+    for (int i = 0; i < this->test_sint32_size(); i++) {
+      data_size += ::google::protobuf::internal::WireFormat::SInt32Size(
+        this->test_sint32(i));
+    }
+    if (data_size > 0) {
+      total_size += 1 + ::google::protobuf::internal::WireFormat::Int32Size(data_size);
+    }
+    _test_sint32_cached_byte_size_ = data_size;
+    total_size += data_size;
+  }
+  
+  // repeated sfixed32 test_sfixed32 = 3 [packed = true];
+  {
+    int data_size = 0;
+    data_size = 4 * this->test_sfixed32_size();
+    if (data_size > 0) {
+      total_size += 1 + ::google::protobuf::internal::WireFormat::Int32Size(data_size);
+    }
+    _test_sfixed32_cached_byte_size_ = data_size;
+    total_size += data_size;
+  }
+  
+  // repeated int64 test_int64 = 4 [packed = true];
+  {
+    int data_size = 0;
+    for (int i = 0; i < this->test_int64_size(); i++) {
+      data_size += ::google::protobuf::internal::WireFormat::Int64Size(
+        this->test_int64(i));
+    }
+    if (data_size > 0) {
+      total_size += 1 + ::google::protobuf::internal::WireFormat::Int32Size(data_size);
+    }
+    _test_int64_cached_byte_size_ = data_size;
+    total_size += data_size;
+  }
+  
+  // repeated sint64 test_sint64 = 5 [packed = true];
+  {
+    int data_size = 0;
+    for (int i = 0; i < this->test_sint64_size(); i++) {
+      data_size += ::google::protobuf::internal::WireFormat::SInt64Size(
+        this->test_sint64(i));
+    }
+    if (data_size > 0) {
+      total_size += 1 + ::google::protobuf::internal::WireFormat::Int32Size(data_size);
+    }
+    _test_sint64_cached_byte_size_ = data_size;
+    total_size += data_size;
+  }
+  
+  // repeated sfixed64 test_sfixed64 = 6 [packed = true];
+  {
+    int data_size = 0;
+    data_size = 8 * this->test_sfixed64_size();
+    if (data_size > 0) {
+      total_size += 1 + ::google::protobuf::internal::WireFormat::Int32Size(data_size);
+    }
+    _test_sfixed64_cached_byte_size_ = data_size;
+    total_size += data_size;
+  }
+  
+  // repeated uint32 test_uint32 = 7 [packed = true];
+  {
+    int data_size = 0;
+    for (int i = 0; i < this->test_uint32_size(); i++) {
+      data_size += ::google::protobuf::internal::WireFormat::UInt32Size(
+        this->test_uint32(i));
+    }
+    if (data_size > 0) {
+      total_size += 1 + ::google::protobuf::internal::WireFormat::Int32Size(data_size);
+    }
+    _test_uint32_cached_byte_size_ = data_size;
+    total_size += data_size;
+  }
+  
+  // repeated fixed32 test_fixed32 = 8 [packed = true];
+  {
+    int data_size = 0;
+    data_size = 4 * this->test_fixed32_size();
+    if (data_size > 0) {
+      total_size += 1 + ::google::protobuf::internal::WireFormat::Int32Size(data_size);
+    }
+    _test_fixed32_cached_byte_size_ = data_size;
+    total_size += data_size;
+  }
+  
+  // repeated uint64 test_uint64 = 9 [packed = true];
+  {
+    int data_size = 0;
+    for (int i = 0; i < this->test_uint64_size(); i++) {
+      data_size += ::google::protobuf::internal::WireFormat::UInt64Size(
+        this->test_uint64(i));
+    }
+    if (data_size > 0) {
+      total_size += 1 + ::google::protobuf::internal::WireFormat::Int32Size(data_size);
+    }
+    _test_uint64_cached_byte_size_ = data_size;
+    total_size += data_size;
+  }
+  
+  // repeated fixed64 test_fixed64 = 10 [packed = true];
+  {
+    int data_size = 0;
+    data_size = 8 * this->test_fixed64_size();
+    if (data_size > 0) {
+      total_size += 1 + ::google::protobuf::internal::WireFormat::Int32Size(data_size);
+    }
+    _test_fixed64_cached_byte_size_ = data_size;
+    total_size += data_size;
+  }
+  
+  // repeated float test_float = 11 [packed = true];
+  {
+    int data_size = 0;
+    data_size = 4 * this->test_float_size();
+    if (data_size > 0) {
+      total_size += 1 + ::google::protobuf::internal::WireFormat::Int32Size(data_size);
+    }
+    _test_float_cached_byte_size_ = data_size;
+    total_size += data_size;
+  }
+  
+  // repeated double test_double = 12 [packed = true];
+  {
+    int data_size = 0;
+    data_size = 8 * this->test_double_size();
+    if (data_size > 0) {
+      total_size += 1 + ::google::protobuf::internal::WireFormat::Int32Size(data_size);
+    }
+    _test_double_cached_byte_size_ = data_size;
+    total_size += data_size;
+  }
+  
+  // repeated bool test_boolean = 13 [packed = true];
+  {
+    int data_size = 0;
+    data_size = 1 * this->test_boolean_size();
+    if (data_size > 0) {
+      total_size += 1 + ::google::protobuf::internal::WireFormat::Int32Size(data_size);
+    }
+    _test_boolean_cached_byte_size_ = data_size;
+    total_size += data_size;
+  }
+  
+  // repeated .foo.TestEnumSmall test_enum_small = 14 [packed = true];
+  {
+    int data_size = 0;
+    for (int i = 0; i < this->test_enum_small_size(); i++) {
+      data_size += ::google::protobuf::internal::WireFormat::EnumSize(
+        this->test_enum_small(i));
+    }
+    if (data_size > 0) {
+      total_size += 1 + ::google::protobuf::internal::WireFormat::Int32Size(data_size);
+    }
+    _test_enum_small_cached_byte_size_ = data_size;
+    total_size += data_size;
+  }
+  
+  // repeated .foo.TestEnum test_enum = 15 [packed = true];
+  {
+    int data_size = 0;
+    for (int i = 0; i < this->test_enum_size(); i++) {
+      data_size += ::google::protobuf::internal::WireFormat::EnumSize(
+        this->test_enum(i));
+    }
+    if (data_size > 0) {
+      total_size += 1 + ::google::protobuf::internal::WireFormat::Int32Size(data_size);
+    }
+    _test_enum_cached_byte_size_ = data_size;
+    total_size += data_size;
+  }
+  
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  _cached_size_ = total_size;
+  return total_size;
+}
+
+void TestMessPacked::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const TestMessPacked* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const TestMessPacked*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void TestMessPacked::MergeFrom(const TestMessPacked& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  test_int32_.MergeFrom(from.test_int32_);
+  test_sint32_.MergeFrom(from.test_sint32_);
+  test_sfixed32_.MergeFrom(from.test_sfixed32_);
+  test_int64_.MergeFrom(from.test_int64_);
+  test_sint64_.MergeFrom(from.test_sint64_);
+  test_sfixed64_.MergeFrom(from.test_sfixed64_);
+  test_uint32_.MergeFrom(from.test_uint32_);
+  test_fixed32_.MergeFrom(from.test_fixed32_);
+  test_uint64_.MergeFrom(from.test_uint64_);
+  test_fixed64_.MergeFrom(from.test_fixed64_);
+  test_float_.MergeFrom(from.test_float_);
+  test_double_.MergeFrom(from.test_double_);
+  test_boolean_.MergeFrom(from.test_boolean_);
+  test_enum_small_.MergeFrom(from.test_enum_small_);
+  test_enum_.MergeFrom(from.test_enum_);
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void TestMessPacked::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void TestMessPacked::CopyFrom(const TestMessPacked& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void TestMessPacked::Swap(TestMessPacked* other) {
+  if (other != this) {
+    test_int32_.Swap(&other->test_int32_);
+    test_sint32_.Swap(&other->test_sint32_);
+    test_sfixed32_.Swap(&other->test_sfixed32_);
+    test_int64_.Swap(&other->test_int64_);
+    test_sint64_.Swap(&other->test_sint64_);
+    test_sfixed64_.Swap(&other->test_sfixed64_);
+    test_uint32_.Swap(&other->test_uint32_);
+    test_fixed32_.Swap(&other->test_fixed32_);
+    test_uint64_.Swap(&other->test_uint64_);
+    test_fixed64_.Swap(&other->test_fixed64_);
+    test_float_.Swap(&other->test_float_);
+    test_double_.Swap(&other->test_double_);
+    test_boolean_.Swap(&other->test_boolean_);
+    test_enum_small_.Swap(&other->test_enum_small_);
+    test_enum_.Swap(&other->test_enum_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+bool TestMessPacked::IsInitialized() const {
+  
+  return true;
+}
+
+const ::google::protobuf::Descriptor* TestMessPacked::GetDescriptor() const {
+  return descriptor();
+}
+
+const ::google::protobuf::Reflection* TestMessPacked::GetReflection() const {
+  protobuf_AssignDescriptorsOnce();
+  return TestMessPacked_reflection_;
 }
 
 // ===================================================================

@@ -395,6 +395,205 @@ const struct lwpb_field_desc lwpb_fields_foo_testmess[] = {
     },
 };
 
+// 'TestMessPacked' field descriptors
+const struct lwpb_field_desc lwpb_fields_foo_testmesspacked[] = {
+    {
+        .number = 1,
+        .opts.label = LWPB_REPEATED,
+        .opts.typ = LWPB_INT32,
+        .opts.flags = 0 | LWPB_IS_PACKED,
+        .msg_desc = 0,
+#if LWPB_FIELD_NAMES
+        .name = "test_int32",
+#endif
+#if LWPB_FIELD_DEFAULTS
+        .def.null = 0,
+#endif
+    },
+    {
+        .number = 2,
+        .opts.label = LWPB_REPEATED,
+        .opts.typ = LWPB_SINT32,
+        .opts.flags = 0 | LWPB_IS_PACKED,
+        .msg_desc = 0,
+#if LWPB_FIELD_NAMES
+        .name = "test_sint32",
+#endif
+#if LWPB_FIELD_DEFAULTS
+        .def.null = 0,
+#endif
+    },
+    {
+        .number = 3,
+        .opts.label = LWPB_REPEATED,
+        .opts.typ = LWPB_SFIXED32,
+        .opts.flags = 0 | LWPB_IS_PACKED,
+        .msg_desc = 0,
+#if LWPB_FIELD_NAMES
+        .name = "test_sfixed32",
+#endif
+#if LWPB_FIELD_DEFAULTS
+        .def.null = 0,
+#endif
+    },
+    {
+        .number = 4,
+        .opts.label = LWPB_REPEATED,
+        .opts.typ = LWPB_INT64,
+        .opts.flags = 0 | LWPB_IS_PACKED,
+        .msg_desc = 0,
+#if LWPB_FIELD_NAMES
+        .name = "test_int64",
+#endif
+#if LWPB_FIELD_DEFAULTS
+        .def.null = 0,
+#endif
+    },
+    {
+        .number = 5,
+        .opts.label = LWPB_REPEATED,
+        .opts.typ = LWPB_SINT64,
+        .opts.flags = 0 | LWPB_IS_PACKED,
+        .msg_desc = 0,
+#if LWPB_FIELD_NAMES
+        .name = "test_sint64",
+#endif
+#if LWPB_FIELD_DEFAULTS
+        .def.null = 0,
+#endif
+    },
+    {
+        .number = 6,
+        .opts.label = LWPB_REPEATED,
+        .opts.typ = LWPB_SFIXED64,
+        .opts.flags = 0 | LWPB_IS_PACKED,
+        .msg_desc = 0,
+#if LWPB_FIELD_NAMES
+        .name = "test_sfixed64",
+#endif
+#if LWPB_FIELD_DEFAULTS
+        .def.null = 0,
+#endif
+    },
+    {
+        .number = 7,
+        .opts.label = LWPB_REPEATED,
+        .opts.typ = LWPB_UINT32,
+        .opts.flags = 0 | LWPB_IS_PACKED,
+        .msg_desc = 0,
+#if LWPB_FIELD_NAMES
+        .name = "test_uint32",
+#endif
+#if LWPB_FIELD_DEFAULTS
+        .def.null = 0,
+#endif
+    },
+    {
+        .number = 8,
+        .opts.label = LWPB_REPEATED,
+        .opts.typ = LWPB_FIXED32,
+        .opts.flags = 0 | LWPB_IS_PACKED,
+        .msg_desc = 0,
+#if LWPB_FIELD_NAMES
+        .name = "test_fixed32",
+#endif
+#if LWPB_FIELD_DEFAULTS
+        .def.null = 0,
+#endif
+    },
+    {
+        .number = 9,
+        .opts.label = LWPB_REPEATED,
+        .opts.typ = LWPB_UINT64,
+        .opts.flags = 0 | LWPB_IS_PACKED,
+        .msg_desc = 0,
+#if LWPB_FIELD_NAMES
+        .name = "test_uint64",
+#endif
+#if LWPB_FIELD_DEFAULTS
+        .def.null = 0,
+#endif
+    },
+    {
+        .number = 10,
+        .opts.label = LWPB_REPEATED,
+        .opts.typ = LWPB_FIXED64,
+        .opts.flags = 0 | LWPB_IS_PACKED,
+        .msg_desc = 0,
+#if LWPB_FIELD_NAMES
+        .name = "test_fixed64",
+#endif
+#if LWPB_FIELD_DEFAULTS
+        .def.null = 0,
+#endif
+    },
+    {
+        .number = 11,
+        .opts.label = LWPB_REPEATED,
+        .opts.typ = LWPB_FLOAT,
+        .opts.flags = 0 | LWPB_IS_PACKED,
+        .msg_desc = 0,
+#if LWPB_FIELD_NAMES
+        .name = "test_float",
+#endif
+#if LWPB_FIELD_DEFAULTS
+        .def.null = 0,
+#endif
+    },
+    {
+        .number = 12,
+        .opts.label = LWPB_REPEATED,
+        .opts.typ = LWPB_DOUBLE,
+        .opts.flags = 0 | LWPB_IS_PACKED,
+        .msg_desc = 0,
+#if LWPB_FIELD_NAMES
+        .name = "test_double",
+#endif
+#if LWPB_FIELD_DEFAULTS
+        .def.null = 0,
+#endif
+    },
+    {
+        .number = 13,
+        .opts.label = LWPB_REPEATED,
+        .opts.typ = LWPB_BOOL,
+        .opts.flags = 0 | LWPB_IS_PACKED,
+        .msg_desc = 0,
+#if LWPB_FIELD_NAMES
+        .name = "test_boolean",
+#endif
+#if LWPB_FIELD_DEFAULTS
+        .def.null = 0,
+#endif
+    },
+    {
+        .number = 14,
+        .opts.label = LWPB_REPEATED,
+        .opts.typ = LWPB_ENUM,
+        .opts.flags = 0 | LWPB_IS_PACKED,
+        .msg_desc = 0,
+#if LWPB_FIELD_NAMES
+        .name = "test_enum_small",
+#endif
+#if LWPB_FIELD_DEFAULTS
+        .def.null = 0,
+#endif
+    },
+    {
+        .number = 15,
+        .opts.label = LWPB_REPEATED,
+        .opts.typ = LWPB_ENUM,
+        .opts.flags = 0 | LWPB_IS_PACKED,
+        .msg_desc = 0,
+#if LWPB_FIELD_NAMES
+        .name = "test_enum",
+#endif
+#if LWPB_FIELD_DEFAULTS
+        .def.null = 0,
+#endif
+    },
+};
+
 // 'TestMessOptional' field descriptors
 const struct lwpb_field_desc lwpb_fields_foo_testmessoptional[] = {
     {
@@ -1298,6 +1497,13 @@ const struct lwpb_msg_desc lwpb_messages_foo[] = {
         .fields = lwpb_fields_foo_testmess,
 #if LWPB_MESSAGE_NAMES
         .name = "TestMess",
+#endif
+    },
+    {
+        .num_fields = 15,
+        .fields = lwpb_fields_foo_testmesspacked,
+#if LWPB_MESSAGE_NAMES
+        .name = "TestMessPacked",
 #endif
     },
     {

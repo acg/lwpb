@@ -39,6 +39,7 @@ class TestFieldNo262144;
 class TestFieldNo33554431;
 class TestFieldNo33554432;
 class TestMess;
+class TestMessPacked;
 class TestMessOptional;
 class TestMessRequiredInt32;
 class TestMessRequiredSInt32;
@@ -1234,6 +1235,265 @@ class TestMess : public ::google::protobuf::Message {
   
   void InitAsDefaultInstance();
   static TestMess* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class TestMessPacked : public ::google::protobuf::Message {
+ public:
+  TestMessPacked();
+  virtual ~TestMessPacked();
+  
+  TestMessPacked(const TestMessPacked& from);
+  
+  inline TestMessPacked& operator=(const TestMessPacked& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const TestMessPacked& default_instance();
+  void Swap(TestMessPacked* other);
+  
+  // implements Message ----------------------------------------------
+  
+  TestMessPacked* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const TestMessPacked& from);
+  void MergeFrom(const TestMessPacked& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const { _cached_size_ = size; }
+  public:
+  
+  const ::google::protobuf::Descriptor* GetDescriptor() const;
+  const ::google::protobuf::Reflection* GetReflection() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // repeated int32 test_int32 = 1 [packed = true];
+  inline int test_int32_size() const;
+  inline void clear_test_int32();
+  static const int kTestInt32FieldNumber = 1;
+  inline const ::google::protobuf::RepeatedField< ::google::protobuf::int32 >& test_int32() const;
+  inline ::google::protobuf::RepeatedField< ::google::protobuf::int32 >* mutable_test_int32();
+  inline ::google::protobuf::int32 test_int32(int index) const;
+  inline void set_test_int32(int index, ::google::protobuf::int32 value);
+  inline void add_test_int32(::google::protobuf::int32 value);
+  
+  // repeated sint32 test_sint32 = 2 [packed = true];
+  inline int test_sint32_size() const;
+  inline void clear_test_sint32();
+  static const int kTestSint32FieldNumber = 2;
+  inline const ::google::protobuf::RepeatedField< ::google::protobuf::int32 >& test_sint32() const;
+  inline ::google::protobuf::RepeatedField< ::google::protobuf::int32 >* mutable_test_sint32();
+  inline ::google::protobuf::int32 test_sint32(int index) const;
+  inline void set_test_sint32(int index, ::google::protobuf::int32 value);
+  inline void add_test_sint32(::google::protobuf::int32 value);
+  
+  // repeated sfixed32 test_sfixed32 = 3 [packed = true];
+  inline int test_sfixed32_size() const;
+  inline void clear_test_sfixed32();
+  static const int kTestSfixed32FieldNumber = 3;
+  inline const ::google::protobuf::RepeatedField< ::google::protobuf::int32 >& test_sfixed32() const;
+  inline ::google::protobuf::RepeatedField< ::google::protobuf::int32 >* mutable_test_sfixed32();
+  inline ::google::protobuf::int32 test_sfixed32(int index) const;
+  inline void set_test_sfixed32(int index, ::google::protobuf::int32 value);
+  inline void add_test_sfixed32(::google::protobuf::int32 value);
+  
+  // repeated int64 test_int64 = 4 [packed = true];
+  inline int test_int64_size() const;
+  inline void clear_test_int64();
+  static const int kTestInt64FieldNumber = 4;
+  inline const ::google::protobuf::RepeatedField< ::google::protobuf::int64 >& test_int64() const;
+  inline ::google::protobuf::RepeatedField< ::google::protobuf::int64 >* mutable_test_int64();
+  inline ::google::protobuf::int64 test_int64(int index) const;
+  inline void set_test_int64(int index, ::google::protobuf::int64 value);
+  inline void add_test_int64(::google::protobuf::int64 value);
+  
+  // repeated sint64 test_sint64 = 5 [packed = true];
+  inline int test_sint64_size() const;
+  inline void clear_test_sint64();
+  static const int kTestSint64FieldNumber = 5;
+  inline const ::google::protobuf::RepeatedField< ::google::protobuf::int64 >& test_sint64() const;
+  inline ::google::protobuf::RepeatedField< ::google::protobuf::int64 >* mutable_test_sint64();
+  inline ::google::protobuf::int64 test_sint64(int index) const;
+  inline void set_test_sint64(int index, ::google::protobuf::int64 value);
+  inline void add_test_sint64(::google::protobuf::int64 value);
+  
+  // repeated sfixed64 test_sfixed64 = 6 [packed = true];
+  inline int test_sfixed64_size() const;
+  inline void clear_test_sfixed64();
+  static const int kTestSfixed64FieldNumber = 6;
+  inline const ::google::protobuf::RepeatedField< ::google::protobuf::int64 >& test_sfixed64() const;
+  inline ::google::protobuf::RepeatedField< ::google::protobuf::int64 >* mutable_test_sfixed64();
+  inline ::google::protobuf::int64 test_sfixed64(int index) const;
+  inline void set_test_sfixed64(int index, ::google::protobuf::int64 value);
+  inline void add_test_sfixed64(::google::protobuf::int64 value);
+  
+  // repeated uint32 test_uint32 = 7 [packed = true];
+  inline int test_uint32_size() const;
+  inline void clear_test_uint32();
+  static const int kTestUint32FieldNumber = 7;
+  inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >& test_uint32() const;
+  inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >* mutable_test_uint32();
+  inline ::google::protobuf::uint32 test_uint32(int index) const;
+  inline void set_test_uint32(int index, ::google::protobuf::uint32 value);
+  inline void add_test_uint32(::google::protobuf::uint32 value);
+  
+  // repeated fixed32 test_fixed32 = 8 [packed = true];
+  inline int test_fixed32_size() const;
+  inline void clear_test_fixed32();
+  static const int kTestFixed32FieldNumber = 8;
+  inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >& test_fixed32() const;
+  inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >* mutable_test_fixed32();
+  inline ::google::protobuf::uint32 test_fixed32(int index) const;
+  inline void set_test_fixed32(int index, ::google::protobuf::uint32 value);
+  inline void add_test_fixed32(::google::protobuf::uint32 value);
+  
+  // repeated uint64 test_uint64 = 9 [packed = true];
+  inline int test_uint64_size() const;
+  inline void clear_test_uint64();
+  static const int kTestUint64FieldNumber = 9;
+  inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint64 >& test_uint64() const;
+  inline ::google::protobuf::RepeatedField< ::google::protobuf::uint64 >* mutable_test_uint64();
+  inline ::google::protobuf::uint64 test_uint64(int index) const;
+  inline void set_test_uint64(int index, ::google::protobuf::uint64 value);
+  inline void add_test_uint64(::google::protobuf::uint64 value);
+  
+  // repeated fixed64 test_fixed64 = 10 [packed = true];
+  inline int test_fixed64_size() const;
+  inline void clear_test_fixed64();
+  static const int kTestFixed64FieldNumber = 10;
+  inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint64 >& test_fixed64() const;
+  inline ::google::protobuf::RepeatedField< ::google::protobuf::uint64 >* mutable_test_fixed64();
+  inline ::google::protobuf::uint64 test_fixed64(int index) const;
+  inline void set_test_fixed64(int index, ::google::protobuf::uint64 value);
+  inline void add_test_fixed64(::google::protobuf::uint64 value);
+  
+  // repeated float test_float = 11 [packed = true];
+  inline int test_float_size() const;
+  inline void clear_test_float();
+  static const int kTestFloatFieldNumber = 11;
+  inline const ::google::protobuf::RepeatedField< float >& test_float() const;
+  inline ::google::protobuf::RepeatedField< float >* mutable_test_float();
+  inline float test_float(int index) const;
+  inline void set_test_float(int index, float value);
+  inline void add_test_float(float value);
+  
+  // repeated double test_double = 12 [packed = true];
+  inline int test_double_size() const;
+  inline void clear_test_double();
+  static const int kTestDoubleFieldNumber = 12;
+  inline const ::google::protobuf::RepeatedField< double >& test_double() const;
+  inline ::google::protobuf::RepeatedField< double >* mutable_test_double();
+  inline double test_double(int index) const;
+  inline void set_test_double(int index, double value);
+  inline void add_test_double(double value);
+  
+  // repeated bool test_boolean = 13 [packed = true];
+  inline int test_boolean_size() const;
+  inline void clear_test_boolean();
+  static const int kTestBooleanFieldNumber = 13;
+  inline const ::google::protobuf::RepeatedField< bool >& test_boolean() const;
+  inline ::google::protobuf::RepeatedField< bool >* mutable_test_boolean();
+  inline bool test_boolean(int index) const;
+  inline void set_test_boolean(int index, bool value);
+  inline void add_test_boolean(bool value);
+  
+  // repeated .foo.TestEnumSmall test_enum_small = 14 [packed = true];
+  inline int test_enum_small_size() const;
+  inline void clear_test_enum_small();
+  static const int kTestEnumSmallFieldNumber = 14;
+  inline const ::google::protobuf::RepeatedField<int>& test_enum_small() const;
+  inline ::google::protobuf::RepeatedField<int>* mutable_test_enum_small();
+  inline foo::TestEnumSmall test_enum_small(int index) const;
+  inline void set_test_enum_small(int index, foo::TestEnumSmall value);
+  inline void add_test_enum_small(foo::TestEnumSmall value);
+  
+  // repeated .foo.TestEnum test_enum = 15 [packed = true];
+  inline int test_enum_size() const;
+  inline void clear_test_enum();
+  static const int kTestEnumFieldNumber = 15;
+  inline const ::google::protobuf::RepeatedField<int>& test_enum() const;
+  inline ::google::protobuf::RepeatedField<int>* mutable_test_enum();
+  inline foo::TestEnum test_enum(int index) const;
+  inline void set_test_enum(int index, foo::TestEnum value);
+  inline void add_test_enum(foo::TestEnum value);
+  
+ private:
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  mutable int _cached_size_;
+  
+  ::google::protobuf::RepeatedField< ::google::protobuf::int32 > test_int32_;
+  mutable int _test_int32_cached_byte_size_;
+  ::google::protobuf::RepeatedField< ::google::protobuf::int32 > test_sint32_;
+  mutable int _test_sint32_cached_byte_size_;
+  ::google::protobuf::RepeatedField< ::google::protobuf::int32 > test_sfixed32_;
+  mutable int _test_sfixed32_cached_byte_size_;
+  ::google::protobuf::RepeatedField< ::google::protobuf::int64 > test_int64_;
+  mutable int _test_int64_cached_byte_size_;
+  ::google::protobuf::RepeatedField< ::google::protobuf::int64 > test_sint64_;
+  mutable int _test_sint64_cached_byte_size_;
+  ::google::protobuf::RepeatedField< ::google::protobuf::int64 > test_sfixed64_;
+  mutable int _test_sfixed64_cached_byte_size_;
+  ::google::protobuf::RepeatedField< ::google::protobuf::uint32 > test_uint32_;
+  mutable int _test_uint32_cached_byte_size_;
+  ::google::protobuf::RepeatedField< ::google::protobuf::uint32 > test_fixed32_;
+  mutable int _test_fixed32_cached_byte_size_;
+  ::google::protobuf::RepeatedField< ::google::protobuf::uint64 > test_uint64_;
+  mutable int _test_uint64_cached_byte_size_;
+  ::google::protobuf::RepeatedField< ::google::protobuf::uint64 > test_fixed64_;
+  mutable int _test_fixed64_cached_byte_size_;
+  ::google::protobuf::RepeatedField< float > test_float_;
+  mutable int _test_float_cached_byte_size_;
+  ::google::protobuf::RepeatedField< double > test_double_;
+  mutable int _test_double_cached_byte_size_;
+  ::google::protobuf::RepeatedField< bool > test_boolean_;
+  mutable int _test_boolean_cached_byte_size_;
+  ::google::protobuf::RepeatedField<int> test_enum_small_;
+  mutable int _test_enum_small_cached_byte_size_;
+  ::google::protobuf::RepeatedField<int> test_enum_;
+  mutable int _test_enum_cached_byte_size_;
+  friend void  protobuf_AddDesc_test_5ffull_2eproto();
+  friend void protobuf_AssignDesc_test_5ffull_2eproto();
+  friend void protobuf_ShutdownFile_test_5ffull_2eproto();
+  ::google::protobuf::uint32 _has_bits_[(15 + 31) / 32];
+  
+  // WHY DOES & HAVE LOWER PRECEDENCE THAN != !?
+  inline bool _has_bit(int index) const {
+    return (_has_bits_[index / 32] & (1u << (index % 32))) != 0;
+  }
+  inline void _set_bit(int index) {
+    _has_bits_[index / 32] |= (1u << (index % 32));
+  }
+  inline void _clear_bit(int index) {
+    _has_bits_[index / 32] &= ~(1u << (index % 32));
+  }
+  
+  void InitAsDefaultInstance();
+  static TestMessPacked* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -4449,6 +4709,389 @@ inline ::foo::SubMess* TestMess::mutable_test_message(int index) {
 }
 inline ::foo::SubMess* TestMess::add_test_message() {
   return test_message_.Add();
+}
+
+// -------------------------------------------------------------------
+
+// TestMessPacked
+
+// repeated int32 test_int32 = 1 [packed = true];
+inline int TestMessPacked::test_int32_size() const {
+  return test_int32_.size();
+}
+inline void TestMessPacked::clear_test_int32() {
+  test_int32_.Clear();
+}
+inline const ::google::protobuf::RepeatedField< ::google::protobuf::int32 >&
+TestMessPacked::test_int32() const {
+  return test_int32_;
+}
+inline ::google::protobuf::RepeatedField< ::google::protobuf::int32 >*
+TestMessPacked::mutable_test_int32() {
+  return &test_int32_;
+}
+inline ::google::protobuf::int32 TestMessPacked::test_int32(int index) const {
+  return test_int32_.Get(index);
+}
+inline void TestMessPacked::set_test_int32(int index, ::google::protobuf::int32 value) {
+  test_int32_.Set(index, value);
+}
+inline void TestMessPacked::add_test_int32(::google::protobuf::int32 value) {
+  test_int32_.Add(value);
+}
+
+// repeated sint32 test_sint32 = 2 [packed = true];
+inline int TestMessPacked::test_sint32_size() const {
+  return test_sint32_.size();
+}
+inline void TestMessPacked::clear_test_sint32() {
+  test_sint32_.Clear();
+}
+inline const ::google::protobuf::RepeatedField< ::google::protobuf::int32 >&
+TestMessPacked::test_sint32() const {
+  return test_sint32_;
+}
+inline ::google::protobuf::RepeatedField< ::google::protobuf::int32 >*
+TestMessPacked::mutable_test_sint32() {
+  return &test_sint32_;
+}
+inline ::google::protobuf::int32 TestMessPacked::test_sint32(int index) const {
+  return test_sint32_.Get(index);
+}
+inline void TestMessPacked::set_test_sint32(int index, ::google::protobuf::int32 value) {
+  test_sint32_.Set(index, value);
+}
+inline void TestMessPacked::add_test_sint32(::google::protobuf::int32 value) {
+  test_sint32_.Add(value);
+}
+
+// repeated sfixed32 test_sfixed32 = 3 [packed = true];
+inline int TestMessPacked::test_sfixed32_size() const {
+  return test_sfixed32_.size();
+}
+inline void TestMessPacked::clear_test_sfixed32() {
+  test_sfixed32_.Clear();
+}
+inline const ::google::protobuf::RepeatedField< ::google::protobuf::int32 >&
+TestMessPacked::test_sfixed32() const {
+  return test_sfixed32_;
+}
+inline ::google::protobuf::RepeatedField< ::google::protobuf::int32 >*
+TestMessPacked::mutable_test_sfixed32() {
+  return &test_sfixed32_;
+}
+inline ::google::protobuf::int32 TestMessPacked::test_sfixed32(int index) const {
+  return test_sfixed32_.Get(index);
+}
+inline void TestMessPacked::set_test_sfixed32(int index, ::google::protobuf::int32 value) {
+  test_sfixed32_.Set(index, value);
+}
+inline void TestMessPacked::add_test_sfixed32(::google::protobuf::int32 value) {
+  test_sfixed32_.Add(value);
+}
+
+// repeated int64 test_int64 = 4 [packed = true];
+inline int TestMessPacked::test_int64_size() const {
+  return test_int64_.size();
+}
+inline void TestMessPacked::clear_test_int64() {
+  test_int64_.Clear();
+}
+inline const ::google::protobuf::RepeatedField< ::google::protobuf::int64 >&
+TestMessPacked::test_int64() const {
+  return test_int64_;
+}
+inline ::google::protobuf::RepeatedField< ::google::protobuf::int64 >*
+TestMessPacked::mutable_test_int64() {
+  return &test_int64_;
+}
+inline ::google::protobuf::int64 TestMessPacked::test_int64(int index) const {
+  return test_int64_.Get(index);
+}
+inline void TestMessPacked::set_test_int64(int index, ::google::protobuf::int64 value) {
+  test_int64_.Set(index, value);
+}
+inline void TestMessPacked::add_test_int64(::google::protobuf::int64 value) {
+  test_int64_.Add(value);
+}
+
+// repeated sint64 test_sint64 = 5 [packed = true];
+inline int TestMessPacked::test_sint64_size() const {
+  return test_sint64_.size();
+}
+inline void TestMessPacked::clear_test_sint64() {
+  test_sint64_.Clear();
+}
+inline const ::google::protobuf::RepeatedField< ::google::protobuf::int64 >&
+TestMessPacked::test_sint64() const {
+  return test_sint64_;
+}
+inline ::google::protobuf::RepeatedField< ::google::protobuf::int64 >*
+TestMessPacked::mutable_test_sint64() {
+  return &test_sint64_;
+}
+inline ::google::protobuf::int64 TestMessPacked::test_sint64(int index) const {
+  return test_sint64_.Get(index);
+}
+inline void TestMessPacked::set_test_sint64(int index, ::google::protobuf::int64 value) {
+  test_sint64_.Set(index, value);
+}
+inline void TestMessPacked::add_test_sint64(::google::protobuf::int64 value) {
+  test_sint64_.Add(value);
+}
+
+// repeated sfixed64 test_sfixed64 = 6 [packed = true];
+inline int TestMessPacked::test_sfixed64_size() const {
+  return test_sfixed64_.size();
+}
+inline void TestMessPacked::clear_test_sfixed64() {
+  test_sfixed64_.Clear();
+}
+inline const ::google::protobuf::RepeatedField< ::google::protobuf::int64 >&
+TestMessPacked::test_sfixed64() const {
+  return test_sfixed64_;
+}
+inline ::google::protobuf::RepeatedField< ::google::protobuf::int64 >*
+TestMessPacked::mutable_test_sfixed64() {
+  return &test_sfixed64_;
+}
+inline ::google::protobuf::int64 TestMessPacked::test_sfixed64(int index) const {
+  return test_sfixed64_.Get(index);
+}
+inline void TestMessPacked::set_test_sfixed64(int index, ::google::protobuf::int64 value) {
+  test_sfixed64_.Set(index, value);
+}
+inline void TestMessPacked::add_test_sfixed64(::google::protobuf::int64 value) {
+  test_sfixed64_.Add(value);
+}
+
+// repeated uint32 test_uint32 = 7 [packed = true];
+inline int TestMessPacked::test_uint32_size() const {
+  return test_uint32_.size();
+}
+inline void TestMessPacked::clear_test_uint32() {
+  test_uint32_.Clear();
+}
+inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >&
+TestMessPacked::test_uint32() const {
+  return test_uint32_;
+}
+inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
+TestMessPacked::mutable_test_uint32() {
+  return &test_uint32_;
+}
+inline ::google::protobuf::uint32 TestMessPacked::test_uint32(int index) const {
+  return test_uint32_.Get(index);
+}
+inline void TestMessPacked::set_test_uint32(int index, ::google::protobuf::uint32 value) {
+  test_uint32_.Set(index, value);
+}
+inline void TestMessPacked::add_test_uint32(::google::protobuf::uint32 value) {
+  test_uint32_.Add(value);
+}
+
+// repeated fixed32 test_fixed32 = 8 [packed = true];
+inline int TestMessPacked::test_fixed32_size() const {
+  return test_fixed32_.size();
+}
+inline void TestMessPacked::clear_test_fixed32() {
+  test_fixed32_.Clear();
+}
+inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >&
+TestMessPacked::test_fixed32() const {
+  return test_fixed32_;
+}
+inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
+TestMessPacked::mutable_test_fixed32() {
+  return &test_fixed32_;
+}
+inline ::google::protobuf::uint32 TestMessPacked::test_fixed32(int index) const {
+  return test_fixed32_.Get(index);
+}
+inline void TestMessPacked::set_test_fixed32(int index, ::google::protobuf::uint32 value) {
+  test_fixed32_.Set(index, value);
+}
+inline void TestMessPacked::add_test_fixed32(::google::protobuf::uint32 value) {
+  test_fixed32_.Add(value);
+}
+
+// repeated uint64 test_uint64 = 9 [packed = true];
+inline int TestMessPacked::test_uint64_size() const {
+  return test_uint64_.size();
+}
+inline void TestMessPacked::clear_test_uint64() {
+  test_uint64_.Clear();
+}
+inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint64 >&
+TestMessPacked::test_uint64() const {
+  return test_uint64_;
+}
+inline ::google::protobuf::RepeatedField< ::google::protobuf::uint64 >*
+TestMessPacked::mutable_test_uint64() {
+  return &test_uint64_;
+}
+inline ::google::protobuf::uint64 TestMessPacked::test_uint64(int index) const {
+  return test_uint64_.Get(index);
+}
+inline void TestMessPacked::set_test_uint64(int index, ::google::protobuf::uint64 value) {
+  test_uint64_.Set(index, value);
+}
+inline void TestMessPacked::add_test_uint64(::google::protobuf::uint64 value) {
+  test_uint64_.Add(value);
+}
+
+// repeated fixed64 test_fixed64 = 10 [packed = true];
+inline int TestMessPacked::test_fixed64_size() const {
+  return test_fixed64_.size();
+}
+inline void TestMessPacked::clear_test_fixed64() {
+  test_fixed64_.Clear();
+}
+inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint64 >&
+TestMessPacked::test_fixed64() const {
+  return test_fixed64_;
+}
+inline ::google::protobuf::RepeatedField< ::google::protobuf::uint64 >*
+TestMessPacked::mutable_test_fixed64() {
+  return &test_fixed64_;
+}
+inline ::google::protobuf::uint64 TestMessPacked::test_fixed64(int index) const {
+  return test_fixed64_.Get(index);
+}
+inline void TestMessPacked::set_test_fixed64(int index, ::google::protobuf::uint64 value) {
+  test_fixed64_.Set(index, value);
+}
+inline void TestMessPacked::add_test_fixed64(::google::protobuf::uint64 value) {
+  test_fixed64_.Add(value);
+}
+
+// repeated float test_float = 11 [packed = true];
+inline int TestMessPacked::test_float_size() const {
+  return test_float_.size();
+}
+inline void TestMessPacked::clear_test_float() {
+  test_float_.Clear();
+}
+inline const ::google::protobuf::RepeatedField< float >&
+TestMessPacked::test_float() const {
+  return test_float_;
+}
+inline ::google::protobuf::RepeatedField< float >*
+TestMessPacked::mutable_test_float() {
+  return &test_float_;
+}
+inline float TestMessPacked::test_float(int index) const {
+  return test_float_.Get(index);
+}
+inline void TestMessPacked::set_test_float(int index, float value) {
+  test_float_.Set(index, value);
+}
+inline void TestMessPacked::add_test_float(float value) {
+  test_float_.Add(value);
+}
+
+// repeated double test_double = 12 [packed = true];
+inline int TestMessPacked::test_double_size() const {
+  return test_double_.size();
+}
+inline void TestMessPacked::clear_test_double() {
+  test_double_.Clear();
+}
+inline const ::google::protobuf::RepeatedField< double >&
+TestMessPacked::test_double() const {
+  return test_double_;
+}
+inline ::google::protobuf::RepeatedField< double >*
+TestMessPacked::mutable_test_double() {
+  return &test_double_;
+}
+inline double TestMessPacked::test_double(int index) const {
+  return test_double_.Get(index);
+}
+inline void TestMessPacked::set_test_double(int index, double value) {
+  test_double_.Set(index, value);
+}
+inline void TestMessPacked::add_test_double(double value) {
+  test_double_.Add(value);
+}
+
+// repeated bool test_boolean = 13 [packed = true];
+inline int TestMessPacked::test_boolean_size() const {
+  return test_boolean_.size();
+}
+inline void TestMessPacked::clear_test_boolean() {
+  test_boolean_.Clear();
+}
+inline const ::google::protobuf::RepeatedField< bool >&
+TestMessPacked::test_boolean() const {
+  return test_boolean_;
+}
+inline ::google::protobuf::RepeatedField< bool >*
+TestMessPacked::mutable_test_boolean() {
+  return &test_boolean_;
+}
+inline bool TestMessPacked::test_boolean(int index) const {
+  return test_boolean_.Get(index);
+}
+inline void TestMessPacked::set_test_boolean(int index, bool value) {
+  test_boolean_.Set(index, value);
+}
+inline void TestMessPacked::add_test_boolean(bool value) {
+  test_boolean_.Add(value);
+}
+
+// repeated .foo.TestEnumSmall test_enum_small = 14 [packed = true];
+inline int TestMessPacked::test_enum_small_size() const {
+  return test_enum_small_.size();
+}
+inline void TestMessPacked::clear_test_enum_small() {
+  test_enum_small_.Clear();
+}
+inline const ::google::protobuf::RepeatedField<int>&
+TestMessPacked::test_enum_small() const {
+  return test_enum_small_;
+}
+inline ::google::protobuf::RepeatedField<int>*
+TestMessPacked::mutable_test_enum_small() {
+  return &test_enum_small_;
+}
+inline foo::TestEnumSmall TestMessPacked::test_enum_small(int index) const {
+  return static_cast< foo::TestEnumSmall >(test_enum_small_.Get(index));
+}
+inline void TestMessPacked::set_test_enum_small(int index, foo::TestEnumSmall value) {
+  GOOGLE_DCHECK(foo::TestEnumSmall_IsValid(value));
+  test_enum_small_.Set(index, value);
+}
+inline void TestMessPacked::add_test_enum_small(foo::TestEnumSmall value) {
+  GOOGLE_DCHECK(foo::TestEnumSmall_IsValid(value));
+  test_enum_small_.Add(value);
+}
+
+// repeated .foo.TestEnum test_enum = 15 [packed = true];
+inline int TestMessPacked::test_enum_size() const {
+  return test_enum_.size();
+}
+inline void TestMessPacked::clear_test_enum() {
+  test_enum_.Clear();
+}
+inline const ::google::protobuf::RepeatedField<int>&
+TestMessPacked::test_enum() const {
+  return test_enum_;
+}
+inline ::google::protobuf::RepeatedField<int>*
+TestMessPacked::mutable_test_enum() {
+  return &test_enum_;
+}
+inline foo::TestEnum TestMessPacked::test_enum(int index) const {
+  return static_cast< foo::TestEnum >(test_enum_.Get(index));
+}
+inline void TestMessPacked::set_test_enum(int index, foo::TestEnum value) {
+  GOOGLE_DCHECK(foo::TestEnum_IsValid(value));
+  test_enum_.Set(index, value);
+}
+inline void TestMessPacked::add_test_enum(foo::TestEnum value) {
+  GOOGLE_DCHECK(foo::TestEnum_IsValid(value));
+  test_enum_.Add(value);
 }
 
 // -------------------------------------------------------------------
