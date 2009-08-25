@@ -39,8 +39,6 @@ static void debug_msg_start_handler(struct lwpb_decoder *decoder,
                                     void *arg)
 {
     const char *name;
-    
-    LWPB_DIAG_PRINTF("%s start\n", msg_desc->name);
 
 #if LWPB_MESSAGE_NAMES
     name = msg_desc->name;
@@ -57,7 +55,6 @@ static void debug_msg_end_handler(struct lwpb_decoder *decoder,
                                   const struct lwpb_msg_desc *msg_desc,
                                   void *arg)
 {
-    LWPB_DIAG_PRINTF("%s end\n", msg_desc->name);
     debug_indent--;
 }
 
@@ -243,6 +240,18 @@ static enum wire_type field_wire_type(const struct lwpb_field_desc *field_desc)
     }
 }
 
+/**
+ * Pushes the decoder stack.
+ * @param decoder Dncoder
+ * @return Returns the top stack frame.
+ */
+static struct lwpb_decoder_stack_frame *push_stack_frame(struct lwpb_decoder *decoder)
+{
+    decoder->depth++;
+    LWPB_ASSERT(decoder->depth <= LWPB_MAX_DEPTH, "Message nesting too deep");
+    return &decoder->stack[decoder->depth - 1];
+}
+
 // Decoder
 
 /**
@@ -299,8 +308,8 @@ void lwpb_decoder_field_handler(struct lwpb_decoder *decoder,
  */
 void lwpb_decoder_use_debug_handlers(struct lwpb_decoder *decoder)
 {
-    lwpb_decoder_msg_handler(decoder,
-                           debug_msg_start_handler, debug_msg_end_handler);
+    lwpb_decoder_msg_handler(decoder, debug_msg_start_handler,
+                             debug_msg_end_handler);
     lwpb_decoder_field_handler(decoder, debug_field_handler);
 }
 
@@ -329,17 +338,16 @@ lwpb_err_t lwpb_decoder_decode(struct lwpb_decoder *decoder,
     int packed = 0;
     
     // Setup initial stack frame
-    decoder->depth = 0;
-    frame = &decoder->stack[decoder->depth];
+    decoder->depth = 1;
+    frame = &decoder->stack[decoder->depth - 1];
     lwpb_buf_init(&frame->buf, data, len);
     frame->msg_desc = msg_desc;
     
-    while (decoder->depth >= 0) {
-        
+    while (decoder->depth >= 1) {
 decode_nested:
         
         // Get current frame
-        frame = &decoder->stack[decoder->depth];
+        frame = &decoder->stack[decoder->depth - 1];
         
         // Notify start message
         if (frame->msg_desc && lwpb_buf_used(&frame->buf) == 0)
@@ -407,14 +415,12 @@ decode_nested:
             if ((wire_type == WT_STRING) &&
                 LWPB_IS_PACKED_REPEATED(field_desc)) {
                 
-                // Add new stack frame
-                decoder->depth++;
-                LWPB_ASSERT(decoder->depth < LWPB_MAX_DEPTH, "Message nesting too deep");
-                
-                new_frame = &decoder->stack[decoder->depth];
+                // Create new stack frame
+                new_frame = push_stack_frame(decoder);
                 lwpb_buf_init(&new_frame->buf, wire_value.string.data, wire_value.string.len);
                 new_frame->msg_desc = frame->msg_desc;
                 
+                // Enter packed repeated mode
                 packed = 1;
                 
                 goto decode_nested;
@@ -478,11 +484,8 @@ decode_nested:
                 if (decoder->field_handler)
                     decoder->field_handler(decoder, msg_desc, field_desc, NULL, decoder->arg);
                 
-                // Add new stack frame
-                decoder->depth++;
-                LWPB_ASSERT(decoder->depth < LWPB_MAX_DEPTH, "Message nesting too deep");
-                
-                new_frame = &decoder->stack[decoder->depth];
+                // Create new stack frame
+                new_frame = push_stack_frame(decoder);
                 lwpb_buf_init(&new_frame->buf, wire_value.string.data, wire_value.string.len);
                 new_frame->msg_desc = field_desc->msg_desc;
                 
@@ -498,8 +501,10 @@ decode_nested:
             if (decoder->msg_end_handler)
                 decoder->msg_end_handler(decoder, frame->msg_desc, decoder->arg);
         
-        // Goto previous frame
+        // Pop the stack
         decoder->depth--;
+        
+        // Leave packed repeated mode
         packed = 0;
     }
     

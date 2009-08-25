@@ -61,6 +61,7 @@ typedef void (*lwpb_decoder_field_handler_t)
      union lwpb_value *value, void *arg);
 
 
+/** Decoder stack frame */
 struct lwpb_decoder_stack_frame {
     struct lwpb_buf buf;
     const struct lwpb_msg_desc *msg_desc;
