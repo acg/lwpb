@@ -88,20 +88,28 @@
  *     
  *     // Initialize the encoder
  *     lwpb_encoder_init(&encoder);
+ *     
  *     // Start encoding a message of type 'test.TestMessage' into buf
  *     lwpb_encoder_start(&encoder, test_TestMessage, buf, sizeof(buf));
+ *     
  *     // Encode a 55 to the field 'count'
  *     lwpb_encoder_add_int32(&encoder, test_TestMessage_count, 55);
+ *     
  *     // Start encoding the nested message of type 'test.Info' in field 'info'
  *     lwpb_encoder_nested_start(&encoder, test_TestMessage_info);
+ *     
  *     // Encode a -1 to the field 'result'
  *     lwpb_encoder_add_int32(&encoder, test_Info_result, -1);
+ *     
  *     // Encode a "Unknown" to the field 'msg'
  *     lwpb_encoder_add_string(&encoder, test_Info_msg, "Unknown");
+ *     
  *     // Finish encoding the nested message of type 'test.Info'
  *     lwpb_encoder_nested_end(&encoder);
+ *     
  *     // Finish encoding the message of type 'test.TestMessage'
  *     len = lwpb_encoder_finish(&encoder);
+ *     
  *     // buf now holds the encoded message which is len bytes long
  * }
  * 
@@ -162,14 +170,18 @@
  *     
  *     // Initialize the decoder
  *     lwpb_decoder_init(&decoder);
+ *     
  *     // Register a pointer to our local structure we want to decode into as
  *     // the argument for the decoder event handlers
  *     lwpb_decoder_arg(&decoder, &msg);
+ *     
  *     // Register event handlers
  *     lwpb_decoder_msg_handler(&decoder, msg_start_handler, msg_end_handler);
  *     lwpb_decoder_field_handler(&decoder, field_handler);
+ *     
  *     // Decode the binary buffer from the encode example
  *     lwpb_decoder_decode(&decoder, test_TestMessage, buf, len, NULL);
+ *     
  *     // The local structure 'msg' will now hold the decoded values
  * }
  * 
