@@ -22,7 +22,7 @@
 
 #include <lwpb/lwpb.h>
 
-
+/** Encoder stack frame */
 struct lwpb_encoder_stack_frame {
     struct lwpb_buf buf;
     const struct lwpb_field_desc *field_desc;

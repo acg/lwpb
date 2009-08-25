@@ -99,6 +99,30 @@ static lwpb_err_t encode_64bit(struct lwpb_buf *buf, u64_t value)
     return LWPB_ERR_OK;
 }
 
+/**
+ * Pushes the encoder stack.
+ * @param encoder Encoder
+ * @return Returns the top stack frame.
+ */
+static struct lwpb_encoder_stack_frame *push_stack_frame(struct lwpb_encoder *encoder)
+{
+    encoder->depth++;
+    LWPB_ASSERT(encoder->depth <= LWPB_MAX_DEPTH, "Message nesting too deep");
+    return &encoder->stack[encoder->depth - 1];
+}
+
+/**
+ * Pops the encoder stack.
+ * @param encoder Encoder
+ * @return Returns the top stack frame.
+ */
+static struct lwpb_encoder_stack_frame *pop_stack_frame(struct lwpb_encoder *encoder)
+{
+    encoder->depth--;
+    LWPB_ASSERT(encoder->depth > 0, "Message nesting too shallow");
+    return &encoder->stack[encoder->depth - 1];
+}
+
 // Encoder
 
 /**
@@ -121,11 +145,14 @@ void lwpb_encoder_start(struct lwpb_encoder *encoder,
                         const struct lwpb_msg_desc *msg_desc,
                         void *data, size_t len)
 {
+    struct lwpb_encoder_stack_frame *frame = &encoder->stack[0];
+    
     encoder->depth = 1;
-    lwpb_buf_init(&encoder->stack[0].buf, data, len);
-    encoder->stack[0].field_desc = NULL;
-    encoder->stack[0].msg_desc = msg_desc;
     encoder->packed = 0;
+    
+    lwpb_buf_init(&frame->buf, data, len);
+    frame->field_desc = NULL;
+    frame->msg_desc = msg_desc;
 }
 
 /**
@@ -155,9 +182,7 @@ lwpb_err_t lwpb_encoder_nested_start(struct lwpb_encoder *encoder,
     frame = &encoder->stack[encoder->depth - 1];
 
     // Create a new frame
-    encoder->depth++;
-    LWPB_ASSERT(encoder->depth <= LWPB_MAX_DEPTH, "Message nesting too deep");
-    new_frame = &encoder->stack[encoder->depth - 1];
+    new_frame = push_stack_frame(encoder);
     new_frame->field_desc = field_desc;
     new_frame->msg_desc = field_desc->msg_desc;
     
@@ -179,14 +204,14 @@ lwpb_err_t lwpb_encoder_nested_start(struct lwpb_encoder *encoder,
  */
 lwpb_err_t lwpb_encoder_nested_end(struct lwpb_encoder *encoder)
 {
-    struct lwpb_encoder_stack_frame *frame, *parent_frame;
+    struct lwpb_encoder_stack_frame *frame;
     union lwpb_value value;
     
+    // Get current frame
     frame = &encoder->stack[encoder->depth - 1];
-    
-    encoder->depth--;
-    LWPB_ASSERT(encoder->depth > 0, "Message nesting too shallow");
-    parent_frame = &encoder->stack[encoder->depth - 1];
+
+    // Pop the stack
+    pop_stack_frame(encoder);
 
     value.message.data = frame->buf.base;
     value.message.len = lwpb_buf_used(&frame->buf);
@@ -213,9 +238,7 @@ lwpb_err_t lwpb_encoder_packed_repeated_start(struct lwpb_encoder *encoder,
     frame = &encoder->stack[encoder->depth - 1];
 
     // Create a new frame
-    encoder->depth++;
-    LWPB_ASSERT(encoder->depth <= LWPB_MAX_DEPTH, "Message nesting too deep");
-    new_frame = &encoder->stack[encoder->depth - 1];
+    new_frame = push_stack_frame(encoder);
     new_frame->field_desc = field_desc;
     new_frame->msg_desc = NULL;
     
@@ -227,6 +250,7 @@ lwpb_err_t lwpb_encoder_packed_repeated_start(struct lwpb_encoder *encoder,
     lwpb_buf_init(&new_frame->buf, frame->buf.pos + MSG_RESERVE_BYTES,
                   lwpb_buf_left(&frame->buf) - MSG_RESERVE_BYTES);
     
+    // Enter packed repeated mode
     encoder->packed = 1;
     
     return LWPB_ERR_OK;
@@ -239,17 +263,18 @@ lwpb_err_t lwpb_encoder_packed_repeated_start(struct lwpb_encoder *encoder,
  */
 lwpb_err_t lwpb_encoder_packed_repeated_end(struct lwpb_encoder *encoder)
 {
-    struct lwpb_encoder_stack_frame *frame, *parent_frame;
+    struct lwpb_encoder_stack_frame *frame;
     union lwpb_value value;
     
     LWPB_ASSERT(encoder->packed, "Not in packed repeated mode");
 
+    // Get current frame
     frame = &encoder->stack[encoder->depth - 1];
+
+    // Pop the stack
+    pop_stack_frame(encoder);
     
-    encoder->depth--;
-    LWPB_ASSERT(encoder->depth > 0, "Message nesting too shallow");
-    parent_frame = &encoder->stack[encoder->depth - 1];
-    
+    // Leave packed repeated mode
     encoder->packed = 0;
     
     value.message.data = frame->buf.base;
@@ -279,6 +304,7 @@ lwpb_err_t lwpb_encoder_add_field(struct lwpb_encoder *encoder,
     
     LWPB_ASSERT(encoder->depth > 0, "Fields can only be added inside a message");
     
+    // Get current frame
     frame = &encoder->stack[encoder->depth - 1];
     
     if (encoder->packed) {
