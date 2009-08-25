@@ -63,6 +63,7 @@ typedef enum {
     LWPB_ERR_OK,                /**< OK */
     LWPB_ERR_CANCEL,            /**< Cancelled by user */
     LWPB_ERR_UNKNOWN_FIELD,     /**< User tried to encode an unknown field */
+    LWPB_ERR_INVALID_FIELD,     /**< Invalid field in current context */
     LWPB_ERR_END_OF_BUF,        /**< End of buffer reached */
     LWPB_ERR_MEM,               /**< Memory allocation failed */
     // Socket service error codes

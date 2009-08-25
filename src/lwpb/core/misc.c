@@ -34,6 +34,8 @@ const char *lwpb_err_text(lwpb_err_t err)
         return "Cancelled by user";
     case LWPB_ERR_UNKNOWN_FIELD:
         return "Unknown field";
+    case LWPB_ERR_INVALID_FIELD:
+        return "Invalid field";
     case LWPB_ERR_END_OF_BUF:
         return "End of buffer";
     case LWPB_ERR_MEM:

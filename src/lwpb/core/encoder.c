@@ -107,6 +107,7 @@ static lwpb_err_t encode_64bit(struct lwpb_buf *buf, u64_t value)
  */
 void lwpb_encoder_init(struct lwpb_encoder *encoder)
 {
+    encoder->depth = 0;
 }
 
 /**
@@ -124,6 +125,7 @@ void lwpb_encoder_start(struct lwpb_encoder *encoder,
     lwpb_buf_init(&encoder->stack[0].buf, data, len);
     encoder->stack[0].field_desc = NULL;
     encoder->stack[0].msg_desc = msg_desc;
+    encoder->packed = 0;
 }
 
 /**
@@ -192,6 +194,71 @@ lwpb_err_t lwpb_encoder_nested_end(struct lwpb_encoder *encoder)
 }
 
 /**
+ * Starts encoding a packed repeated field.
+ * @param encoder Encoder
+ * @param field_desc Field descriptor of packed repeated field
+ * @return Returns LWPB_ERR_OK if successful.
+ */
+lwpb_err_t lwpb_encoder_packed_repeated_start(struct lwpb_encoder *encoder,
+                                              const struct lwpb_field_desc *field_desc)
+{
+    struct lwpb_encoder_stack_frame *frame, *new_frame;
+
+    LWPB_ASSERT((field_desc->opts.label == LWPB_REPEATED) && 
+                (field_desc->opts.flags & LWPB_IS_PACKED),
+                "Field is not repeated packed");
+    
+    LWPB_ASSERT(!encoder->packed, "Packed repeated fields must not be nested");
+    
+    // Get parent frame
+    frame = &encoder->stack[encoder->depth - 1];
+
+    // Create a new frame
+    encoder->depth++;
+    LWPB_ASSERT(encoder->depth <= LWPB_MAX_DEPTH, "Message nesting too deep");
+    new_frame = &encoder->stack[encoder->depth - 1];
+    new_frame->field_desc = field_desc;
+    new_frame->msg_desc = NULL;
+    
+    // Reserve a few bytes for the field on the parent frame. This is where
+    // the field key (type) and the message length will be stored, once it
+    // is known.
+    if (lwpb_buf_left(&frame->buf) < MSG_RESERVE_BYTES)
+        return LWPB_ERR_END_OF_BUF;
+    lwpb_buf_init(&new_frame->buf, frame->buf.pos + MSG_RESERVE_BYTES,
+                  lwpb_buf_left(&frame->buf) - MSG_RESERVE_BYTES);
+    
+    encoder->packed = 1;
+    
+    return LWPB_ERR_OK;
+}
+
+/**
+ * Ends encoding a packed repeated field.
+ * @param encoder Encoder
+ * @return Returns LWPB_ERR_OK if successful.
+ */
+lwpb_err_t lwpb_encoder_packed_repeated_end(struct lwpb_encoder *encoder)
+{
+    struct lwpb_encoder_stack_frame *frame, *parent_frame;
+    union lwpb_value value;
+    
+    LWPB_ASSERT(encoder->packed, "Not in packed repeated mode");
+
+    frame = &encoder->stack[encoder->depth - 1];
+    
+    encoder->depth--;
+    LWPB_ASSERT(encoder->depth > 0, "Message nesting too shallow");
+    parent_frame = &encoder->stack[encoder->depth - 1];
+    
+    encoder->packed = 0;
+    
+    value.message.data = frame->buf.base;
+    value.message.len = lwpb_buf_used(&frame->buf);
+    return lwpb_encoder_add_field(encoder, frame->field_desc, &value);
+}
+
+/**
  * Encodes a field.
  * @note This method should not normally be used. Use the lwpb_encoder_add_xxx()
  * methods to directly add a field of a given type.
@@ -215,12 +282,21 @@ lwpb_err_t lwpb_encoder_add_field(struct lwpb_encoder *encoder,
     
     frame = &encoder->stack[encoder->depth - 1];
     
-    // Check that field belongs to the current message
-    for (i = 0; i < frame->msg_desc->num_fields; i++)
-        if (field_desc == &frame->msg_desc->fields[i])
-            break;
-    if (i == frame->msg_desc->num_fields)
-        return LWPB_ERR_UNKNOWN_FIELD;
+    if (encoder->packed) {
+        // Check that packed repeated field is not interleaved with other fields
+        LWPB_ASSERT(field_desc == frame->field_desc,
+                    "Packed repeated fields must not be interleaved with other"
+                    "fields");
+        if (field_desc != frame->field_desc)
+            return LWPB_ERR_INVALID_FIELD;
+    } else {
+        // Check that field belongs to the current message
+        for (i = 0; i < frame->msg_desc->num_fields; i++)
+            if (field_desc == &frame->msg_desc->fields[i])
+                break;
+        if (i == frame->msg_desc->num_fields)
+            return LWPB_ERR_UNKNOWN_FIELD;
+    }
     
     // Encode wire value
     switch (field_desc->opts.typ) {
@@ -299,10 +375,20 @@ lwpb_err_t lwpb_encoder_add_field(struct lwpb_encoder *encoder,
         break;
     }
     
-    key = wire_type | (field_desc->number << 3);
-    ret = encode_varint(&frame->buf, key);
-    if (ret != LWPB_ERR_OK)
-        return ret;
+    // Do not encode field key for packed repeated fields
+    if (!encoder->packed) {
+        // Override wire value if this is a packed repeated field
+        if (field_desc->opts.flags & LWPB_IS_PACKED) {
+            wire_type = WT_STRING;
+            wire_value.string.data = value->message.data;
+            wire_value.string.len = value->message.len;
+        }
+        
+        key = wire_type | (field_desc->number << 3);
+        ret = encode_varint(&frame->buf, key);
+        if (ret != LWPB_ERR_OK)
+            return ret;
+    }
     
     switch (wire_type) {
     case WT_VARINT:
@@ -321,9 +407,10 @@ lwpb_err_t lwpb_encoder_add_field(struct lwpb_encoder *encoder,
             return ret;
         if (lwpb_buf_left(&frame->buf) < wire_value.string.len)
             return LWPB_ERR_END_OF_BUF;
-        // Use memmove() when writing a message field as the memory areas are
-        // overlapping.
-        if (field_desc->opts.typ == LWPB_MESSAGE) {
+        // Use memmove() when writing a message or packed repeated field as the
+        // memory areas are overlapping.
+        if ((field_desc->opts.typ == LWPB_MESSAGE) ||
+            (field_desc->opts.flags & LWPB_IS_PACKED)) {
             LWPB_MEMMOVE(frame->buf.pos, wire_value.string.data, wire_value.string.len);
         } else {
             LWPB_MEMCPY(frame->buf.pos, wire_value.string.data, wire_value.string.len);
