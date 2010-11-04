@@ -17,137 +17,6 @@
 #include "Python.h"
 #include <lwpb/lwpb.h>
 
-/* ----------------------------------------- */
-
-// 'PhoneNumber.PhoneType' enumeration values
-#define TEST_PHONENUMBER_MOBILE 0
-#define TEST_PHONENUMBER_HOME 1
-#define TEST_PHONENUMBER_WORK 2
-
-extern const struct lwpb_msg_desc lwpb_messages_test[];
-
-// Message descriptor pointers
-#define test_PhoneNumber (&lwpb_messages_test[0])
-#define test_Person (&lwpb_messages_test[1])
-
-extern const struct lwpb_field_desc lwpb_fields_test_phonenumber[];
-
-// 'PhoneNumber' field descriptor pointers
-#define test_PhoneNumber_number (&lwpb_fields_test_phonenumber[0])
-#define test_PhoneNumber_type (&lwpb_fields_test_phonenumber[1])
-
-extern const struct lwpb_field_desc lwpb_fields_test_person[];
-
-// 'Person' field descriptor pointers
-#define test_Person_name (&lwpb_fields_test_person[0])
-#define test_Person_id (&lwpb_fields_test_person[1])
-#define test_Person_email (&lwpb_fields_test_person[2])
-#define test_Person_phone (&lwpb_fields_test_person[3])
-
-// 'PhoneNumber' field descriptors
-const struct lwpb_field_desc lwpb_fields_test_phonenumber[] = {
-    {
-        .number = 1,
-        .opts.label = LWPB_REQUIRED,
-        .opts.typ = LWPB_STRING,
-        .opts.flags = 0,
-        .msg_desc = 0,
-#if LWPB_FIELD_NAMES
-        .name = "number",
-#endif
-#if LWPB_FIELD_DEFAULTS
-        .def.string.str = "",
-#endif
-    },
-    {
-        .number = 2,
-        .opts.label = LWPB_OPTIONAL,
-        .opts.typ = LWPB_ENUM,
-        .opts.flags = 0 | LWPB_HAS_DEFAULT,
-        .msg_desc = 0,
-#if LWPB_FIELD_NAMES
-        .name = "type",
-#endif
-#if LWPB_FIELD_DEFAULTS
-        .def.int32 = 1,
-#endif
-    },
-};
-
-// 'Person' field descriptors
-const struct lwpb_field_desc lwpb_fields_test_person[] = {
-    {
-        .number = 1,
-        .opts.label = LWPB_REQUIRED,
-        .opts.typ = LWPB_STRING,
-        .opts.flags = 0,
-        .msg_desc = 0,
-#if LWPB_FIELD_NAMES
-        .name = "name",
-#endif
-#if LWPB_FIELD_DEFAULTS
-        .def.string.str = "",
-#endif
-    },
-    {
-        .number = 2,
-        .opts.label = LWPB_REQUIRED,
-        .opts.typ = LWPB_INT32,
-        .opts.flags = 0,
-        .msg_desc = 0,
-#if LWPB_FIELD_NAMES
-        .name = "id",
-#endif
-#if LWPB_FIELD_DEFAULTS
-        .def.int32 = 0,
-#endif
-    },
-    {
-        .number = 3,
-        .opts.label = LWPB_OPTIONAL,
-        .opts.typ = LWPB_STRING,
-        .opts.flags = 0 | LWPB_IS_DEPRECATED,
-        .msg_desc = 0,
-#if LWPB_FIELD_NAMES
-        .name = "email",
-#endif
-#if LWPB_FIELD_DEFAULTS
-        .def.string.str = "",
-#endif
-    },
-    {
-        .number = 4,
-        .opts.label = LWPB_REPEATED,
-        .opts.typ = LWPB_MESSAGE,
-        .opts.flags = 0,
-        .msg_desc = test_PhoneNumber,
-#if LWPB_FIELD_NAMES
-        .name = "phone",
-#endif
-#if LWPB_FIELD_DEFAULTS
-        .def.null = 0,
-#endif
-    },
-};
-
-// Message descriptors
-const struct lwpb_msg_desc lwpb_messages_test[] = {
-    {
-        .num_fields = 2,
-        .fields = lwpb_fields_test_phonenumber,
-#if LWPB_MESSAGE_NAMES
-        .name = "PhoneNumber",
-#endif
-    },
-    {
-        .num_fields = 4,
-        .fields = lwpb_fields_test_person,
-#if LWPB_MESSAGE_NAMES
-        .name = "Person",
-#endif
-    },
-};
-
 
 /* ----------------------------------------- */
 
@@ -660,16 +529,25 @@ msg_start_handler(
 {
   if (!arg) return;
 
+  PyObject* message_name;
+
+  if (msg_desc && msg_desc->name != NULL)
+    message_name = PyString_FromString(msg_desc->name);
+  else {
+    message_name = Py_None;
+    Py_INCREF(Py_None);
+  }
+
   PyObject* method = PyString_FromString("msg_start_handler");
   PyObject* object = (PyObject*)arg;
-  PyObject* retval = PyObject_CallMethodObjArgs(object, method, NULL);
+  PyObject* retval = PyObject_CallMethodObjArgs(object, method, message_name, NULL);
 
   /*
   TODO handle NULL return value (ie exception).
     need to modify lwpb to abort decoding.
   */
 
-  Py_DECREF(retval);
+  Py_XDECREF(retval);
   Py_DECREF(method);
 }
 
@@ -681,16 +559,25 @@ msg_end_handler(
 {
   if (!arg) return;
 
+  PyObject* message_name;
+
+  if (msg_desc && msg_desc->name != NULL)
+    message_name = PyString_FromString(msg_desc->name);
+  else {
+    message_name = Py_None;
+    Py_INCREF(Py_None);
+  }
+
   PyObject* method = PyString_FromString("msg_end_handler");
   PyObject* object = (PyObject*)arg;
-  PyObject* retval = PyObject_CallMethodObjArgs(object, method, NULL);
+  PyObject* retval = PyObject_CallMethodObjArgs(object, method, message_name, NULL);
 
   /*
   TODO handle NULL return value (ie exception).
     need to modify lwpb to abort decoding.
   */
 
-  Py_DECREF(retval);
+  Py_XDECREF(retval);
   Py_DECREF(method);
 }
 
@@ -739,10 +626,9 @@ field_handler(
   /*
   TODO handle NULL return value (ie exception).
     need to modify lwpb to abort decoding in this case.
-    otherwise, get a segfault.
   */
 
-  Py_DECREF(retval);
+  Py_XDECREF(retval);
   Py_DECREF(method);
   Py_DECREF(field_name);
   Py_DECREF(message_name);
@@ -771,8 +657,7 @@ Decoder_decode(Decoder *self, PyObject *args)
   lwpb_decoder_field_handler(&self->decoder, field_handler);
   ret = lwpb_decoder_decode(&self->decoder, &self->descriptor->msg_desc[msgnum], buf, len, NULL);
 
-  Py_INCREF(Py_None);
-  return Py_None;
+  return PyInt_FromLong(ret);
 }
 
 static PyObject *
@@ -798,13 +683,13 @@ Decoder_msg_end_handler(Decoder *self, PyObject *args)
 
 static PyMethodDef Decoder_methods[] = {
   {"decode",  (PyCFunction)Decoder_decode,  METH_VARARGS,
-    PyDoc_STR("decode(data,msgnum) -> None")},
+    PyDoc_STR("decode(data,msgnum) -> Integer")},
   {"field_handler",  (PyCFunction)Decoder_field_handler,  METH_VARARGS,
-    PyDoc_STR("field_handler(value) -> None")},
+    PyDoc_STR("field_handler(msgname,fieldname,value) -> None")},
   {"msg_start_handler",  (PyCFunction)Decoder_msg_start_handler,  METH_VARARGS,
-    PyDoc_STR("msg_start_handler() -> None")},
+    PyDoc_STR("msg_start_handler(msgname) -> None")},
   {"msg_end_handler",  (PyCFunction)Decoder_msg_end_handler,  METH_VARARGS,
-    PyDoc_STR("msg_end_handler() -> None")},
+    PyDoc_STR("msg_end_handler(msgname) -> None")},
   {NULL,    NULL}    /* sentinel */
 };
 
@@ -871,22 +756,26 @@ PyMODINIT_FUNC
 initlwpb(void)
 {
   /* Make sure exposed types are subclassable. */
+
   DecoderType.tp_base = &PyBaseObject_Type;
   DescriptorType.tp_base = &PyBaseObject_Type;
 
   /* Finalize the type object including setting type of the new type
    * object; doing it here is required for portability, too. */
+
   if (PyType_Ready(&DecoderType) < 0)
     return;
   if (PyType_Ready(&DescriptorType) < 0)
     return;
 
   /* Create the module and add the functions */
+
   PyObject* mod = Py_InitModule3("lwpb", lwpb_methods, module_doc);
   if (mod == NULL)
     return;
 
   /* Add some symbolic constants to the module */
+
   if (ErrorObject == NULL) {
     ErrorObject = PyErr_NewException("lwpb.Error", NULL, NULL);
     if (ErrorObject == NULL)

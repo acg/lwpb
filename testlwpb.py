@@ -81,14 +81,15 @@ class Builder(lwpb.Decoder):
     else:
       print "%s%s.%s = %s (%s)" % ("  " * (self.indent-1), message_name, field_name, value, type(value))
 
-  def msg_start_handler(self):
+  def msg_start_handler(self, message_name):
     self.indent += 1
 
-  def msg_end_handler(self):
+  def msg_end_handler(self, message_name):
     self.indent -= 1
 
 
 d = Builder(desc)
 data = file("person.pb").read()
-d.decode(data, 1)
+status = d.decode(data, 1)
+print "status = %d" % status
 
