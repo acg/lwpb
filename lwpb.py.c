@@ -324,270 +324,11 @@ py_to_lwpb(union lwpb_value* p, PyObject *val, unsigned int type)
 }
 
 
-/* ----------------------------------------- */
-
-
 static PyObject *ErrorObject;
 
-/* Decoder object */
+/* ----------------------------------------- */
 
-typedef struct {
-  PyObject_HEAD
-  struct lwpb_decoder decoder;
-  PyObject *x_attr;  /* Attributes dictionary */
-} Decoder;
-
-static PyTypeObject DecoderType;
-
-#define Decoder_Check(v)  (Py_TYPE(v) == &DecoderType)
-
-
-/* Decoder methods */
-
-static PyObject *
-Decoder_new(PyTypeObject *type, PyObject *arg, PyObject *kwds)
-{
-  Decoder *self;
-  self = (Decoder *)type->tp_alloc(type, 0);
-  if (self == NULL)
-    return NULL;
-  self->x_attr = NULL;
-  return (PyObject *)self;
-}
-
-static void
-Decoder_dealloc(Decoder *self)
-{
-  Py_XDECREF(self->x_attr);
-  self->ob_type->tp_free((PyObject*)self);
-}
-
-
-/* Decoder handlers */
-
-static void
-msg_start_handler(
-  struct lwpb_decoder *decoder,
-  const struct lwpb_msg_desc *msg_desc,
-  void *arg)
-{
-  if (!arg) return;
-
-  PyObject* method = PyString_FromString("msg_start_handler");
-  PyObject* object = (PyObject*)arg;
-  PyObject* retval = PyObject_CallMethodObjArgs(object, method, NULL);
-
-  /*
-  TODO handle NULL return value (ie exception).
-    need to modify lwpb to abort decoding.
-  */
-
-  Py_DECREF(retval);
-  Py_DECREF(method);
-}
-
-static void
-msg_end_handler(
-  struct lwpb_decoder *decoder,
-  const struct lwpb_msg_desc *msg_desc,
-  void *arg)
-{
-  if (!arg) return;
-
-  PyObject* method = PyString_FromString("msg_end_handler");
-  PyObject* object = (PyObject*)arg;
-  PyObject* retval = PyObject_CallMethodObjArgs(object, method, NULL);
-
-  /*
-  TODO handle NULL return value (ie exception).
-    need to modify lwpb to abort decoding.
-  */
-
-  Py_DECREF(retval);
-  Py_DECREF(method);
-}
-
-void
-field_handler(
-  struct lwpb_decoder *decoder,
-  const struct lwpb_msg_desc *msg_desc,
-  const struct lwpb_field_desc *field_desc,
-  union lwpb_value *value,
-  void *arg)
-{
-  if (!arg) return;
-
-  PyObject* val;
-
-  if (value)
-    val = lwpb_to_py(value, field_desc->opts.typ);
-  else {
-    val = Py_None;
-    Py_INCREF(Py_None);
-  }
-
-  if (val == NULL) return;
-
-  /*
-  TODO Look up msg_desc->name in the Descriptor pydict.
-  TODO Look up field_desc->name under the msg pydict.
-  */
-
-  PyObject* method = PyString_FromString("field_handler");
-  PyObject* object = (PyObject*)arg;
-  PyObject* retval = PyObject_CallMethodObjArgs(object, method, val, NULL);
-
-  /*
-  TODO handle NULL return value (ie exception).
-    need to modify lwpb to abort decoding.
-  */
-
-  Py_DECREF(retval);
-  Py_DECREF(method);
-  Py_DECREF(val);
-}
-
-static PyObject *
-Decoder_decode(Decoder *self, PyObject *args)
-{
-  char *buf;
-  int len;
-  lwpb_err_t ret;
-
-  if (!PyArg_ParseTuple(args, "s#:decode", &buf, &len))
-    return NULL;
-
-  //lwpb_decoder_use_debug_handlers(&self->decoder);
-  lwpb_decoder_arg(&self->decoder, (PyObject*)self);
-  lwpb_decoder_msg_handler(&self->decoder, msg_start_handler, msg_end_handler);
-  lwpb_decoder_field_handler(&self->decoder, field_handler);
-  ret = lwpb_decoder_decode(&self->decoder, test_Person, buf, len, NULL);
-
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
-static PyObject *
-Decoder_field_handler(Decoder *self, PyObject *args)
-{
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
-static PyObject *
-Decoder_msg_start_handler(Decoder *self, PyObject *args)
-{
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
-static PyObject *
-Decoder_msg_end_handler(Decoder *self, PyObject *args)
-{
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
-static PyMethodDef Decoder_methods[] = {
-  {"decode",  (PyCFunction)Decoder_decode,  METH_VARARGS,
-    PyDoc_STR("decode() -> None")},
-  {"field_handler",  (PyCFunction)Decoder_field_handler,  METH_VARARGS,
-    PyDoc_STR("field_handler() -> None")},
-  {"msg_start_handler",  (PyCFunction)Decoder_msg_start_handler,  METH_VARARGS,
-    PyDoc_STR("msg_start_handler() -> None")},
-  {"msg_end_handler",  (PyCFunction)Decoder_msg_end_handler,  METH_VARARGS,
-    PyDoc_STR("msg_end_handler() -> None")},
-  {NULL,    NULL}    /* sentinel */
-};
-
-static PyTypeObject DecoderType = {
-  /* The ob_type field must be initialized in the module init function
-   * to be portable to Windows without using C++. */
-  PyVarObject_HEAD_INIT(NULL, 0)
-  "lwpb.Decoder",               /*tp_name*/
-  sizeof(Decoder),        /*tp_basicsize*/
-  0,                            /*tp_itemsize*/
-  /* methods */
-  (destructor)Decoder_dealloc,  /*tp_dealloc*/
-  0,                            /*tp_print*/
-  0,                            /*tp_getattr*/
-  0,                            /*tp_setattr*/
-  0,                            /*tp_compare*/
-  0,                            /*tp_repr*/
-  0,                            /*tp_as_number*/
-  0,                            /*tp_as_sequence*/
-  0,                            /*tp_as_mapping*/
-  0,                            /*tp_hash*/
-  0,                            /*tp_call*/
-  0,                            /*tp_str*/
-  0,                            /*tp_getattro*/
-  0,                            /*tp_setattro*/
-  0,                            /*tp_as_buffer*/
-  Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
-  0,                            /*tp_doc*/
-  0,                            /*tp_traverse*/
-  0,                            /*tp_clear*/
-  0,                            /*tp_richcompare*/
-  0,                            /*tp_weaklistoffset*/
-  0,                            /*tp_iter*/
-  0,                            /*tp_iternext*/
-  Decoder_methods,              /*tp_methods*/
-  0,                            /*tp_members*/
-  0,                            /*tp_getset*/
-  0,                            /*tp_base*/
-  0,                            /*tp_dict*/
-  0,                            /*tp_descr_get*/
-  0,                            /*tp_descr_set*/
-  0,                            /*tp_dictoffset*/
-  0,                            /*tp_init*/
-  0,                            /*tp_alloc*/
-  Decoder_new,                  /*tp_new*/
-  0,                            /*tp_free*/
-  0,                            /*tp_is_gc*/
-};
-
-/* --------------------------------------------------------------------- */
-
-/*
-
- TODO lwpb.Descriptor(dict)
-
- Where dict has the form
-
-  {
-    "name": filename,
-    "package": package,
-    "dependency": [ "filename1", "filename2", ... ],
-    "message_type": [
-      {
-        "name": message_name,
-        "field":
-        [
-          {
-             "name": field_name,
-             "number": field_number,
-             "label": label,     # integer
-             "type": type,       # integer
-             "type_name": type_name,   # either TYPE_MESSAGE or TYPE_ENUM
-             "default_value": default_value,  # any python scalar type
-             "options": {
-               "packed": packed,  # boolean
-               "deprecated": deprecated,  # boolean
-             }
-          },
-        ]
-      }
-    ]
-  }
-
-  When a new one is created, dynamically create an array of lwpb_msg_desc
-  with associated lwpb_field_desc entries, and populate them from the dict.
-  Determine length of message_type array and field arrays for malloc().
-  In pass #1 over pydict, fill in everything except field_desc->msg_desc.
-  In pass #2 over lwpb_msg_desc fields, find type_name in pydict and
-  set up pointer to the right lwpb_msg_desc slot in case of TYPE_MESSAGE.
-
- */
+/* Descriptor class */
 
 typedef struct {
   PyObject_HEAD
@@ -649,6 +390,8 @@ Descriptor_init(Descriptor *self, PyObject *arg, PyObject *kwds)
 
   int pass;
 
+  // FIXME for all string types, store a private PyString in the object, refer to that
+
   for (pass=0; pass<2; pass++)
   {
     for (i=0; i<msgtypes_len; i++)
@@ -680,7 +423,7 @@ Descriptor_init(Descriptor *self, PyObject *arg, PyObject *kwds)
         {
           struct lwpb_field_desc* f = (struct lwpb_field_desc*)&m->fields[j];
 
-          field = PyList_GetItem(fields, i);
+          field = PyList_GetItem(fields, j);
           if (field == NULL) continue;
           if (!PyDict_Check(field)) continue;
 
@@ -799,9 +542,10 @@ Descriptor_debug_print(Descriptor *self, PyObject *args)
 
       if (f->msg_desc && f->msg_desc->name)
         printf( "  message = %s\n", m->name );
+      printf( "\n" );
     }
 
-    printf( "\n" );
+    printf( "\n\n" );
   }
   
   Py_INCREF(Py_None);
@@ -864,6 +608,254 @@ static PyTypeObject DescriptorType = {
 
 /* --------------------------------------------------------------------- */
 
+/* Decoder object */
+
+typedef struct {
+  PyObject_HEAD
+  struct lwpb_decoder decoder;
+  Descriptor* descriptor;
+} Decoder;
+
+static PyTypeObject DecoderType;
+
+#define Decoder_Check(v)  (Py_TYPE(v) == &DecoderType)
+
+
+/* Decoder methods */
+
+static PyObject *
+Decoder_new(PyTypeObject *type, PyObject *arg, PyObject *kwds)
+{
+  Decoder *self;
+  self = (Decoder *)type->tp_alloc(type, 0);
+  if (self == NULL) return NULL;
+  self->descriptor = NULL;
+  return (PyObject *)self;
+}
+
+static int
+Decoder_init(Decoder *self, PyObject *arg, PyObject *kwds)
+{
+  if (!PyArg_ParseTuple(arg, "O!:init", &DescriptorType, &self->descriptor))
+    return -1;
+  Py_INCREF(self->descriptor);
+  return 0;
+}
+
+static void
+Decoder_dealloc(Decoder *self)
+{
+  Py_XDECREF(self->descriptor);
+  self->ob_type->tp_free((PyObject*)self);
+}
+
+
+/* Decoder handlers */
+
+static void
+msg_start_handler(
+  struct lwpb_decoder *decoder,
+  const struct lwpb_msg_desc *msg_desc,
+  void *arg)
+{
+  if (!arg) return;
+
+  PyObject* method = PyString_FromString("msg_start_handler");
+  PyObject* object = (PyObject*)arg;
+  PyObject* retval = PyObject_CallMethodObjArgs(object, method, NULL);
+
+  /*
+  TODO handle NULL return value (ie exception).
+    need to modify lwpb to abort decoding.
+  */
+
+  Py_DECREF(retval);
+  Py_DECREF(method);
+}
+
+static void
+msg_end_handler(
+  struct lwpb_decoder *decoder,
+  const struct lwpb_msg_desc *msg_desc,
+  void *arg)
+{
+  if (!arg) return;
+
+  PyObject* method = PyString_FromString("msg_end_handler");
+  PyObject* object = (PyObject*)arg;
+  PyObject* retval = PyObject_CallMethodObjArgs(object, method, NULL);
+
+  /*
+  TODO handle NULL return value (ie exception).
+    need to modify lwpb to abort decoding.
+  */
+
+  Py_DECREF(retval);
+  Py_DECREF(method);
+}
+
+void
+field_handler(
+  struct lwpb_decoder *decoder,
+  const struct lwpb_msg_desc *msg_desc,
+  const struct lwpb_field_desc *field_desc,
+  union lwpb_value *value,
+  void *arg)
+{
+  if (!arg) return;
+
+  PyObject* val;
+
+  if (value)
+    val = lwpb_to_py(value, field_desc->opts.typ);
+  else {
+    val = Py_None;
+    Py_INCREF(Py_None);
+  }
+
+  if (val == NULL) return;
+
+  PyObject* message_name;
+  PyObject* field_name;
+
+  if (msg_desc && msg_desc->name != NULL)
+    message_name = PyString_FromString(msg_desc->name);
+  else {
+    message_name = Py_None;
+    Py_INCREF(Py_None);
+  }
+
+  if (field_desc && field_desc->name != NULL)
+    field_name = PyString_FromString(field_desc->name);
+  else {
+    field_name = Py_None;
+    Py_INCREF(Py_None);
+  }
+
+  PyObject* method = PyString_FromString("field_handler");
+  PyObject* object = (PyObject*)arg;
+  PyObject* retval = PyObject_CallMethodObjArgs(object, method, message_name, field_name, val, NULL);
+
+  /*
+  TODO handle NULL return value (ie exception).
+    need to modify lwpb to abort decoding in this case.
+    otherwise, get a segfault.
+  */
+
+  Py_DECREF(retval);
+  Py_DECREF(method);
+  Py_DECREF(field_name);
+  Py_DECREF(message_name);
+  Py_DECREF(val);
+}
+
+static PyObject *
+Decoder_decode(Decoder *self, PyObject *args)
+{
+  char *buf;
+  int len;
+  unsigned int msgnum;
+  lwpb_err_t ret;
+
+  if (!PyArg_ParseTuple(args, "s#i:decode", &buf, &len, &msgnum))
+    return NULL;
+
+  if (msgnum >= self->descriptor->num_msgs) {
+    PyErr_SetString(PyExc_IndexError, "message type index out of range");
+    return NULL;
+  }
+
+  //lwpb_decoder_use_debug_handlers(&self->decoder);
+  lwpb_decoder_arg(&self->decoder, (PyObject*)self);
+  lwpb_decoder_msg_handler(&self->decoder, msg_start_handler, msg_end_handler);
+  lwpb_decoder_field_handler(&self->decoder, field_handler);
+  ret = lwpb_decoder_decode(&self->decoder, &self->descriptor->msg_desc[msgnum], buf, len, NULL);
+
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+static PyObject *
+Decoder_field_handler(Decoder *self, PyObject *args)
+{
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+static PyObject *
+Decoder_msg_start_handler(Decoder *self, PyObject *args)
+{
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+static PyObject *
+Decoder_msg_end_handler(Decoder *self, PyObject *args)
+{
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+static PyMethodDef Decoder_methods[] = {
+  {"decode",  (PyCFunction)Decoder_decode,  METH_VARARGS,
+    PyDoc_STR("decode(data,msgnum) -> None")},
+  {"field_handler",  (PyCFunction)Decoder_field_handler,  METH_VARARGS,
+    PyDoc_STR("field_handler(value) -> None")},
+  {"msg_start_handler",  (PyCFunction)Decoder_msg_start_handler,  METH_VARARGS,
+    PyDoc_STR("msg_start_handler() -> None")},
+  {"msg_end_handler",  (PyCFunction)Decoder_msg_end_handler,  METH_VARARGS,
+    PyDoc_STR("msg_end_handler() -> None")},
+  {NULL,    NULL}    /* sentinel */
+};
+
+static PyTypeObject DecoderType = {
+  /* The ob_type field must be initialized in the module init function
+   * to be portable to Windows without using C++. */
+  PyVarObject_HEAD_INIT(NULL, 0)
+  "lwpb.Decoder",               /*tp_name*/
+  sizeof(Decoder),        /*tp_basicsize*/
+  0,                            /*tp_itemsize*/
+  /* methods */
+  (destructor)Decoder_dealloc,  /*tp_dealloc*/
+  0,                            /*tp_print*/
+  0,                            /*tp_getattr*/
+  0,                            /*tp_setattr*/
+  0,                            /*tp_compare*/
+  0,                            /*tp_repr*/
+  0,                            /*tp_as_number*/
+  0,                            /*tp_as_sequence*/
+  0,                            /*tp_as_mapping*/
+  0,                            /*tp_hash*/
+  0,                            /*tp_call*/
+  0,                            /*tp_str*/
+  0,                            /*tp_getattro*/
+  0,                            /*tp_setattro*/
+  0,                            /*tp_as_buffer*/
+  Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
+  0,                            /*tp_doc*/
+  0,                            /*tp_traverse*/
+  0,                            /*tp_clear*/
+  0,                            /*tp_richcompare*/
+  0,                            /*tp_weaklistoffset*/
+  0,                            /*tp_iter*/
+  0,                            /*tp_iternext*/
+  Decoder_methods,              /*tp_methods*/
+  0,                            /*tp_members*/
+  0,                            /*tp_getset*/
+  0,                            /*tp_base*/
+  0,                            /*tp_dict*/
+  0,                            /*tp_descr_get*/
+  0,                            /*tp_descr_set*/
+  0,                            /*tp_dictoffset*/
+  (initproc)Decoder_init,       /*tp_init*/
+  0,                            /*tp_alloc*/
+  Decoder_new,                  /*tp_new*/
+  0,                            /*tp_free*/
+  0,                            /*tp_is_gc*/
+};
+
+/* --------------------------------------------------------------------- */
+
 /* List of functions defined in the module */
 
 static PyMethodDef lwpb_methods[] = {
@@ -909,5 +901,34 @@ initlwpb(void)
 
   Py_INCREF(&DescriptorType);
   PyModule_AddObject(mod, "Descriptor", (PyObject*)&DescriptorType);
+
+  PyModule_AddIntConstant(mod, "LABEL_REQUIRED", LWPB_REQUIRED);
+  PyModule_AddIntConstant(mod, "LABEL_OPTIONAL", LWPB_OPTIONAL);
+  PyModule_AddIntConstant(mod, "LABEL_REPEATED", LWPB_REPEATED);
+
+  PyModule_AddIntConstant(mod, "TYPE_DOUBLE", LWPB_DOUBLE);
+  PyModule_AddIntConstant(mod, "TYPE_FLOAT", LWPB_FLOAT);
+  PyModule_AddIntConstant(mod, "TYPE_INT32", LWPB_INT32);
+  PyModule_AddIntConstant(mod, "TYPE_INT64", LWPB_INT64);
+  PyModule_AddIntConstant(mod, "TYPE_UINT32", LWPB_UINT32);
+  PyModule_AddIntConstant(mod, "TYPE_UINT64", LWPB_UINT64);
+  PyModule_AddIntConstant(mod, "TYPE_SINT32", LWPB_SINT32);
+  PyModule_AddIntConstant(mod, "TYPE_SINT64", LWPB_SINT64);
+  PyModule_AddIntConstant(mod, "TYPE_FIXED32", LWPB_FIXED32);
+  PyModule_AddIntConstant(mod, "TYPE_FIXED64", LWPB_FIXED64);
+  PyModule_AddIntConstant(mod, "TYPE_SFIXED32", LWPB_SFIXED32);
+  PyModule_AddIntConstant(mod, "TYPE_SFIXED64", LWPB_SFIXED64);
+  PyModule_AddIntConstant(mod, "TYPE_BOOL", LWPB_BOOL);
+  PyModule_AddIntConstant(mod, "TYPE_ENUM", LWPB_ENUM);
+  PyModule_AddIntConstant(mod, "TYPE_STRING", LWPB_STRING);
+  PyModule_AddIntConstant(mod, "TYPE_BYTES", LWPB_BYTES);
+  PyModule_AddIntConstant(mod, "TYPE_MESSAGE", LWPB_MESSAGE);
+
+  PyModule_AddIntConstant(mod, "WIRETYPE_VARINT", 0);
+  PyModule_AddIntConstant(mod, "WIRETYPE_FIXED64", 1);
+  PyModule_AddIntConstant(mod, "WIRETYPE_LENGTH_DELIMITED", 2);
+  PyModule_AddIntConstant(mod, "WIRETYPE_START_GROUP", 3);
+  PyModule_AddIntConstant(mod, "WIRETYPE_END_GROUP", 4);
+  PyModule_AddIntConstant(mod, "WIRETYPE_FIXED32", 5);
 }
 
