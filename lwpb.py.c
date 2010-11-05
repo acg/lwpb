@@ -225,36 +225,75 @@ Descriptor_new(PyTypeObject *type, PyObject *arg, PyObject *kwds)
   return (PyObject *)self;
 }
 
+/* NB: This method is not exposed. */
+static void
+Descriptor_free(Descriptor *self)
+{
+  unsigned int i;
+
+  for (i=0; i<self->num_msgs; i++)
+  {
+    struct lwpb_msg_desc* m = &self->msg_desc[i];
+
+    if (m->fields){
+      free((void*)m->fields);
+      m->fields = 0;
+    }
+  }
+  
+  if (self->msg_desc) {
+    free((void*)self->msg_desc);
+    self->msg_desc = 0;
+    self->num_msgs = 0;
+  }
+}
+
 static int
 Descriptor_init(Descriptor *self, PyObject *arg, PyObject *kwds)
 {
+  int error = 0;
+
   PyObject* dict;
+  PyObject* prop;
   PyObject* msgtypes;
-
-  if (!PyArg_ParseTuple(arg, "O!:init", &PyDict_Type, &dict))
-    return -1;
-
-  msgtypes = PyDict_GetItemString(dict, "message_type");
-  if (msgtypes == NULL) return 0;
-
-  if (!PyList_Check(msgtypes)) {
-    PyErr_SetString(PyExc_RuntimeError, "message_type: list expected");
-    return -1;
-  }
-
   PyObject* msgtype;
   PyObject* fields;
   PyObject* field;
   PyObject* options;
-  PyObject* prop;
   Py_ssize_t msgtypes_len;
   Py_ssize_t fields_len;
   Py_ssize_t i;
   Py_ssize_t j;
   Py_ssize_t k;
 
-  msgtypes_len = PyList_Size(msgtypes);
-  self->msg_desc = (struct lwpb_msg_desc*)calloc(msgtypes_len, sizeof(struct lwpb_msg_desc)); // FIXME check for out of memory error
+  /* We are expecting a dictionary containing a key "message_type"
+     with a list of message descriptor structures. */
+
+  if (!PyArg_ParseTuple(arg, "O!:init", &PyDict_Type, &dict))
+    return -1;
+
+  if (!(msgtypes = PyDict_GetItemString(dict, "message_type")))
+    return 0;
+
+  if (!PyList_Check(msgtypes)) {
+    PyErr_SetString(PyExc_RuntimeError, "message_type: list expected");
+    return -1;
+  }
+
+  const char* package = "";
+
+  if ((prop = PyDict_GetItemString(dict, "package")) && PyString_Check(prop))
+    package = PyString_AsString(prop);
+
+  if (!(msgtypes_len = PyList_Size(msgtypes)))
+    goto init_cleanup;
+
+  if (!(self->msg_desc = (struct lwpb_msg_desc*)calloc(msgtypes_len, sizeof(struct lwpb_msg_desc)))) {
+    PyErr_SetString(PyExc_MemoryError, "unable to allocate message descriptors");
+    error = -1;
+    goto init_cleanup;
+  }
+
   self->num_msgs = msgtypes_len;
 
   int pass;
@@ -267,95 +306,104 @@ Descriptor_init(Descriptor *self, PyObject *arg, PyObject *kwds)
     {
       struct lwpb_msg_desc* m = &self->msg_desc[i];
 
-      msgtype = PyList_GetItem(msgtypes, i);
-      if (msgtype == NULL) continue;
-      if (!PyDict_Check(msgtype)) continue;
+      if (!(msgtype = PyList_GetItem(msgtypes, i)) || !PyDict_Check(msgtype))
+        continue;
 
-      fields = PyDict_GetItemString(msgtype, "field");
-      if (fields == NULL) continue;
-      if (!PyList_Check(fields)) continue;
+      if (!(fields = PyDict_GetItemString(msgtype, "field")) || !PyList_Check(fields))
+        continue;
+
       fields_len = PyList_Size(fields);
 
       if (pass == 0)
       {
-        m->num_fields = fields_len;
-        m->fields = (struct lwpb_field_desc*)calloc(fields_len, sizeof(struct lwpb_field_desc)); // FIXME check for out of memory error
+        /* First pass: just allocate enough field descriptors, and fill in
+           any message descriptor properties. */
 
-        prop = PyDict_GetItemString(msgtype, "name");
-        if (prop != NULL && PyString_Check(prop)) {
+        if (fields_len)
+          if (!(m->fields = (struct lwpb_field_desc*)calloc(fields_len, sizeof(struct lwpb_field_desc)))) {
+            PyErr_SetString(PyExc_MemoryError, "unable to allocate field descriptors");
+            error = -1;
+            goto init_cleanup;
+          }
+
+        m->num_fields = fields_len;
+
+        if ((prop = PyDict_GetItemString(msgtype, "name")) && PyString_Check(prop))
           m->name = PyString_AsString(prop);
-        }
       }
       else if (pass == 1)
       {
+        /* Second pass: fill in all field descriptors and their properties,
+           Resolve TYPE_MESSAGE fields to their message descriptors. */
+
         for (j=0; j<m->num_fields; j++)
         {
           struct lwpb_field_desc* f = (struct lwpb_field_desc*)&m->fields[j];
 
-          field = PyList_GetItem(fields, j);
-          if (field == NULL) continue;
-          if (!PyDict_Check(field)) continue;
+          if (!(field = PyList_GetItem(fields, j)) || !PyDict_Check(field))
+            continue;
 
-          prop = PyDict_GetItemString(field, "number");
-          if (prop != NULL && PyInt_Check(prop)) {
+          if ((prop = PyDict_GetItemString(field, "number")) && PyInt_Check(prop))
             f->number = PyInt_AsLong(prop);
-          }
 
-          prop = PyDict_GetItemString(field, "label");
-          if (prop != NULL && PyInt_Check(prop)) {
+          if ((prop = PyDict_GetItemString(field, "label")) && PyInt_Check(prop))
             f->opts.label = PyInt_AsLong(prop);
-          }
 
-          prop = PyDict_GetItemString(field, "type");
-          if (prop != NULL && PyInt_Check(prop)) {
+          if ((prop = PyDict_GetItemString(field, "type")) && PyInt_Check(prop))
             f->opts.typ = PyInt_AsLong(prop);
-          }
 
-          options = PyDict_GetItemString(field, "options");
-
-          if (options != NULL && PyDict_Check(options))
+          if ((options = PyDict_GetItemString(field, "options")) && PyDict_Check(options))
           {
-            prop = PyDict_GetItemString(options, "packed");
-            if (prop == Py_True) {
+            if (PyDict_GetItemString(options, "packed") == Py_True)
               f->opts.flags |= LWPB_IS_PACKED;
-            }
 
-            prop = PyDict_GetItemString(options, "deprecated");
-            if (prop == Py_True) {
+            if (PyDict_GetItemString(options, "deprecated") == Py_True)
               f->opts.flags |= LWPB_IS_DEPRECATED;
-            }
           }
 
-          prop = PyDict_GetItemString(field, "name");
-          if (prop != NULL && PyString_Check(prop)) {
+          if ((prop = PyDict_GetItemString(field, "name")) && PyString_Check(prop))
             f->name = PyString_AsString(prop);
-          }
 
-          prop = PyDict_GetItemString(field, "default_value");
-          if (prop != NULL) {
+          if ((prop = PyDict_GetItemString(field, "default_value")))
             if (!py_to_lwpb(&f->def, prop, f->opts.typ))
               f->opts.flags |= LWPB_HAS_DEFAULT;
-          }
 
-          prop = PyDict_GetItemString(field, "type_name");
-          if (prop != NULL && PyString_Check(prop)) {
-            if (f->opts.typ == LWPB_MESSAGE) {
+          /* If "type_name" is set for this field, it names a message
+             descriptor fully qualified by package. Search through message
+             descriptors for a match. */
 
-              for (k=0; k<msgtypes_len; k++) {
+          if ((prop = PyDict_GetItemString(field, "type_name")) && PyString_Check(prop)) {
+            if (f->opts.typ == LWPB_MESSAGE)
+            {
+              for (k=0; k<msgtypes_len; k++)
+              {
+                PyObject* msgtype2;
+                PyObject* prop2;
+                PyObject* qualified;
 
-                PyObject* msgtype2 = PyList_GetItem(msgtypes, k);
-                if (msgtype2 == NULL) continue;
-                if (!PyDict_Check(msgtype2)) continue;
+                if (!(msgtype2 = PyList_GetItem(msgtypes, k)) || !PyDict_Check(msgtype2))
+                  continue;
 
-                PyObject* prop2 = PyDict_GetItemString(msgtype2, "name");
-                if (prop2 == NULL) continue;
-                if (!PyString_Check(prop2)) continue;
+                if (!(prop2 = PyDict_GetItemString(msgtype2, "name")) || !PyString_Check(prop2))
+                  continue;
 
-                int cmp;
-                if (PyObject_Cmp(prop, prop2, &cmp) >= 0 && cmp == 0) {
+                if (!(qualified = PyString_FromFormat(".%s.%s", package, PyString_AsString(prop2))))
+                  continue;
+
+                int cmp, ret;
+                ret = PyObject_Cmp(prop, qualified, &cmp);
+                Py_DECREF(qualified);
+                
+                if (ret >= 0 && cmp == 0) {
                   f->msg_desc = &self->msg_desc[k];
                   break;
                 }
+              }
+
+              if (!f->msg_desc) {
+                PyErr_Format(PyExc_RuntimeError, "could not resolve type_name: %s", PyString_AsString(prop));
+                error = -1;
+                goto init_cleanup;
               }
             }
           }
@@ -365,24 +413,16 @@ Descriptor_init(Descriptor *self, PyObject *arg, PyObject *kwds)
     } // for each msgtype 
   } // for each pass
 
-  return 0;
+init_cleanup:
+
+  if (error) Descriptor_free(self);
+  return error;
 }
 
 static void
 Descriptor_dealloc(Descriptor *self)
 {
-  unsigned int i;
-
-  for (i=0; i<self->num_msgs; i++)
-  {
-    struct lwpb_msg_desc* m = &self->msg_desc[i];
-    if (m->fields)
-      free((void*)m->fields);
-  }
-  
-  if (self->msg_desc)
-    free((void*)self->msg_desc);
-
+  Descriptor_free(self);
   self->ob_type->tp_free((PyObject*)self);
 }
 
@@ -621,6 +661,8 @@ Decoder_decode(Decoder *self, PyObject *args)
   unsigned int msgnum;
   lwpb_err_t ret;
 
+  // TODO accept the descriptor object here, instead of in Decoder_init.
+
   if (!PyArg_ParseTuple(args, "s#i:decode", &buf, &len, &msgnum))
     return NULL;
 
@@ -639,26 +681,36 @@ Decoder_decode(Decoder *self, PyObject *args)
   PyObject* dst = PyDict_New();
   PyList_Append(context.stack, dst);
 
-  //lwpb_decoder_use_debug_handlers(&self->decoder);
+  /* Set up the decoder event handlers. */
+
   lwpb_decoder_arg(&self->decoder, &context);
   lwpb_decoder_msg_handler(&self->decoder, msg_start_handler, msg_end_handler);
   lwpb_decoder_field_handler(&self->decoder, field_handler);
+
+  /* Perform decoding of the specified message type. */
+  
   ret = lwpb_decoder_decode(&self->decoder, &self->descriptor->msg_desc[msgnum], buf, len, NULL);
+
+  /* Done with the decoder context now. */
 
   Py_DECREF(context.stack);
 
-  if (ret == LWPB_ERR_OK) {
+  /* On success, return the target dict object.
+     On partial message error, return None.
+     On any other error, throw an exception with the error code. */
+
+  if (ret == LWPB_ERR_OK)
     return dst;
-  }
-  else if (ret == LWPB_ERR_END_OF_BUF) {
-    Py_DECREF(dst);
-    dst = Py_None;
-    Py_INCREF(dst);
-    return dst;
+
+  Py_DECREF(dst);
+
+  if (ret == LWPB_ERR_END_OF_BUF) {
+    Py_INCREF(Py_None);
+    return Py_None;
   }
   else {
-    Py_DECREF(dst);
-    PyErr_SetString(PyExc_RuntimeError, "decode error");
+    // TODO define specific exception classes
+    PyErr_Format(PyExc_RuntimeError, "decode error: %d", ret);
     return NULL;
   }
 }

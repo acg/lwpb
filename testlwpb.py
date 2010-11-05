@@ -88,8 +88,8 @@ class Builder(lwpb.Decoder):
     self.indent -= 1
 
 
-d = Builder(desc)
-data = file("person.pb").read()
-status = d.decode(data, 1)
-print "status = %d" % status
+d = lwpb.Decoder(desc)
+pb = file("person.partial.pb").read()
+data = d.decode(pb, 1)
+print data
 
