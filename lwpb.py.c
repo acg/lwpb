@@ -485,6 +485,10 @@ typedef struct {
   Descriptor* descriptor;
 } Decoder;
 
+typedef struct {
+  PyObject* stack;
+} DecoderContext;
+
 static PyTypeObject DecoderType;
 
 #define Decoder_Check(v)  (Py_TYPE(v) == &DecoderType)
@@ -527,28 +531,6 @@ msg_start_handler(
   const struct lwpb_msg_desc *msg_desc,
   void *arg)
 {
-  if (!arg) return;
-
-  PyObject* message_name;
-
-  if (msg_desc && msg_desc->name != NULL)
-    message_name = PyString_FromString(msg_desc->name);
-  else {
-    message_name = Py_None;
-    Py_INCREF(Py_None);
-  }
-
-  PyObject* method = PyString_FromString("msg_start_handler");
-  PyObject* object = (PyObject*)arg;
-  PyObject* retval = PyObject_CallMethodObjArgs(object, method, message_name, NULL);
-
-  /*
-  TODO handle NULL return value (ie exception).
-    need to modify lwpb to abort decoding.
-  */
-
-  Py_XDECREF(retval);
-  Py_DECREF(method);
 }
 
 static void
@@ -559,26 +541,12 @@ msg_end_handler(
 {
   if (!arg) return;
 
-  PyObject* message_name;
+  DecoderContext* context = (DecoderContext*)arg;
 
-  if (msg_desc && msg_desc->name != NULL)
-    message_name = PyString_FromString(msg_desc->name);
-  else {
-    message_name = Py_None;
-    Py_INCREF(Py_None);
-  }
-
-  PyObject* method = PyString_FromString("msg_end_handler");
-  PyObject* object = (PyObject*)arg;
-  PyObject* retval = PyObject_CallMethodObjArgs(object, method, message_name, NULL);
-
-  /*
-  TODO handle NULL return value (ie exception).
-    need to modify lwpb to abort decoding.
-  */
-
-  Py_XDECREF(retval);
-  Py_DECREF(method);
+  Py_ssize_t stacklen = PyList_Size(context->stack);
+  Py_ssize_t low = stacklen-1;
+  Py_ssize_t high = stacklen;
+  PyList_SetSlice(context->stack, low, high, NULL);
 }
 
 void
@@ -591,48 +559,58 @@ field_handler(
 {
   if (!arg) return;
 
-  PyObject* val;
+  DecoderContext* context = (DecoderContext*)arg;
+
+  /* Get the top of the decoder context stack, the current target dict. */
+
+  Py_ssize_t stacklen = PyList_Size(context->stack);
+  PyObject* top = PyList_GetItem(context->stack, stacklen-1);
+  PyObject* pyval;
+
+  /* If the lwpb value is not NULL, convert it to a pyval. */
+  /* Otherwise, if lwpb value is NULL, this signals a nested message. */
+  /* Create or acquire a dict to hold the nested message. */
 
   if (value)
-    val = lwpb_to_py(value, field_desc->opts.typ);
+    pyval = lwpb_to_py(value, field_desc->opts.typ);
   else {
-    val = Py_None;
-    Py_INCREF(Py_None);
+    if (field_desc->opts.label == LWPB_REPEATED)
+      pyval = PyDict_New();
+    else {
+      PyObject* curval = PyDict_GetItemString(top, field_desc->name);
+      if (curval)
+        pyval = curval;
+      else
+        pyval = PyDict_New();
+    }
   }
 
-  if (val == NULL) return;
+  if (pyval == NULL) return;
 
-  PyObject* message_name;
-  PyObject* field_name;
+  /* If this is a REPEATED field, always append to a list under the key. */
+  /* If this is not REPEATED, store under key, overwriting any old value. */
 
-  if (msg_desc && msg_desc->name != NULL)
-    message_name = PyString_FromString(msg_desc->name);
+  if (field_desc->opts.label == LWPB_REPEATED) {
+    PyObject* list = PyDict_GetItemString(top, field_desc->name);
+
+    if (list == NULL) {
+      list = PyList_New(0);
+      PyDict_SetItemString(top, field_desc->name, list);
+    }
+
+    PyList_Append(list, pyval);
+  }
   else {
-    message_name = Py_None;
-    Py_INCREF(Py_None);
+    PyDict_SetItemString(top, field_desc->name, pyval);
   }
 
-  if (field_desc && field_desc->name != NULL)
-    field_name = PyString_FromString(field_desc->name);
-  else {
-    field_name = Py_None;
-    Py_INCREF(Py_None);
-  }
+  /* When the lwpb value is NULL, pyval is a dict, and we are starting a new
+     nested message. Push new the target dict onto the stack. */
 
-  PyObject* method = PyString_FromString("field_handler");
-  PyObject* object = (PyObject*)arg;
-  PyObject* retval = PyObject_CallMethodObjArgs(object, method, message_name, field_name, val, NULL);
+  if (!value)
+    PyList_Append(context->stack, pyval);
 
-  /*
-  TODO handle NULL return value (ie exception).
-    need to modify lwpb to abort decoding in this case.
-  */
-
-  Py_XDECREF(retval);
-  Py_DECREF(method);
-  Py_DECREF(field_name);
-  Py_DECREF(message_name);
-  Py_DECREF(val);
+  Py_DECREF(pyval);
 }
 
 static PyObject *
@@ -651,13 +629,38 @@ Decoder_decode(Decoder *self, PyObject *args)
     return NULL;
   }
 
+  /* Create a new decoder context with an empty stack. */
+
+  DecoderContext context;
+  context.stack = PyList_New(0);
+
+  /* Push a new target dict onto the stack for the decoding process. */
+
+  PyObject* dst = PyDict_New();
+  PyList_Append(context.stack, dst);
+
   //lwpb_decoder_use_debug_handlers(&self->decoder);
-  lwpb_decoder_arg(&self->decoder, (PyObject*)self);
+  lwpb_decoder_arg(&self->decoder, &context);
   lwpb_decoder_msg_handler(&self->decoder, msg_start_handler, msg_end_handler);
   lwpb_decoder_field_handler(&self->decoder, field_handler);
   ret = lwpb_decoder_decode(&self->decoder, &self->descriptor->msg_desc[msgnum], buf, len, NULL);
 
-  return PyInt_FromLong(ret);
+  Py_DECREF(context.stack);
+
+  if (ret == LWPB_ERR_OK) {
+    return dst;
+  }
+  else if (ret == LWPB_ERR_END_OF_BUF) {
+    Py_DECREF(dst);
+    dst = Py_None;
+    Py_INCREF(dst);
+    return dst;
+  }
+  else {
+    Py_DECREF(dst);
+    PyErr_SetString(PyExc_RuntimeError, "decode error");
+    return NULL;
+  }
 }
 
 static PyObject *
@@ -683,7 +686,7 @@ Decoder_msg_end_handler(Decoder *self, PyObject *args)
 
 static PyMethodDef Decoder_methods[] = {
   {"decode",  (PyCFunction)Decoder_decode,  METH_VARARGS,
-    PyDoc_STR("decode(data,msgnum) -> Integer")},
+    PyDoc_STR("decode(data,msgnum) -> Dict")},
   {"field_handler",  (PyCFunction)Decoder_field_handler,  METH_VARARGS,
     PyDoc_STR("field_handler(msgname,fieldname,value) -> None")},
   {"msg_start_handler",  (PyCFunction)Decoder_msg_start_handler,  METH_VARARGS,
