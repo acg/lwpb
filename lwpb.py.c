@@ -205,6 +205,7 @@ static PyObject *ErrorObject;
 
 typedef struct {
   PyObject_HEAD
+  PyObject* strings;
   unsigned int num_msgs;
   struct lwpb_msg_desc *msg_desc;
 } Descriptor;
@@ -220,8 +221,12 @@ static PyObject *
 Descriptor_new(PyTypeObject *type, PyObject *arg, PyObject *kwds)
 {
   Descriptor *self;
-  self = (Descriptor *)type->tp_alloc(type, 0);
-  if (self == NULL) return NULL;
+  
+  if (!(self = (Descriptor*)type->tp_alloc(type, 0)))
+    return NULL;
+
+  if (!(self->strings = PyList_New(0)))
+    return NULL;
 
   self->num_msgs = 0;
   self->msg_desc = NULL;
@@ -230,11 +235,13 @@ Descriptor_new(PyTypeObject *type, PyObject *arg, PyObject *kwds)
 }
 
 
-/* NB: This method is not exposed. */
+/* NB: This method is not exposed to Python. */
 static void
-Descriptor_free(Descriptor *self)
+Descriptor_clear(Descriptor *self)
 {
   unsigned int i;
+
+  /* Free all field descriptors. */
 
   for (i=0; i<self->num_msgs; i++)
   {
@@ -242,15 +249,41 @@ Descriptor_free(Descriptor *self)
 
     if (m->fields){
       free((void*)m->fields);
-      m->fields = 0;
+      m->fields = NULL;
     }
   }
-  
+ 
+  /* Free all message descriptors. */
+
   if (self->msg_desc) {
     free((void*)self->msg_desc);
-    self->msg_desc = 0;
+    self->msg_desc = NULL;
     self->num_msgs = 0;
   }
+
+  /* Clear the string table. */
+
+  if (self->strings)
+    PyList_SetSlice(self->strings, 0, PyList_Size(self->strings), NULL);
+}
+
+
+static void
+Descriptor_dealloc(Descriptor *self)
+{
+  Descriptor_clear(self);
+  Py_DECREF(self->strings);
+  self->ob_type->tp_free((PyObject*)self);
+}
+
+
+/* NB: This method is not exposed to Python. */
+char*
+Descriptor_store_string(Descriptor *self, PyObject* str)
+{
+  PyObject* copy = PyString_FromStringAndSize(PyString_AsString(str), PyString_Size(str));
+  PyList_Append(self->strings, copy);
+  return PyString_AsString(copy);
 }
 
 
@@ -304,8 +337,6 @@ Descriptor_init(Descriptor *self, PyObject *arg, PyObject *kwds)
 
   int pass;
 
-  // FIXME for all string types, store a private PyString in the object, refer to that
-
   for (pass=0; pass<2; pass++)
   {
     for (i=0; i<msgtypes_len; i++)
@@ -335,7 +366,7 @@ Descriptor_init(Descriptor *self, PyObject *arg, PyObject *kwds)
         m->num_fields = fields_len;
 
         if ((prop = PyDict_GetItemString(msgtype, "name")) && PyString_Check(prop))
-          m->name = PyString_AsString(prop);
+          m->name = Descriptor_store_string(self, prop);
       }
       else if (pass == 1)
       {
@@ -368,11 +399,18 @@ Descriptor_init(Descriptor *self, PyObject *arg, PyObject *kwds)
           }
 
           if ((prop = PyDict_GetItemString(field, "name")) && PyString_Check(prop))
-            f->name = PyString_AsString(prop);
+            f->name = Descriptor_store_string(self, prop);
 
-          if ((prop = PyDict_GetItemString(field, "default_value")))
-            if (!py_to_lwpb(&f->def, prop, f->opts.typ))
+          /* Convert the Python default value for a field to an lwpb value.
+             If it's a string, make sure we create and use a private copy. */
+
+          if ((prop = PyDict_GetItemString(field, "default_value"))) {
+            if (!py_to_lwpb(&f->def, prop, f->opts.typ)) {
               f->opts.flags |= LWPB_HAS_DEFAULT;
+              if (PyString_Check(prop))
+                f->def.string.str = Descriptor_store_string(self, prop);
+            }
+          }
 
           /* If "type_name" is set for this field, it names a message
              descriptor fully qualified by package. Search through message
@@ -421,16 +459,8 @@ Descriptor_init(Descriptor *self, PyObject *arg, PyObject *kwds)
 
 init_cleanup:
 
-  if (error) Descriptor_free(self);
+  if (error) Descriptor_clear(self);
   return error;
-}
-
-
-static void
-Descriptor_dealloc(Descriptor *self)
-{
-  Descriptor_free(self);
-  self->ob_type->tp_free((PyObject*)self);
 }
 
 
@@ -592,9 +622,7 @@ msg_end_handler(
   /* Leaving a nested message, pop the top off the context stack. */
 
   Py_ssize_t stacklen = PyList_Size(context->stack);
-  Py_ssize_t low = stacklen-1;
-  Py_ssize_t high = stacklen;
-  PyList_SetSlice(context->stack, low, high, NULL);
+  PyList_SetSlice(context->stack, stacklen-1, stacklen, NULL);
 }
 
 void
@@ -625,9 +653,11 @@ field_handler(
     if (field_desc->opts.label == LWPB_REPEATED)
       pyval = PyDict_New();
     else {
-      PyObject* curval = PyDict_GetItemString(top, field_desc->name);
-      if (curval)
+      PyObject* curval;
+      if ((curval = PyDict_GetItemString(top, field_desc->name))) {
         pyval = curval;
+        Py_INCREF(pyval);
+      }
       else
         pyval = PyDict_New();
     }
@@ -639,11 +669,12 @@ field_handler(
   /* If this is not REPEATED, store under key, overwriting any old value. */
 
   if (field_desc->opts.label == LWPB_REPEATED) {
-    PyObject* list = PyDict_GetItemString(top, field_desc->name);
-
-    if (list == NULL) {
+    PyObject* list;
+    
+    if (!(list = PyDict_GetItemString(top, field_desc->name))) {
       list = PyList_New(0);
       PyDict_SetItemString(top, field_desc->name, list);
+      Py_DECREF(list);
     }
 
     PyList_Append(list, pyval);
@@ -652,8 +683,8 @@ field_handler(
     PyDict_SetItemString(top, field_desc->name, pyval);
   }
 
-  /* When the lwpb value is NULL, pyval is a dict, and we are starting a new
-     nested message. Push new the target dict onto the stack. */
+  /* When the lwpb value is NULL, pyval is a dict, and we are starting a
+     new nested message. Push the new target dict onto the stack. */
 
   if (!value)
     PyList_Append(context->stack, pyval);
@@ -679,12 +710,10 @@ Decoder_decode(Decoder *self, PyObject *args)
   }
 
   /* Create a new decoder context with an empty stack. */
+  /* Push a new target dict onto the stack for the decoding process. */
 
   DecoderContext context;
   context.stack = PyList_New(0);
-
-  /* Push a new target dict onto the stack for the decoding process. */
-
   PyObject* dst = PyDict_New();
   PyList_Append(context.stack, dst);
 
