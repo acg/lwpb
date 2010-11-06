@@ -532,7 +532,6 @@ static PyTypeObject DescriptorType = {
 typedef struct {
   PyObject_HEAD
   struct lwpb_decoder decoder;
-  Descriptor* descriptor;
 } Decoder;
 
 typedef struct {
@@ -552,7 +551,6 @@ Decoder_new(PyTypeObject *type, PyObject *arg, PyObject *kwds)
   Decoder *self;
   self = (Decoder *)type->tp_alloc(type, 0);
   if (self == NULL) return NULL;
-  self->descriptor = NULL;
   return (PyObject *)self;
 }
 
@@ -560,9 +558,6 @@ Decoder_new(PyTypeObject *type, PyObject *arg, PyObject *kwds)
 static int
 Decoder_init(Decoder *self, PyObject *arg, PyObject *kwds)
 {
-  if (!PyArg_ParseTuple(arg, "O!:init", &DescriptorType, &self->descriptor))
-    return -1;
-  Py_INCREF(self->descriptor);
   return 0;
 }
 
@@ -570,7 +565,6 @@ Decoder_init(Decoder *self, PyObject *arg, PyObject *kwds)
 static void
 Decoder_dealloc(Decoder *self)
 {
-  Py_XDECREF(self->descriptor);
   self->ob_type->tp_free((PyObject*)self);
 }
 
@@ -674,13 +668,12 @@ Decoder_decode(Decoder *self, PyObject *args)
   int len;
   unsigned int msgnum;
   lwpb_err_t ret;
+  Descriptor* descriptor;
 
-  // TODO accept the descriptor object here, instead of in Decoder_init.
-
-  if (!PyArg_ParseTuple(args, "s#i:decode", &buf, &len, &msgnum))
+  if (!PyArg_ParseTuple(args, "s#O!i:decode", &buf, &len, &DescriptorType, &descriptor, &msgnum))
     return NULL;
 
-  if (msgnum >= self->descriptor->num_msgs) {
+  if (msgnum >= descriptor->num_msgs) {
     PyErr_SetString(PyExc_IndexError, "message type index out of range");
     return NULL;
   }
@@ -703,7 +696,7 @@ Decoder_decode(Decoder *self, PyObject *args)
 
   /* Perform decoding of the specified message type. */
   
-  ret = lwpb_decoder_decode(&self->decoder, &self->descriptor->msg_desc[msgnum], buf, len, NULL);
+  ret = lwpb_decoder_decode(&self->decoder, &descriptor->msg_desc[msgnum], buf, len, NULL);
 
   /* Done with the decoder context now. */
 

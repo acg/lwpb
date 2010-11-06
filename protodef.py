@@ -143,9 +143,9 @@ protodef = {
 
 protodesc = lwpb.Descriptor(protodef)
 # protodesc.debug_print()
-d1 = lwpb.Decoder(protodesc)
+d1 = lwpb.Decoder()
 pb1 = file(sys.argv[1]).read()
-data = d1.decode(pb1, 0)
-pp = pprint.PrettyPrinter(indent=2)
-pp.pprint(data)
+schema = d1.decode(pb1, protodesc, 0)
+#pp = pprint.PrettyPrinter(indent=2)
+#pp.pprint(schema)
 
