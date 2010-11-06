@@ -723,9 +723,47 @@ Decoder_decode(Decoder *self, PyObject *args)
 }
 
 
+// FIXME expose this method from lwpb, don't reimplement here
+static PyObject*
+Decoder_decode_varint(Decoder *self, PyObject *args)
+{
+  char* buf;
+  int len;
+
+  if (!PyArg_ParseTuple(args, "s#:decode_varint", &buf, &len))
+    return NULL;
+
+  char* start = buf;
+  char* end = start + len;
+  int bitpos;
+  int done = 0;
+  u64_t varint = 0;
+  
+  for (bitpos = 0; !done && bitpos < 64 && buf < end; bitpos += 7, buf++) {
+    varint |= (u64_t)(*buf & 0x7f) << bitpos;
+    done = !(*buf & 0x80);
+  }
+
+  PyObject* tuple = PyTuple_New(2);
+
+  if (!done && buf >= end) {
+    PyTuple_SetItem(tuple, 0, Py_None);
+    PyTuple_SetItem(tuple, 1, PyLong_FromLong(0));
+  }
+  else {
+    PyTuple_SetItem(tuple, 0, PyLong_FromLong(varint));
+    PyTuple_SetItem(tuple, 1, PyLong_FromLong(buf-start));
+  }
+
+  return tuple;
+}
+
+
 static PyMethodDef Decoder_methods[] = {
   {"decode",  (PyCFunction)Decoder_decode,  METH_VARARGS,
-    PyDoc_STR("decode(data,msgnum) -> Dict")},
+    PyDoc_STR("decode(data,descriptor,msgnum) -> Dict")},
+  {"decode_varint",  (PyCFunction)Decoder_decode_varint,  METH_VARARGS,
+    PyDoc_STR("decode_varint(data) -> (Number,Bytes)")},
   {NULL,    NULL}    /* sentinel */
 };
 
