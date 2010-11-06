@@ -20,6 +20,8 @@
 
 /* ----------------------------------------- */
 
+/* Utility functions: scalar type conversion */
+
 static PyObject*
 lwpb_to_py(union lwpb_value *p, unsigned int type)
 {
@@ -193,6 +195,8 @@ py_to_lwpb(union lwpb_value* p, PyObject *val, unsigned int type)
 }
 
 
+/* ----------------------------------------- */
+
 static PyObject *ErrorObject;
 
 /* ----------------------------------------- */
@@ -225,6 +229,7 @@ Descriptor_new(PyTypeObject *type, PyObject *arg, PyObject *kwds)
   return (PyObject *)self;
 }
 
+
 /* NB: This method is not exposed. */
 static void
 Descriptor_free(Descriptor *self)
@@ -247,6 +252,7 @@ Descriptor_free(Descriptor *self)
     self->num_msgs = 0;
   }
 }
+
 
 static int
 Descriptor_init(Descriptor *self, PyObject *arg, PyObject *kwds)
@@ -419,12 +425,14 @@ init_cleanup:
   return error;
 }
 
+
 static void
 Descriptor_dealloc(Descriptor *self)
 {
   Descriptor_free(self);
   self->ob_type->tp_free((PyObject*)self);
 }
+
 
 static PyObject *
 Descriptor_debug_print(Descriptor *self, PyObject *args)
@@ -461,11 +469,13 @@ Descriptor_debug_print(Descriptor *self, PyObject *args)
   return Py_None;
 }
 
+
 static PyMethodDef Descriptor_methods[] = {
   {"debug_print",  (PyCFunction)Descriptor_debug_print,  METH_VARARGS,
     PyDoc_STR("debug_print() -> None")},
   {NULL,    NULL}    /* sentinel */
 };
+
 
 static PyTypeObject DescriptorType = {
   /* The ob_type field must be initialized in the module init function
@@ -546,6 +556,7 @@ Decoder_new(PyTypeObject *type, PyObject *arg, PyObject *kwds)
   return (PyObject *)self;
 }
 
+
 static int
 Decoder_init(Decoder *self, PyObject *arg, PyObject *kwds)
 {
@@ -554,6 +565,7 @@ Decoder_init(Decoder *self, PyObject *arg, PyObject *kwds)
   Py_INCREF(self->descriptor);
   return 0;
 }
+
 
 static void
 Decoder_dealloc(Decoder *self)
@@ -582,6 +594,8 @@ msg_end_handler(
   if (!arg) return;
 
   DecoderContext* context = (DecoderContext*)arg;
+
+  /* Leaving a nested message, pop the top off the context stack. */
 
   Py_ssize_t stacklen = PyList_Size(context->stack);
   Py_ssize_t low = stacklen-1;
@@ -715,38 +729,13 @@ Decoder_decode(Decoder *self, PyObject *args)
   }
 }
 
-static PyObject *
-Decoder_field_handler(Decoder *self, PyObject *args)
-{
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
-static PyObject *
-Decoder_msg_start_handler(Decoder *self, PyObject *args)
-{
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
-static PyObject *
-Decoder_msg_end_handler(Decoder *self, PyObject *args)
-{
-  Py_INCREF(Py_None);
-  return Py_None;
-}
 
 static PyMethodDef Decoder_methods[] = {
   {"decode",  (PyCFunction)Decoder_decode,  METH_VARARGS,
     PyDoc_STR("decode(data,msgnum) -> Dict")},
-  {"field_handler",  (PyCFunction)Decoder_field_handler,  METH_VARARGS,
-    PyDoc_STR("field_handler(msgname,fieldname,value) -> None")},
-  {"msg_start_handler",  (PyCFunction)Decoder_msg_start_handler,  METH_VARARGS,
-    PyDoc_STR("msg_start_handler(msgname) -> None")},
-  {"msg_end_handler",  (PyCFunction)Decoder_msg_end_handler,  METH_VARARGS,
-    PyDoc_STR("msg_end_handler(msgname) -> None")},
   {NULL,    NULL}    /* sentinel */
 };
+
 
 static PyTypeObject DecoderType = {
   /* The ob_type field must be initialized in the module init function
@@ -795,6 +784,7 @@ static PyTypeObject DecoderType = {
 };
 
 /* --------------------------------------------------------------------- */
+
 
 /* List of functions defined in the module */
 
