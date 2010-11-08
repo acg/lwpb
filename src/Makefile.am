@@ -47,7 +47,7 @@ test_full_generate_SOURCES = \
 test/test_full_generate.cc \
 test/generated/test_full.pb.cc
 
-test_full_generate_LDADD = /usr/local/lib/libprotobuf.la -lpthread
+test_full_generate_LDADD = -lprotobuf -lpthread
 test_full_generate_CXXFLAGS = -I./include
 
 test_rpc_direct_SOURCES = \
