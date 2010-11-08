@@ -20,6 +20,7 @@
 #define __STDC_LIMIT_MACROS
 #include "generated/test_full.pb.h"
 #include <inttypes.h>
+#include <stdio.h>
 
 using namespace foo;
 
