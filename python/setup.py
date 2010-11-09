@@ -3,10 +3,10 @@ from distutils.core import setup, Extension
 setup(name='lwpb',
       version='0.1',
       ext_modules=[
-          Extension('lwpb', ['lwpb.py.c'],
-              include_dirs=['./lwpb/src/include'],
+          Extension('lwpb.cext', ['lwpb.py.c'],
+              include_dirs=['../src/include'],
               define_macros=[],
-              library_dirs=['./lwpb/src/.libs'],
+              library_dirs=['../src/.libs'],
               libraries=['lwpb'],
           ),
       ],

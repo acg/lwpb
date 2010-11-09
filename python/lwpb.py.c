@@ -511,7 +511,7 @@ static PyTypeObject DescriptorType = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
-  "lwpb.Descriptor",            /*tp_name*/
+  "lwpb.cext.Descriptor",       /*tp_name*/
   sizeof(Descriptor),           /*tp_basicsize*/
   0,                            /*tp_itemsize*/
   /* methods */
@@ -801,7 +801,7 @@ static PyTypeObject DecoderType = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
   PyVarObject_HEAD_INIT(NULL, 0)
-  "lwpb.Decoder",               /*tp_name*/
+  "lwpb.cext.Decoder",           /*tp_name*/
   sizeof(Decoder),        /*tp_basicsize*/
   0,                            /*tp_itemsize*/
   /* methods */
@@ -855,10 +855,10 @@ static PyMethodDef lwpb_methods[] = {
 PyDoc_STRVAR(module_doc,
 "This is a template module just for instruction.");
 
-/* Initialization function for the module (*must* be called initlwpb) */
+/* Initialization function for the module (*must* be called initcext) */
 
 PyMODINIT_FUNC
-initlwpb(void)
+initcext(void)
 {
   /* Make sure exposed types are subclassable. */
 
@@ -875,14 +875,14 @@ initlwpb(void)
 
   /* Create the module and add the functions */
 
-  PyObject* mod = Py_InitModule3("lwpb", lwpb_methods, module_doc);
+  PyObject* mod = Py_InitModule3("lwpb.cext", lwpb_methods, module_doc);
   if (mod == NULL)
     return;
 
   /* Add some symbolic constants to the module */
 
   if (ErrorObject == NULL) {
-    ErrorObject = PyErr_NewException("lwpb.Error", NULL, NULL);
+    ErrorObject = PyErr_NewException("lwpb.cext.Error", NULL, NULL);
     if (ErrorObject == NULL)
       return;
   }
