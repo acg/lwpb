@@ -71,28 +71,29 @@ typedef enum {
 } lwpb_err_t;
 
 /* Field labels */
-#define LWPB_REQUIRED       0
 #define LWPB_OPTIONAL       1
-#define LWPB_REPEATED       2
+#define LWPB_REQUIRED       2
+#define LWPB_REPEATED       3
 
 /* Field value types */
-#define LWPB_DOUBLE         0
-#define LWPB_FLOAT          1
-#define LWPB_INT32          2
+#define LWPB_DOUBLE         1
+#define LWPB_FLOAT          2
 #define LWPB_INT64          3
-#define LWPB_UINT32         4
-#define LWPB_UINT64         5
-#define LWPB_SINT32         6
-#define LWPB_SINT64         7
-#define LWPB_FIXED32        8
-#define LWPB_FIXED64        9
-#define LWPB_SFIXED32       10
-#define LWPB_SFIXED64       11
-#define LWPB_BOOL           12
-#define LWPB_ENUM           13
-#define LWPB_STRING         14
-#define LWPB_BYTES          15
-#define LWPB_MESSAGE        16
+#define LWPB_UINT64         4
+#define LWPB_INT32          5
+#define LWPB_FIXED64        6
+#define LWPB_FIXED32        7
+#define LWPB_BOOL           8
+#define LWPB_STRING         9
+#define LWPB_GROUP          10
+#define LWPB_MESSAGE        11
+#define LWPB_BYTES          12
+#define LWPB_UINT32         13
+#define LWPB_ENUM           14
+#define LWPB_SFIXED32       15
+#define LWPB_SFIXED64       16
+#define LWPB_SINT32         17
+#define LWPB_SINT64         18
 
 /* Field flags */
 #define LWPB_HAS_DEFAULT    (1 << 0)
