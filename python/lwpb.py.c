@@ -752,7 +752,6 @@ Decoder_decode(Decoder *self, PyObject *args)
 }
 
 
-// FIXME expose this method from lwpb, don't reimplement here
 static PyObject*
 Decoder_decode_varint(Decoder *self, PyObject *args)
 {
@@ -762,26 +761,123 @@ Decoder_decode_varint(Decoder *self, PyObject *args)
   if (!PyArg_ParseTuple(args, "s#:decode_varint", &buf, &len))
     return NULL;
 
-  char* start = buf;
-  char* end = start + len;
-  int bitpos;
-  int done = 0;
-  u64_t varint = 0;
-  
-  for (bitpos = 0; !done && bitpos < 64 && buf < end; bitpos += 7, buf++) {
-    varint |= (u64_t)(*buf & 0x7f) << bitpos;
-    done = !(*buf & 0x80);
-  }
+  struct lwpb_buf lbuf;
+  lwpb_err_t ret;
+  u64_t value;
+ 
+  lbuf.base = (u8_t*)buf;
+  lbuf.pos  = (u8_t*)buf;
+  lbuf.end  = (u8_t*)buf + len;
+ 
+  ret = lwpb_decode_varint(&lbuf, &value);
 
   PyObject* tuple = PyTuple_New(2);
 
-  if (!done && buf >= end) {
-    PyTuple_SetItem(tuple, 0, Py_None);
-    PyTuple_SetItem(tuple, 1, PyLong_FromLong(0));
+  switch (ret) {
+
+    case LWPB_ERR_OK:
+      PyTuple_SetItem(tuple, 0, PyLong_FromLong(value));
+      PyTuple_SetItem(tuple, 1, PyLong_FromLong(lbuf.pos-lbuf.base));
+      break;
+
+    case LWPB_ERR_END_OF_BUF:
+      PyTuple_SetItem(tuple, 0, Py_None);
+      PyTuple_SetItem(tuple, 1, PyLong_FromLong(0));
+      break;
+
+    default:
+      // TODO define specific exception classes
+      Py_DECREF(tuple);
+      PyErr_Format(PyExc_RuntimeError, "decode_varint error: %d", ret);
+      return NULL;
   }
-  else {
-    PyTuple_SetItem(tuple, 0, PyLong_FromLong(varint));
-    PyTuple_SetItem(tuple, 1, PyLong_FromLong(buf-start));
+
+  return tuple;
+}
+
+
+static PyObject*
+Decoder_decode_32bit(Decoder *self, PyObject *args)
+{
+  char* buf;
+  int len;
+
+  if (!PyArg_ParseTuple(args, "s#:decode_32bit", &buf, &len))
+    return NULL;
+
+  struct lwpb_buf lbuf;
+  lwpb_err_t ret;
+  u32_t value;
+ 
+  lbuf.base = (u8_t*)buf;
+  lbuf.pos  = (u8_t*)buf;
+  lbuf.end  = (u8_t*)buf + len;
+ 
+  ret = lwpb_decode_32bit(&lbuf, &value);
+
+  PyObject* tuple = PyTuple_New(2);
+
+  switch (ret) {
+
+    case LWPB_ERR_OK:
+      PyTuple_SetItem(tuple, 0, PyInt_FromLong(value));
+      PyTuple_SetItem(tuple, 1, PyLong_FromLong(lbuf.pos-lbuf.base));
+      break;
+
+    case LWPB_ERR_END_OF_BUF:
+      PyTuple_SetItem(tuple, 0, Py_None);
+      PyTuple_SetItem(tuple, 1, PyLong_FromLong(0));
+      break;
+
+    default:
+      // TODO define specific exception classes
+      Py_DECREF(tuple);
+      PyErr_Format(PyExc_RuntimeError, "decode_varint error: %d", ret);
+      return NULL;
+  }
+
+  return tuple;
+}
+
+
+static PyObject*
+Decoder_decode_64bit(Decoder *self, PyObject *args)
+{
+  char* buf;
+  int len;
+
+  if (!PyArg_ParseTuple(args, "s#:decode_64bit", &buf, &len))
+    return NULL;
+
+  struct lwpb_buf lbuf;
+  lwpb_err_t ret;
+  u64_t value;
+ 
+  lbuf.base = (u8_t*)buf;
+  lbuf.pos  = (u8_t*)buf;
+  lbuf.end  = (u8_t*)buf + len;
+ 
+  ret = lwpb_decode_64bit(&lbuf, &value);
+
+  PyObject* tuple = PyTuple_New(2);
+
+  switch (ret) {
+
+    case LWPB_ERR_OK:
+      PyTuple_SetItem(tuple, 0, PyLong_FromLong(value));
+      PyTuple_SetItem(tuple, 1, PyLong_FromLong(lbuf.pos-lbuf.base));
+      break;
+
+    case LWPB_ERR_END_OF_BUF:
+      PyTuple_SetItem(tuple, 0, Py_None);
+      PyTuple_SetItem(tuple, 1, PyLong_FromLong(0));
+      break;
+
+    default:
+      // TODO define specific exception classes
+      Py_DECREF(tuple);
+      PyErr_Format(PyExc_RuntimeError, "decode_64bit error: %d", ret);
+      return NULL;
   }
 
   return tuple;
@@ -793,6 +889,10 @@ static PyMethodDef Decoder_methods[] = {
     PyDoc_STR("decode(data,descriptor,msgnum) -> Dict")},
   {"decode_varint",  (PyCFunction)Decoder_decode_varint,  METH_VARARGS,
     PyDoc_STR("decode_varint(data) -> (Number,Bytes)")},
+  {"decode_32bit",  (PyCFunction)Decoder_decode_32bit,  METH_VARARGS,
+    PyDoc_STR("decode_32bit(data) -> (Number,Bytes)")},
+  {"decode_64bit",  (PyCFunction)Decoder_decode_64bit,  METH_VARARGS,
+    PyDoc_STR("decode_64bit(data) -> (Number,Bytes)")},
   {NULL,    NULL}    /* sentinel */
 };
 
