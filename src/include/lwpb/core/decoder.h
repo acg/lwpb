@@ -94,5 +94,10 @@ lwpb_err_t lwpb_decoder_decode(struct lwpb_decoder *decoder,
                                const struct lwpb_msg_desc *msg_desc,
                                void *data, size_t len, size_t *used);
 
+lwpb_err_t lwpb_decode_varint(struct lwpb_buf *buf, u64_t *varint);
+
+lwpb_err_t lwpb_decode_32bit(struct lwpb_buf *buf, u32_t *value);
+
+lwpb_err_t lwpb_decode_64bit(struct lwpb_buf *buf, u64_t *value);
 
 #endif // __LWPB_CORE_DECODER_H__
