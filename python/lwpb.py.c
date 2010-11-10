@@ -1044,13 +1044,16 @@ pyobject_encode(
       /* Recurse when encoding a nested message,
          reserving enough leading room for the length prefix. */
 
-      if (field_desc->opts.typ == LWPB_MESSAGE) {
+      if (field_desc->opts.typ == LWPB_MESSAGE)
+      {
         u8_t* nestedbuf;
         size_t nestedlen;
+
         extralen += MSG_RESERVE_BYTES;
         nestedbuf = valuebuf ? valuebuf + MSG_RESERVE_BYTES : 0;
         nestedlen = pyobject_encode(pyval, encoder, field_desc->msg_desc, nestedbuf, error);
         if (*error) break;
+
         val.message.data = nestedbuf;
         val.message.len = nestedlen;
       }
@@ -1134,9 +1137,60 @@ Encoder_encode(Encoder *self, PyObject *args)
 }
 
 
+static PyObject*
+Encoder_encode_varint(Decoder *self, PyObject *args)
+{
+  u64_t value;
+  u8_t buf[64];
+  size_t len;
+
+  if (!PyArg_ParseTuple(args, "K:encode_varint", &value))
+    return NULL;
+
+  len = lwpb_encode_varint(buf, value);
+  return PyString_FromStringAndSize((char*)buf, len);
+}
+
+
+static PyObject*
+Encoder_encode_32bit(Decoder *self, PyObject *args)
+{
+  u32_t value;
+  u8_t buf[64];
+  size_t len;
+
+  if (!PyArg_ParseTuple(args, "I:encode_32bit", &value))
+    return NULL;
+
+  len = lwpb_encode_32bit(buf, value);
+  return PyString_FromStringAndSize((char*)buf, len);
+}
+
+
+static PyObject*
+Encoder_encode_64bit(Decoder *self, PyObject *args)
+{
+  u64_t value;
+  u8_t buf[64];
+  size_t len;
+
+  if (!PyArg_ParseTuple(args, "K:encode_64bit", &value))
+    return NULL;
+
+  len = lwpb_encode_64bit(buf, value);
+  return PyString_FromStringAndSize((char*)buf, len);
+}
+
+
 static PyMethodDef Encoder_methods[] = {
   {"encode",  (PyCFunction)Encoder_encode,  METH_VARARGS,
     PyDoc_STR("encode(dict,descriptor,msgnum) -> String")},
+  {"encode_varint",  (PyCFunction)Encoder_encode_varint,  METH_VARARGS,
+    PyDoc_STR("encode_varint(Number) -> String")},
+  {"encode_32bit",  (PyCFunction)Encoder_encode_32bit,  METH_VARARGS,
+    PyDoc_STR("encode_32bit(Number) -> String")},
+  {"encode_64bit",  (PyCFunction)Encoder_encode_64bit,  METH_VARARGS,
+    PyDoc_STR("encode_64bit(Number) -> String")},
   {NULL,    NULL}    /* sentinel */
 };
 
