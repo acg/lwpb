@@ -1,21 +1,6 @@
-
-/* Use this file as a template to start implementing a module that
-   also declares object types. All occurrences of 'decoder' should be changed
-   to something reasonable for your objects. After that, all other
-   occurrences of 'xx' should be changed to something reasonable for your
-   module. If your module is named foo your sourcefile should be named
-   foomodule.c.
-
-   You will probably want to delete all references to 'x_attr' and add
-   your own types of attributes instead.  Maybe you want to name your
-   local variables other than 'self'.  If your object type is needed in
-   other files, you'll have to create a file "foobarobject.h"; see
-   intobject.h for an example. */
-
-/* decoder objects */
-
 #include "Python.h"
 #include <lwpb/lwpb.h>
+#include <lwpb/core/encoder2.h>  // FIXME
 
 
 /* ----------------------------------------- */
@@ -193,6 +178,7 @@ py_to_lwpb(union lwpb_value* p, PyObject *val, unsigned int type)
     }
   }
 }
+
 
 
 /* ----------------------------------------- */
@@ -942,6 +928,121 @@ static PyTypeObject DecoderType = {
   0,                            /*tp_free*/
   0,                            /*tp_is_gc*/
 };
+
+/* --------------------------------------------------------------------- */
+
+
+#define MSG_RESERVE_BYTES 10
+
+size_t
+pyobject_encode(
+  PyObject* obj,
+  struct lwpb_encoder2 *encoder,
+  const struct lwpb_msg_desc *msg_desc,
+  u8_t* buf,
+  int* error)
+{
+  size_t len = 0;
+  unsigned int i;
+  unsigned int j;
+  union lwpb_value val;
+  PyObject* pyval = NULL;
+  PyObject* pylist = NULL;
+
+  /* Python object must be a dict to be encoded as a message. */
+
+  if (!PyDict_Check(obj)) {
+    *error = 1; // FIXME more specific error code
+    return -1;
+  }
+
+  /* Encode each field in the message descriptor. */
+
+  for (i=0; i<msg_desc->num_fields; i++)
+  {
+    u8_t* fieldbuf = buf;
+    size_t fieldlen = 0;
+    const struct lwpb_field_desc *field_desc = &msg_desc->fields[i];
+
+    /* If the field is packed repeated, enter packed encoder mode
+       and reserve enough leading room for the eventual length prefix.  */
+
+    if (LWPB_IS_PACKED_REPEATED(field_desc)) {
+      lwpb_encoder2_packed_repeated_start(encoder, field_desc);
+      if (fieldbuf) fieldbuf += MSG_RESERVE_BYTES;
+    }
+
+    /* Get the python field value.
+       If it isn't a list, turn it into a list with one item. */
+
+    pyval = PyDict_GetItemString(obj, field_desc->name);
+
+    if (!pyval) {
+      continue;
+    }
+    else if (PyList_Check(pyval)) {
+      pylist = pyval;
+      Py_INCREF(pylist);
+    }
+    else {
+      pylist = PyList_New(1);
+      Py_INCREF(pyval);
+      PyList_SetItem(pylist, 0, pyval);
+    }
+
+    /* Encode each python value under this field. */
+
+    u8_t* valuebuf = fieldbuf;
+    size_t valuelen = 0;
+
+    Py_ssize_t num_values = PyList_Size(pylist);
+
+    for (j=0; j<num_values; j++)
+    {
+      pyval = PyList_GetItem(pylist, j);
+
+      /* Recurse when encoding a nested message,
+         reserving enough leading room for the length prefix. */
+
+      if (field_desc->opts.typ == LWPB_MESSAGE) {
+        u8_t* nestedbuf = valuebuf ? valuebuf + MSG_RESERVE_BYTES : 0;
+        size_t nestedlen = pyobject_encode(pyval, encoder, field_desc->msg_desc, nestedbuf, error);
+        if (*error) break;
+        val.message.data = nestedbuf;
+        val.message.len = nestedlen;
+      }
+      else {
+        if (py_to_lwpb(&val, pyval, field_desc->opts.typ) < 0) {
+          *error = 1; // FIXME more specific error code
+          break;
+        }
+      }
+
+      valuelen = lwpb_encoder2_add_field(encoder, field_desc, &val, valuebuf);
+      if (valuebuf) valuebuf += valuelen;
+      fieldlen += valuelen;
+    }
+
+    Py_XDECREF(pylist);
+    if (*error) return -1;
+
+    /* If the field is packed repeated, leave packed encoder mode
+       and re-encode with the length prefix. */
+
+    if (LWPB_IS_PACKED_REPEATED(field_desc)) {
+      lwpb_encoder2_packed_repeated_end(encoder);
+      val.message.data = fieldbuf;
+      val.message.len = fieldlen;
+      fieldlen = lwpb_encoder2_add_field(encoder, field_desc, &val, buf);
+      if (*error) return -1;
+    }
+
+    if (buf) buf += fieldlen;
+    len += fieldlen;
+  }
+
+  return len;
+}
 
 /* --------------------------------------------------------------------- */
 
