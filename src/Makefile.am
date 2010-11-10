@@ -6,6 +6,7 @@ liblwpb_la_SOURCES = \
 lwpb/core/buf.c \
 lwpb/core/decoder.c \
 lwpb/core/encoder.c \
+lwpb/core/encoder2.c \
 lwpb/core/misc.c \
 lwpb/rpc/client.c \
 lwpb/rpc/direct.c \
