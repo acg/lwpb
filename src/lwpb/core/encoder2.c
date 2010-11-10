@@ -41,13 +41,12 @@ size_t lwpb_encode_varint(u8_t *buf, u64_t varint)
     do {
         if (buf) {
             if (varint > 127) {
-                *buf = 0x80 | (varint & 0x7F);
+                *buf++ = 0x80 | (varint & 0x7F);
             } else {
-                *buf = (varint & 0x7F);
+                *buf++ = (varint & 0x7F);
             }
         }
         varint >>= 7;
-        buf++;
         len++;
     } while (varint);
     
@@ -166,6 +165,7 @@ size_t lwpb_encoder2_add_field(struct lwpb_encoder2 *encoder,
                                u8_t* buf)
 {
     size_t len = 0;
+    size_t size = 0;
     int i;
     u64_t key;
     enum wire_type wire_type = 0;
@@ -260,19 +260,27 @@ size_t lwpb_encoder2_add_field(struct lwpb_encoder2 *encoder,
         }
         
         key = wire_type | (field_desc->number << 3);
-        len += lwpb_encode_varint(buf, key);
+        size = lwpb_encode_varint(buf, key);
+        len += size;
+        if (buf) buf += size;
     }
 
     switch (wire_type) {
     case WT_VARINT:
-        len += lwpb_encode_varint(buf, wire_value.varint);
+        size = lwpb_encode_varint(buf, wire_value.varint);
+        len += size;
+        if (buf) buf += size;
         break;
     case WT_64BIT:
-        len += lwpb_encode_64bit(buf, wire_value.int64);
+        size = lwpb_encode_64bit(buf, wire_value.int64);
+        len += size;
+        if (buf) buf += size;
         break;
     case WT_STRING:
-        len += lwpb_encode_varint(buf, wire_value.string.len);
+        size = lwpb_encode_varint(buf, wire_value.string.len);
+        len += size;
         if (buf) {
+            buf += size;
             // Use memmove() when writing a message or packed repeated field
             // as the memory areas are overlapping.
             if ((field_desc->opts.typ == LWPB_MESSAGE) ||
@@ -282,10 +290,14 @@ size_t lwpb_encoder2_add_field(struct lwpb_encoder2 *encoder,
                 LWPB_MEMCPY(buf, wire_value.string.data, wire_value.string.len);
             }
         }
-        len += wire_value.string.len;
+        size = wire_value.string.len;
+        len += size;
+        if (buf) buf += size;
         break;
     case WT_32BIT:
-        len += lwpb_encode_32bit(buf, wire_value.int32);
+        size = lwpb_encode_32bit(buf, wire_value.int32);
+        len += size;
+        if (buf) buf += size;
         break;
     default:
         LWPB_ASSERT(1, "Unknown wire type");
