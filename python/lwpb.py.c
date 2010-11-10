@@ -931,6 +931,44 @@ static PyTypeObject DecoderType = {
 
 /* --------------------------------------------------------------------- */
 
+/* Encoder object */
+
+typedef struct {
+  PyObject_HEAD
+  struct lwpb_encoder2 encoder;
+} Encoder;
+
+static PyTypeObject EncoderType;
+
+#define Encoder_Check(v)  (Py_TYPE(v) == &EncoderType)
+
+
+/* Encoder methods */
+
+static PyObject *
+Encoder_new(PyTypeObject *type, PyObject *arg, PyObject *kwds)
+{
+  Encoder *self;
+  self = (Encoder *)type->tp_alloc(type, 0);
+  if (self == NULL) return NULL;
+  return (PyObject *)self;
+}
+
+
+static int
+Encoder_init(Encoder *self, PyObject *arg, PyObject *kwds)
+{
+  lwpb_encoder2_init(&self->encoder);
+  return 0;
+}
+
+
+static void
+Encoder_dealloc(Encoder *self)
+{
+  self->ob_type->tp_free((PyObject*)self);
+}
+
 
 #define MSG_RESERVE_BYTES 10
 
@@ -943,6 +981,7 @@ pyobject_encode(
   int* error)
 {
   size_t len = 0;
+  size_t extralen = 0;
   unsigned int i;
   unsigned int j;
   union lwpb_value val;
@@ -956,7 +995,7 @@ pyobject_encode(
     return -1;
   }
 
-  /* Encode each field in the message descriptor. */
+  /* Encode each field defined in the message descriptor. */
 
   for (i=0; i<msg_desc->num_fields; i++)
   {
@@ -970,6 +1009,7 @@ pyobject_encode(
     if (LWPB_IS_PACKED_REPEATED(field_desc)) {
       lwpb_encoder2_packed_repeated_start(encoder, field_desc);
       if (fieldbuf) fieldbuf += MSG_RESERVE_BYTES;
+      extralen += MSG_RESERVE_BYTES;
     }
 
     /* Get the python field value.
@@ -1005,8 +1045,11 @@ pyobject_encode(
          reserving enough leading room for the length prefix. */
 
       if (field_desc->opts.typ == LWPB_MESSAGE) {
-        u8_t* nestedbuf = valuebuf ? valuebuf + MSG_RESERVE_BYTES : 0;
-        size_t nestedlen = pyobject_encode(pyval, encoder, field_desc->msg_desc, nestedbuf, error);
+        u8_t* nestedbuf;
+        size_t nestedlen;
+        extralen += MSG_RESERVE_BYTES;
+        nestedbuf = valuebuf ? valuebuf + MSG_RESERVE_BYTES : 0;
+        nestedlen = pyobject_encode(pyval, encoder, field_desc->msg_desc, nestedbuf, error);
         if (*error) break;
         val.message.data = nestedbuf;
         val.message.len = nestedlen;
@@ -1041,8 +1084,109 @@ pyobject_encode(
     len += fieldlen;
   }
 
-  return len;
+  return buf ? len : (len + extralen);
 }
+
+static PyObject *
+Encoder_encode(Encoder *self, PyObject *args)
+{
+  PyObject* dict;
+  Descriptor* descriptor;
+  unsigned int msgnum;
+
+  if (!PyArg_ParseTuple(args, "O!O!i:encode", &PyDict_Type, &dict, &DescriptorType, &descriptor, &msgnum))
+    return NULL;
+
+  if (msgnum >= descriptor->num_msgs) {
+    PyErr_SetString(PyExc_IndexError, "message type index out of range");
+    return NULL;
+  }
+
+  PyObject* string = NULL;
+  size_t len;
+  u8_t *buf = 0;
+  int error = 0;
+  int pass;
+
+  for (pass=0; pass<2; pass++)
+  {
+    lwpb_encoder2_start(&self->encoder, &descriptor->msg_desc[msgnum]);
+    len = pyobject_encode(dict, &self->encoder, &descriptor->msg_desc[msgnum], buf, &error);
+
+    if (error) {
+      PyErr_Format(PyExc_RuntimeError, "encode error: %d", error); // FIXME exception class
+      break;
+    }
+
+    if (pass == 0) {
+      if (!(buf = calloc(1, len))) {
+        PyErr_SetString(PyExc_MemoryError, "unable to allocate string");
+        break;
+      }
+    } else if (pass == 1) {
+      if (!(string = PyString_FromStringAndSize((char*)buf, len)))
+        break;
+    }
+  }
+
+  if (buf) free(buf);
+  return string;
+}
+
+
+static PyMethodDef Encoder_methods[] = {
+  {"encode",  (PyCFunction)Encoder_encode,  METH_VARARGS,
+    PyDoc_STR("encode(dict,descriptor,msgnum) -> String")},
+  {NULL,    NULL}    /* sentinel */
+};
+
+
+static PyTypeObject EncoderType = {
+  /* The ob_type field must be initialized in the module init function
+   * to be portable to Windows without using C++. */
+  PyVarObject_HEAD_INIT(NULL, 0)
+  "lwpb.cext.Encoder",           /*tp_name*/
+  sizeof(Encoder),        /*tp_basicsize*/
+  0,                            /*tp_itemsize*/
+  /* methods */
+  (destructor)Encoder_dealloc,  /*tp_dealloc*/
+  0,                            /*tp_print*/
+  0,                            /*tp_getattr*/
+  0,                            /*tp_setattr*/
+  0,                            /*tp_compare*/
+  0,                            /*tp_repr*/
+  0,                            /*tp_as_number*/
+  0,                            /*tp_as_sequence*/
+  0,                            /*tp_as_mapping*/
+  0,                            /*tp_hash*/
+  0,                            /*tp_call*/
+  0,                            /*tp_str*/
+  0,                            /*tp_getattro*/
+  0,                            /*tp_setattro*/
+  0,                            /*tp_as_buffer*/
+  Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
+  0,                            /*tp_doc*/
+  0,                            /*tp_traverse*/
+  0,                            /*tp_clear*/
+  0,                            /*tp_richcompare*/
+  0,                            /*tp_weaklistoffset*/
+  0,                            /*tp_iter*/
+  0,                            /*tp_iternext*/
+  Encoder_methods,              /*tp_methods*/
+  0,                            /*tp_members*/
+  0,                            /*tp_getset*/
+  0,                            /*tp_base*/
+  0,                            /*tp_dict*/
+  0,                            /*tp_descr_get*/
+  0,                            /*tp_descr_set*/
+  0,                            /*tp_dictoffset*/
+  (initproc)Encoder_init,       /*tp_init*/
+  0,                            /*tp_alloc*/
+  Encoder_new,                  /*tp_new*/
+  0,                            /*tp_free*/
+  0,                            /*tp_is_gc*/
+};
+
 
 /* --------------------------------------------------------------------- */
 
@@ -1063,15 +1207,18 @@ initcext(void)
 {
   /* Make sure exposed types are subclassable. */
 
-  DecoderType.tp_base = &PyBaseObject_Type;
   DescriptorType.tp_base = &PyBaseObject_Type;
+  DecoderType.tp_base = &PyBaseObject_Type;
+  EncoderType.tp_base = &PyBaseObject_Type;
 
   /* Finalize the type object including setting type of the new type
    * object; doing it here is required for portability, too. */
 
+  if (PyType_Ready(&DescriptorType) < 0)
+    return;
   if (PyType_Ready(&DecoderType) < 0)
     return;
-  if (PyType_Ready(&DescriptorType) < 0)
+  if (PyType_Ready(&EncoderType) < 0)
     return;
 
   /* Create the module and add the functions */
@@ -1091,11 +1238,14 @@ initcext(void)
   Py_INCREF(ErrorObject);
   PyModule_AddObject(mod, "Error", ErrorObject);
 
+  Py_INCREF(&DescriptorType);
+  PyModule_AddObject(mod, "Descriptor", (PyObject*)&DescriptorType);
+
   Py_INCREF(&DecoderType);
   PyModule_AddObject(mod, "Decoder", (PyObject*)&DecoderType);
 
-  Py_INCREF(&DescriptorType);
-  PyModule_AddObject(mod, "Descriptor", (PyObject*)&DescriptorType);
+  Py_INCREF(&EncoderType);
+  PyModule_AddObject(mod, "Encoder", (PyObject*)&EncoderType);
 
   PyModule_AddIntConstant(mod, "LABEL_REQUIRED", LWPB_REQUIRED);
   PyModule_AddIntConstant(mod, "LABEL_OPTIONAL", LWPB_OPTIONAL);
