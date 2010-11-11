@@ -174,6 +174,14 @@ Encoder_encode(Encoder *self, PyObject *args)
   int error = 0;
   int pass;
 
+  /*
+     In pass #0, invoke the object encoder on a NULL buffer just to
+     calculate the required size. Allocate a buffer of that size.
+
+     In pass #1, actually encode the object into the allocated buffer.
+     Copy this into a new Python string.
+  */
+
   for (pass=0; pass<2; pass++)
   {
     lwpb_encoder2_start(&self->encoder, &descriptor->msg_desc[msgnum]);
@@ -303,6 +311,5 @@ PyTypeObject EncoderType = {
   0,                            /*tp_free*/
   0,                            /*tp_is_gc*/
 };
-
 
 

@@ -3,7 +3,7 @@ from lwpb.cext import *
 # Defines the "meta schema" of a binary file created with:
 #   $ protoc foo.proto -o foo.pb2 
 
-protodef = {
+PROTOFILE_DEFINITION = {
   "name": "descriptor.proto",
   "package": "google.protobuf",
   "dependency": [ ],

@@ -1,21 +1,23 @@
-
 import sys
-import pprint
 import lwpb
-#import json
 
-protodesc = lwpb.Descriptor(lwpb.protodef)
-# protodesc.debug_print()
+arg_protofile = sys.argv[1]
+arg_infile = sys.argv[2]
+arg_messagename = sys.argv[3]
+
 d = lwpb.Decoder()
-pb1 = file(sys.argv[1]).read()
-schema = d.decode(pb1, protodesc, 0)
-schemadesc = lwpb.Descriptor(schema['file'][0])
-#schemadesc.debug_print()
+protofile_def = lwpb.PROTOFILE_DEFINITION
+protofile_desc = lwpb.Descriptor(protofile_def)
+protofile_msg = protofile_desc.message_types()
+protofile_bin = file(arg_protofile).read()
 
-#pp = pprint.PrettyPrinter(indent=2)
-#pp.pprint(record)
+m = protofile_msg['google.protobuf.FileDescriptorSet']
+schema_def = d.decode(protofile_bin, protofile_desc, m)
+schema_desc = lwpb.Descriptor(schema_def['file'][0])
+schema_msg = schema_desc.message_types()
 
-f = file(sys.argv[2])
+m = schema_msg[arg_messagename]
+f = file(arg_infile)
 blocksize = 4096
 buf = ""
 eof = False
@@ -34,7 +36,7 @@ while not eof or len(buf) > 0:
     if not bytes: break
     if pos + bytes + recordlen > len(buf): break
     pos += bytes
-    record = d.decode(buf[pos:pos+recordlen],schemadesc,1)
+    record = d.decode(buf[pos:pos+recordlen],schema_desc,m)
     pos += recordlen
     print record
 

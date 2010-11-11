@@ -9,6 +9,7 @@
 typedef struct {
   PyObject_HEAD
   PyObject* strings;
+  PyObject* message_types;
   unsigned int num_msgs;
   struct lwpb_msg_desc *msg_desc;
 } Descriptor;

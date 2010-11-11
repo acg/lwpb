@@ -18,6 +18,9 @@ Descriptor_new(PyTypeObject *type, PyObject *arg, PyObject *kwds)
   if (!(self->strings = PyList_New(0)))
     return NULL;
 
+  if (!(self->message_types = PyDict_New()))
+    return NULL;
+
   self->num_msgs = 0;
   self->msg_desc = NULL;
 
@@ -51,10 +54,13 @@ Descriptor_clear(Descriptor *self)
     self->num_msgs = 0;
   }
 
-  /* Clear the string table. */
+  /* Clear the string table and the messages index. */
 
   if (self->strings)
     PyList_SetSlice(self->strings, 0, PyList_Size(self->strings), NULL);
+
+  if (self->message_types)
+    PyDict_Clear(self->message_types);
 }
 
 
@@ -109,6 +115,8 @@ Descriptor_init(Descriptor *self, PyObject *arg, PyObject *kwds)
     return -1;
   }
 
+  /* Top level message stuff. */
+
   const char* package = "";
 
   if ((prop = PyDict_GetItemString(dict, "package")) && PyString_Check(prop))
@@ -124,6 +132,9 @@ Descriptor_init(Descriptor *self, PyObject *arg, PyObject *kwds)
   }
 
   self->num_msgs = msgtypes_len;
+
+  /* Pass #0: fill in message descriptors.
+     Pass #1: fill in field descriptors, resolving nested messages. */
 
   int pass;
 
@@ -156,7 +167,18 @@ Descriptor_init(Descriptor *self, PyObject *arg, PyObject *kwds)
         m->num_fields = fields_len;
 
         if ((prop = PyDict_GetItemString(msgtype, "name")) && PyString_Check(prop))
+        {
           m->name = Descriptor_store_string(self, prop);
+
+          /* Map the package-qualified message name to the index number,
+             which Python clients can look up and pass to Decoder.decode()
+             or Encoder.encode(). */
+
+          PyObject* qualified;
+
+          if ((qualified = PyString_FromFormat("%s.%s", package, m->name)))
+            PyDict_SetItem(self->message_types, qualified, PyInt_FromLong(i));
+        }
       }
       else if (pass == 1)
       {
@@ -206,6 +228,9 @@ Descriptor_init(Descriptor *self, PyObject *arg, PyObject *kwds)
              descriptor fully qualified by package. Search through message
              descriptors for a match. */
 
+          /* TODO just lookup qualified type name in self->message_types */
+          /* TODO support name resolution for nested types */
+
           if ((prop = PyDict_GetItemString(field, "type_name")) && PyString_Check(prop)) {
             if (f->opts.typ == LWPB_MESSAGE)
             {
@@ -254,6 +279,8 @@ init_cleanup:
 }
 
 
+
+
 static PyObject *
 Descriptor_debug_print(Descriptor *self, PyObject *args)
 {
@@ -290,7 +317,16 @@ Descriptor_debug_print(Descriptor *self, PyObject *args)
 }
 
 
+static PyObject *
+Descriptor_message_types(Descriptor *self, PyObject *arg)
+{
+  return PyDictProxy_New(self->message_types);
+}
+
+
 static PyMethodDef Descriptor_methods[] = {
+  {"message_types",  (PyCFunction)Descriptor_message_types,  METH_VARARGS,
+    PyDoc_STR("message_types() -> dict")},
   {"debug_print",  (PyCFunction)Descriptor_debug_print,  METH_VARARGS,
     PyDoc_STR("debug_print() -> None")},
   {NULL,    NULL}    /* sentinel */
@@ -317,7 +353,7 @@ PyTypeObject DescriptorType = {
   0,                            /*tp_hash*/
   0,                            /*tp_call*/
   0,                            /*tp_str*/
-  0,                            /*tp_getattro*/
+  0,                            /*tp_getattro */
   0,                            /*tp_setattro*/
   0,                            /*tp_as_buffer*/
   Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
