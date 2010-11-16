@@ -66,15 +66,6 @@ pyobject_encode(
     size_t fieldlen = 0;
     const struct lwpb_field_desc *field_desc = &msg_desc->fields[i];
 
-    /* If the field is packed repeated, enter packed encoder mode
-       and reserve enough leading room for the eventual length prefix.  */
-
-    if (LWPB_IS_PACKED_REPEATED(field_desc)) {
-      lwpb_encoder2_packed_repeated_start(encoder, field_desc);
-      if (fieldbuf) fieldbuf += MSG_RESERVE_BYTES;
-      extralen += MSG_RESERVE_BYTES;
-    }
-
     /* Get the python field value.
        If it isn't a list, turn it into a list with one item. */
 
@@ -91,6 +82,15 @@ pyobject_encode(
       pylist = PyList_New(1);
       Py_INCREF(pyval);
       PyList_SetItem(pylist, 0, pyval);
+    }
+
+    /* If the field is packed repeated, enter packed encoder mode
+       and reserve enough leading room for the eventual length prefix.  */
+
+    if (LWPB_IS_PACKED_REPEATED(field_desc)) {
+      lwpb_encoder2_packed_repeated_start(encoder, field_desc);
+      if (fieldbuf) fieldbuf += MSG_RESERVE_BYTES;
+      extralen += MSG_RESERVE_BYTES;
     }
 
     /* Encode each python value under this field. */
