@@ -2,7 +2,10 @@ CFLAGS = -g -I/home/agrow/src/protobuf-2.3.0/src
 LDFLAGS = -lprotobuf -lpthread
 
 
-all : truthdb
+all : truthdb.txt
+
+truthdb.txt : truthdb
+	./truthdb > $@
 
 truthdb : truthdb.o generated/test.pb.o python_format.o
 	$(CC) -o $@ $^ $(LDFLAGS)
