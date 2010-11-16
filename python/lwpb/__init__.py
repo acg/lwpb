@@ -116,6 +116,7 @@ PROTOFILE_DEFINITION = {
            "number": 8,
            "label": LABEL_OPTIONAL,
            "type": TYPE_MESSAGE,
+           "type_name": ".google.protobuf.FieldOptions",
         },
       ]
     },
@@ -123,6 +124,13 @@ PROTOFILE_DEFINITION = {
       "name": "FieldOptions",
       "field":
       [
+        {
+           "name": "ctype",
+           "number": 1,
+           "label": LABEL_OPTIONAL,
+           "type": TYPE_ENUM,
+           "default": 0,
+        },
         {
            "name": "packed",
            "number": 2,
