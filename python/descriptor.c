@@ -136,6 +136,9 @@ Descriptor_init(Descriptor *self, PyObject *arg, PyObject *kwds)
   /* Pass #0: fill in message descriptors.
      Pass #1: fill in field descriptors, resolving nested messages. */
 
+  /* FIXME require that messages have a name */
+  /* FIXME require that fields have a name and field number */
+
   int pass;
 
   for (pass=0; pass<2; pass++)
@@ -231,9 +234,14 @@ Descriptor_init(Descriptor *self, PyObject *arg, PyObject *kwds)
           /* TODO just lookup qualified type name in self->message_types */
           /* TODO support name resolution for nested types */
 
-          if ((prop = PyDict_GetItemString(field, "type_name")) && PyString_Check(prop)) {
-            if (f->opts.typ == LWPB_MESSAGE)
+          const char* typename = "\"\"";
+
+          if (f->opts.typ == LWPB_MESSAGE)
+          {
+            if ((prop = PyDict_GetItemString(field, "type_name")) && PyString_Check(prop))
             {
+              typename = PyString_AsString(prop);
+
               for (k=0; k<msgtypes_len; k++)
               {
                 PyObject* msgtype2;
@@ -258,12 +266,16 @@ Descriptor_init(Descriptor *self, PyObject *arg, PyObject *kwds)
                   break;
                 }
               }
+            }
 
-              if (!f->msg_desc) {
-                PyErr_Format(PyExc_RuntimeError, "could not resolve type_name: %s", PyString_AsString(prop));
-                error = -1;
-                goto init_cleanup;
-              }
+            if (!f->msg_desc) {
+              PyErr_Format(
+                PyExc_RuntimeError,
+                "could not resolve type_name for message field %s.%s.%s: %s",
+                package, m->name, f->name, typename
+              );
+              error = -1;
+              goto init_cleanup;
             }
           }
 
@@ -304,7 +316,7 @@ Descriptor_debug_print(Descriptor *self, PyObject *args)
       printf( "  type = %d\n", f->opts.typ );
       printf( "  flags = %d\n", f->opts.flags );
 
-      if (f->msg_desc && f->msg_desc->name)
+      if (f->opts.typ == LWPB_MESSAGE)
         printf( "  message = %s\n", m->name );
       printf( "\n" );
     }
