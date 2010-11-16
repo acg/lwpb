@@ -170,6 +170,7 @@ int main(int argc, char** argv)
     msg->SerializeToOstream(&binout);
 
     cout << tests[i].name << endl;
+    cout << msg->GetDescriptor()->full_name() << endl;
     cout << pyout << endl;
     cout << "\"" << strings::CHexEscape(binout.str()) << "\"" << endl;
     cout << endl;
