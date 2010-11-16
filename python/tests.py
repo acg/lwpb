@@ -3,7 +3,7 @@ import sys
 import lwpb
 
 
-class CodecTestCase(unittest.TestCase):
+class DecoderTestCase(unittest.TestCase):
 
   def __init__(self, **keywords):
     unittest.TestCase.__init__(self)
@@ -14,15 +14,31 @@ class CodecTestCase(unittest.TestCase):
   def runTest(self):
 
     self.assertEqual(
-      self.encoder.encode(self.pydata, self.descriptor, self.msgnum),
-      self.pbdata)
-
-    self.assertEqual(
-      self.decoder.decode(self.pbdata, self.descriptor, self.msgnum),
-      self.pydata)
+      self.decoder.decode(self.indata, self.descriptor, self.msgnum),
+      self.outdata)
 
   def shortDescription(self):
     return self.name
+
+
+class EncoderTestCase(unittest.TestCase):
+
+  def __init__(self, **keywords):
+    unittest.TestCase.__init__(self)
+
+    for k, v in keywords.items():
+      setattr(self, k, v)
+
+  def runTest(self):
+
+    self.assertEqual(
+      self.encoder.encode(self.indata, self.descriptor, self.msgnum),
+      self.outdata)
+
+  def shortDescription(self):
+    return self.name
+
+
 
 
 
@@ -47,21 +63,36 @@ if __name__ == '__main__':
   f = open(sys.argv[2])
 
   for line in f:
+
     line = line.rstrip('\r\n')
 
     if line != "":
-      block.append(line)
-    elif len(block) >= 4:
-      (name, msgname, pystr, pb2str) = block
 
-      suite.addTest(CodecTestCase(
-        name=name,
-        encoder=encoder,
+      block.append(line)
+
+    elif len(block) >= 4:
+
+      (name, msgname, pystr, pb2str) = block
+      msgnum = schema_messages[msgname]
+      pydata = eval(pystr)
+      pbdata = pb2str.strip('"').decode('string_escape')
+
+      suite.addTest(DecoderTestCase(
+        name="Decode %s" % name,
         decoder=decoder,
         descriptor=schema_descriptor,
-        msgnum=schema_messages[msgname],
-        pydata=eval(pystr),
-        pbdata=pb2str.strip('"').decode('string_escape')
+        msgnum=msgnum,
+        indata=pbdata,
+        outdata=pydata,
+      ))
+
+      suite.addTest(EncoderTestCase(
+        name="Encode %s" % name,
+        encoder=encoder,
+        descriptor=schema_descriptor,
+        msgnum=msgnum,
+        indata=pydata,
+        outdata=pbdata,
       ))
 
       block = []
