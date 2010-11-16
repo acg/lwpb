@@ -424,8 +424,8 @@ void PythonFormat::Printer::PrintFieldValue(
 
       case FieldDescriptor::CPPTYPE_ENUM:
         generator.Print(SimpleItoa(field->is_repeated() ?
-          reflection->GetRepeatedEnum(message, field, index)->index() :
-          reflection->GetEnum(message, field)->index()));
+          reflection->GetRepeatedEnum(message, field, index)->number() :
+          reflection->GetEnum(message, field)->number()));
         break;
 
       case FieldDescriptor::CPPTYPE_MESSAGE:
