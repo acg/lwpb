@@ -10,6 +10,7 @@ protofile_def = lwpb.PROTOFILE_DEFINITION
 protofile_desc = lwpb.Descriptor(protofile_def)
 protofile_msg = protofile_desc.message_types()
 protofile_bin = file(arg_protofile).read()
+protofile_desc.debug_print()
 
 m = protofile_msg['google.protobuf.FileDescriptorSet']
 schema_def = d.decode(protofile_bin, protofile_desc, m)

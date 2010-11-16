@@ -415,10 +415,10 @@ void PythonFormat::Printer::PrintFieldValue(
       case FieldDescriptor::CPPTYPE_BOOL:
         if (field->is_repeated()) {
           generator.Print(reflection->GetRepeatedBool(message, field, index)
-                          ? "true" : "false");
+                          ? "True" : "False");
         } else {
           generator.Print(reflection->GetBool(message, field)
-                          ? "true" : "false");
+                          ? "True" : "False");
         }
         break;
 

@@ -33,8 +33,9 @@ lwpb_to_py(union lwpb_value *p, unsigned int type)
       return PyInt_FromLong(p->int32);
 #endif
     case LWPB_FIXED32:
-    case LWPB_UINT32:
       return PyLong_FromLong(p->uint32);
+    case LWPB_UINT32:
+      return PyLong_FromUnsignedLong(p->uint32);
     case LWPB_BOOL:
       return PyBool_FromLong(p->bool);
     case LWPB_STRING:
