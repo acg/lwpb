@@ -25,7 +25,7 @@
 
 /* Maximum depth of message embedding */
 #ifndef LWPB_MAX_DEPTH
-#define LWPB_MAX_DEPTH 8
+#define LWPB_MAX_DEPTH 32
 #endif
 
 /* Maximum number of required fields in a message */
