@@ -23,7 +23,7 @@ typedef struct {
 Message* test_double()
 {
   test::MessagePrimitives* m = new test::MessagePrimitives;
-  m->set_f_double(1.2345);
+  m->set_f_double(11.0 / 7);
   return m;
 }
 
@@ -130,7 +130,6 @@ Message* test_packed()
   for (i=0; i<10; i++)
   {
     m->add_f_double(11 * (double)i / 7);
-    m->add_f_float(11 * (double)i / 7);
     m->add_f_int64(i * i * i * i);
     m->add_f_int32(i * i * i * i);
     m->add_f_fixed64(i * i * i * i);
