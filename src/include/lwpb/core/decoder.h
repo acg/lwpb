@@ -75,6 +75,7 @@ struct lwpb_decoder {
     lwpb_decoder_field_handler_t field_handler;
     struct lwpb_decoder_stack_frame stack[LWPB_MAX_DEPTH];
     int depth;
+    int packed;
 };
 
 void lwpb_decoder_init(struct lwpb_decoder *decoder);

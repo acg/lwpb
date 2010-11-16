@@ -335,10 +335,10 @@ lwpb_err_t lwpb_decoder_decode(struct lwpb_decoder *decoder,
     union wire_value wire_value;
     union lwpb_value value;
     struct lwpb_decoder_stack_frame *frame, *new_frame;
-    int packed = 0;
     
     // Setup initial stack frame
     decoder->depth = 1;
+    decoder->packed = 0;
     frame = &decoder->stack[decoder->depth - 1];
     lwpb_buf_init(&frame->buf, data, len);
     frame->msg_desc = msg_desc;
@@ -357,7 +357,7 @@ decode_nested:
         // Process buffer
         while (lwpb_buf_left(&frame->buf) > 0) {
             
-            if (packed) {
+            if (decoder->packed) {
                 wire_type = field_wire_type(field_desc);
             } else {
                 // Decode the field key
@@ -421,7 +421,7 @@ decode_nested:
                 new_frame->msg_desc = frame->msg_desc;
                 
                 // Enter packed repeated mode
-                packed = 1;
+                decoder->packed = 1;
                 
                 goto decode_nested;
             }
@@ -505,7 +505,7 @@ decode_nested:
         decoder->depth--;
         
         // Leave packed repeated mode
-        packed = 0;
+        decoder->packed = 0;
     }
     
     if (used)
