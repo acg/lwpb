@@ -58,8 +58,10 @@ msg_end_handler(
 
   /* Leaving a nested message, pop the top off the context stack. */
 
-  Py_ssize_t stacklen = PyList_Size(context->stack);
-  PyList_SetSlice(context->stack, stacklen-1, stacklen, NULL);
+  if (!decoder->packed) {
+    Py_ssize_t stacklen = PyList_Size(context->stack);
+    PyList_SetSlice(context->stack, stacklen-1, stacklen, NULL);
+  }
 }
 
 void
