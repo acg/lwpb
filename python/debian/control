@@ -1,0 +1,17 @@
+Source: python-lwpb
+Section: admin
+Priority: extra
+Maintainer: Alan Grow <alangrow@gmail.com>
+Build-depends: debhelper (>= 7), python-support
+Standards-Version: 0.1.0
+Homepage: http://code.google.com/p/lwpb/
+
+Package: python-lwpb
+Architecture: all
+Section: python
+Build-Depends: python-support (>= 1.0.0), python (>= 2.6), protobuf-compiler (>= 2.3.0)
+Depends: ${misc:Depends}, ${python:Depends}, python (>= 2.6)
+# Recommends: python-pycurl
+Description: Python LWPB
+ Fast, lightweight decoding and encoding of Google's Protocol Buffers in Python.
+
