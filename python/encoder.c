@@ -269,9 +269,10 @@ static PyMethodDef Encoder_methods[] = {
 PyTypeObject EncoderType = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
-  PyVarObject_HEAD_INIT(NULL, 0)
-  "lwpb.cext.Encoder",           /*tp_name*/
-  sizeof(Encoder),        /*tp_basicsize*/
+  PyObject_HEAD_INIT(NULL)
+  0,                            /*ob_size*/
+  "lwpb.cext.Encoder",          /*tp_name*/
+  sizeof(Encoder),              /*tp_basicsize*/
   0,                            /*tp_itemsize*/
   /* methods */
   (destructor)Encoder_dealloc,  /*tp_dealloc*/

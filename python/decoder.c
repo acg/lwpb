@@ -339,9 +339,10 @@ static PyMethodDef Decoder_methods[] = {
 PyTypeObject DecoderType = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
-  PyVarObject_HEAD_INIT(NULL, 0)
+  PyObject_HEAD_INIT(NULL)
+  0,                            /*ob_size*/
   "lwpb.cext.Decoder",           /*tp_name*/
-  sizeof(Decoder),        /*tp_basicsize*/
+  sizeof(Decoder),              /*tp_basicsize*/
   0,                            /*tp_itemsize*/
   /* methods */
   (destructor)Decoder_dealloc,  /*tp_dealloc*/
