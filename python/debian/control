@@ -12,6 +12,6 @@ Section: python
 Build-Depends: python-support (>= 1.0.0), python (>= 2.6), protobuf-compiler (>= 2.3.0)
 Depends: ${misc:Depends}, ${python:Depends}, python (>= 2.6)
 # Recommends: python-pycurl
-Description: Python LWPB
+Description: Python Lightweight Protocol Buffers
  Fast, lightweight decoding and encoding of Google's Protocol Buffers in Python.
 
