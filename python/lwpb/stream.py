@@ -63,10 +63,11 @@ class StreamWriter:
 
   def write(self, record):
     data = self.codec.encode(record)
-    self.write_raw(data)
+    return self.write_raw(data)
 
   def write_raw(self, raw):
     recordlen = len(raw)
     self.stream.write(self.codec.encoder.encode_32bit(recordlen))
     self.stream.write(raw)
+    return recordlen
 
