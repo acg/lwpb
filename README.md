@@ -5,17 +5,17 @@ The "Lightweight Protocol Buffer Library" provides fast encoding and decoding of
 
 Quick Python synopsis:
 
-  from lwpb.codec import MessageCodec
+    from lwpb.codec import MessageCodec
 
-  codec = MessageCodec( pb2file='person.pb2', typename='example.Person' )
-  serialized = codec.encode( { 'name': 'John Doe', 'id': 1234  } )
-  deserialized = codec.decode( serialized )
+    codec = MessageCodec( pb2file='person.pb2', typename='example.Person' )
+    serialized = codec.encode( { 'name': 'John Doe', 'id': 1234  } )
+    deserialized = codec.decode( serialized )
 
-  print deserialized
+    print deserialized
 
 This expects a compiled .proto file you can generate with:
 
-  protoc person.proto -o person.pb2
+    protoc person.proto -o person.pb2
 
 Some distinctive things about lwpb:
 
