@@ -1,5 +1,0 @@
-pylwpb
-======
-Fast encoding and decoding of Google Protocol Buffers for Python.
-Based on the excellent "Lightweight Protocol Buffers" C library from Simon Kallweit. http://code.google.com/p/lwpb/
-pylwpb is still in the early stages of development.

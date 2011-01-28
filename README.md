@@ -3,6 +3,19 @@ lwpb
 
 The "Lightweight Protocol Buffer Library" provides fast encoding and decoding of Google Protocol Buffers in C and Python.
 
+Some distinctive things about lwpb:
+
+  * lwpb does not require a codegen step.
+
+  * lwpb does not force OO on the programmer. Encoding and decoding works with dicts in Python, and plain old structures in C.
+
+  * lwpb is fast and small. The C library is 31kb stripped. The Python module is mostly written in C and performs well in benchmarks.
+
+  * lwpb does not depend on Google's C++ API or anything outside the Python standard libraries.
+
+Python library
+--------------
+
 Quick Python synopsis:
 
     from lwpb.codec import MessageCodec
@@ -17,15 +30,28 @@ This expects a compiled .proto file you can generate with:
 
     protoc person.proto -o person.pb2
 
-Some distinctive things about lwpb:
+To build the Python module, first compile the C library (see below), then:
 
-  * lwpb does not require a codegen step
+    cd python
+    ./build_inplace
+    python setup.py test
+    python setup.py build
+    python setup.py install
 
-  * lwpb does not force OO on the programmer, encoding and decoding works with dicts
+For Debian and Ubuntu users:
 
-  * lwpb is fast and small
+    cd python
+    debian/rules binary
+    dpkg -i ../*.deb
 
-  * lwpb does not wrap Google's C++ API
+C library
+---------
 
-The C library was originally released by Simon Kallweit: http://code.google.com/p/lwpb/. More documentation on the C API is there.
+The C library was originally released by Simon Kallweit. More documentation on the C API can be found here: [ http://code.google.com/p/lwpb/ ](http://code.google.com/p/lwpb/)
+
+To compile:
+
+    ./autogen.sh && ./configure && make
+
+Currently, the test step requires google's protobuf 2.3.0+.
 
