@@ -1,5 +1,4 @@
 import unittest
-import sys
 import lwpb
 
 
@@ -39,10 +38,7 @@ class EncoderTestCase(unittest.TestCase):
     return self.name
 
 
-
-
-
-if __name__ == '__main__':
+def run(pbfile, truthdbfile):
 
   suite = unittest.TestSuite()
 
@@ -51,7 +47,7 @@ if __name__ == '__main__':
 
   protofile_descriptor = lwpb.Descriptor(lwpb.PROTOFILE_DEFINITION)
   protofile_messages = protofile_descriptor.message_types()
-  protofile_bin = file(sys.argv[1]).read()
+  protofile_bin = file(pbfile).read()
 
   msgnum = protofile_messages['google.protobuf.FileDescriptorSet']
   schema_def = decoder.decode(protofile_bin, protofile_descriptor, msgnum)
@@ -60,7 +56,7 @@ if __name__ == '__main__':
 
   block = []
 
-  f = open(sys.argv[2])
+  f = open(truthdbfile)
 
   for line in f:
 
@@ -99,4 +95,16 @@ if __name__ == '__main__':
 
   runner = unittest.TextTestRunner(verbosity=2)
   runner.run(suite)
+
+
+if __name__ == '__main__':
+
+  import sys
+
+  if len(sys.argv) != 3:
+    print >> sys.stderr, "usage: %s pbfile truthfile" % sys.argv[0]
+    sys.exit(1)
+
+  run( sys.argv[1], sys.argv[2] )
+
 

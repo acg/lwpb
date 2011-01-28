@@ -1,4 +1,19 @@
-from distutils.core import setup, Extension
+from distutils.core import setup, Extension, Command
+
+
+class TestCommand(Command):
+  user_options = []
+
+  def initialize_options(self):
+    pass
+
+  def finalize_options(self):
+    pass
+
+  def run(self):
+    import tests
+    tests.run('test/test.proto.pb', 'test/truthdb.txt')
+
 
 setup(
   name='lwpb',
@@ -19,6 +34,7 @@ setup(
       libraries=['lwpb'],
     ),
   ],
-  packages=['lwpb']
+  packages=['lwpb'],
+  cmdclass={"test":TestCommand}
 )
 
