@@ -1,27 +1,43 @@
-CFLAGS = -g -I/home/agrow/src/protobuf-2.3.0/src
-LDFLAGS = -lprotobuf -lpthread
+TARGET_FILES = truthdb.txt test.proto.pb
+TARGET = truthdb
+
+SOURCES_CXX = \
+	truthdb.cc \
+	python_format.cc \
+	generated/test.pb.cc
+
+OBJECTS = $(SOURCES_CXX:.cc=.o) 
+DEPS = $(SOURCES_CXX:.cc=.d) 
+
+PROTOC = protoc
+CFLAGS += -g
+CXXFLAGS += $(CFLAGS) 
+LIBS = -lprotobuf -lpthread
 
 
-all : truthdb.txt
+all : $(DEPS) $(TARGET_FILES)
+
+test.proto.pb : test.proto
+	$(PROTOC) $< -o $@
 
 truthdb.txt : truthdb
 	./truthdb > $@
 
-truthdb : truthdb.o generated/test.pb.o python_format.o
-	$(CC) -o $@ $^ $(LDFLAGS)
+$(TARGET) : $(OBJECTS)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS) $(LIBS)
 
-truthdb.o : truthdb.cc generated/test.pb.h
-	$(CC) $(CFLAGS) -o $@ -c $<
+%.o : %.cc
+	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
-python_format.o : python_format.cc
-	$(CC) $(CFLAGS) -o $@ -c $<
+# Trick for setting up header file dependencies
 
-generated/test.pb.o : generated/test.pb.cc generated/test.pb.h
-	$(CC) $(CFLAGS) -o $@ -c $<
+%.d : %.cc
+	set -e; $(CXX) $(CXXFLAGS) -MM $(LDFLAGS) $< | \
+	sed -e "s@^\(.*\)\.o:@\1.d \1.o:@" > $@
 
 generated/test.pb.cc generated/test.pb.h : test.proto
-	protoc --cpp_out=generated $^
+	$(PROTOC) --cpp_out=generated $^
 
 clean :
-	rm -f truthdb *.o generated/*
+	rm -f $(TARGET) $(TARGET_FILES) *.o generated/*
 
