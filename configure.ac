@@ -13,4 +13,4 @@ AM_PROG_CC_C_O
 AC_PROG_CXXCPP
 AC_PROG_CXX
 
-AC_OUTPUT( Makefile src/Makefile )
+AC_OUTPUT( Makefile src/Makefile test/Makefile )
