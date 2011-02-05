@@ -17,7 +17,9 @@ import lwpb.stream
 import lwpb.codec
 
 
-def unflatten(src, dst={}):
+def unflatten(src):
+
+  dst = {}
 
   for k, v in src.items():
     path = k.split(".")
@@ -153,8 +155,8 @@ class PercentCodecReader:
         if not k.startswith('$'):
           flat[k] = self.escaper.decode(values[i])
 
-      record = unflatten(flat)
-      yield record
+      self.current_record = unflatten(flat)
+      yield self.current_record
 
 
 
@@ -221,8 +223,9 @@ def main():
 
   pb2file = shift(args)
   if len(args): fin = file(shift(args))
+  if len(args): fout = file(shift(args), 'w')
 
-  codec = lwpb.codec.MessageCodec(pb2file=pb2file, typename=typename )
+  codec = lwpb.codec.MessageCodec(pb2file=pb2file, typename=typename)
 
   # reader
 
