@@ -30,8 +30,7 @@ class PercentCodecReader:
 
       for i in range(0, len(values)):
         k = self.fields[i]
-        if not k.startswith('$'):
-          flat[k] = self.escaper.decode(values[i])
+        flat[k] = self.escaper.decode(values[i])
 
       self.current_record = unflatten(flat)
       yield self.current_record

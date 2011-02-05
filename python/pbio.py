@@ -70,13 +70,23 @@ def main():
   else:
     raise Exception("bad writer format")
 
-  # TODO implement skip and count
-  # TODO implement raw $RECORD passthrough when writing, see below
+  written = 0
 
   for record in reader:
 
+    if reader.current_number < skip:
+      continue
+
+    if count >= 0 and written >= count:
+      break
+
     for k in fields:
+
+      if k in record:
+        continue
+
       v = None
+
       if k == '$RECORD':
         v = reader.current_raw
       elif k == '$NUMBER':
@@ -85,49 +95,21 @@ def main():
         v = reader.current_offset
       elif k == '$LENGTH':
         v = reader.current_length
+
       if v != None:
         record[k] = str(v)
 
-    writer.write( record )
+    if writer_format == 'pb' and '$RECORD' in record:
+      writer.write_raw( record['$RECORD'] )
+    else:
+      writer.write( record )
+
+    written += 1
 
   return 0
 
 
-'''
-  elif mode == 'output':
-
-    writer = lwpb.stream.StreamWriter(fout, codec=codec)
-
-    ### If the original encoded record is included via the special
-    ### $RECORD field, there is no need to re-encode all the fields.
-
-    try:
-      rawindex = fields.index('$RECORD')
-    except ValueError, e:
-      rawindex = -1
-
-    for line in fin:
-      values = line.rstrip('\r\n').split(delim)
-
-      if rawindex >= 0:
-        raw = escaper.decode(values[rawindex])
-        writer.write_raw(record)
-      else:
-        flat = {}
-
-        for i in range(0, len(values)):
-          k = fields[i]
-          if not k.startswith('$'):
-            flat[k] = escaper.decode(values[i])
-
-        record = unflatten(flat)
-        writer.write(record)
-'''
-
-
 if __name__ == '__main__':
   sys.exit(main())
-  #test_unflatten()
-  #test_percent_codec()
 
 
