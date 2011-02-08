@@ -30,6 +30,7 @@ setup(
         'module.c',
         'primitives.c',
       ],
+      extra_compile_args=['-fPIC'],
       include_dirs=['../src/include'],
       define_macros=[],
       library_dirs=['../src/.libs'],
