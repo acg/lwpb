@@ -30,13 +30,15 @@ def main():
   fin = sys.stdin
   fout = sys.stdout
 
-  opts, args = getopt.getopt(sys.argv[1:], 'R:W:F:d:m:s:c:')
+  opts, args = getopt.getopt(sys.argv[1:], 'R:W:p:F:d:m:s:c:')
 
   for o, a in opts:
     if o == '-R':
       reader_format = a
     elif o == '-W':
       writer_format = a
+    elif o == '-p':
+      pb2file = a
     elif o == '-F':
       fields = a.split(',')
     elif o == '-m':
@@ -46,7 +48,6 @@ def main():
     elif o == '-c':
       count = int(a)
 
-  pb2file = shift(args)
   if len(args): fin = file(shift(args))
   if len(args): fout = file(shift(args), 'w')
 
