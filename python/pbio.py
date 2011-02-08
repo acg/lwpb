@@ -44,7 +44,7 @@ def main():
     elif o == '-s':
       skip = int(a)
     elif o == '-c':
-      count = int(c)
+      count = int(a)
 
   pb2file = shift(args)
   if len(args): fin = file(shift(args))
