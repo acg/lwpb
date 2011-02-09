@@ -26,12 +26,15 @@ def main():
   typename = ""
   skip = 0
   count = -1
+  begincode = None
   mapcode = None
+  endcode = None
+  codeglobals = {}
   pb2file = None
   fin = sys.stdin
   fout = sys.stdout
 
-  opts, args = getopt.getopt(sys.argv[1:], 'R:W:p:F:d:m:s:c:e:')
+  opts, args = getopt.getopt(sys.argv[1:], 'R:W:p:F:d:m:s:c:e:B:E:')
 
   for o, a in opts:
     if o == '-R':
@@ -49,7 +52,11 @@ def main():
     elif o == '-c':
       count = int(a)
     elif o == '-e':
-      mapcode = compile(a,'<string>','exec')
+      mapcode = compile(a,"-e '%s'" % a,'exec')
+    elif o == '-B':
+      begincode = compile(a,"-B '%s'" % a,'exec')
+    elif o == '-E':
+      endcode = compile(a,"-E '%s'" % a,'exec')
 
   if len(args): fin = file(shift(args))
   if len(args): fout = file(shift(args), 'w')
@@ -76,6 +83,12 @@ def main():
 
   written = 0
 
+  if begincode != None:
+    exec begincode in codeglobals
+
+
+  # record reading loop
+
   for record in reader:
 
     if reader.current_number < skip:
@@ -85,7 +98,7 @@ def main():
       break
 
     if mapcode != None:
-      exec mapcode in record
+      exec mapcode in codeglobals, record
 
     for k in fields:
 
@@ -112,6 +125,10 @@ def main():
       writer.write( record )
 
     written += 1
+
+
+  if endcode != None:
+    exec endcode in codeglobals
 
   return 0
 
