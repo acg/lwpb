@@ -20,39 +20,31 @@ Python library
 
 Quick Python synopsis:
 
-{% highlight python %}
-from lwpb.codec import MessageCodec
+    from lwpb.codec import MessageCodec
 
-codec = MessageCodec( pb2file='person.pb2', typename='example.Person' )
-serialized = codec.encode( { 'name': 'John Doe', 'id': 1234  } )
-deserialized = codec.decode( serialized )
+    codec = MessageCodec( pb2file='person.pb2', typename='example.Person' )
+    serialized = codec.encode( { 'name': 'John Doe', 'id': 1234  } )
+    deserialized = codec.decode( serialized )
 
-print deserialized
-{% endhighlight %}
+    print deserialized
 
 This expects a compiled .proto file you can generate with:
 
-{% highlight bash %}
-protoc person.proto -o person.pb2
-{% endhighlight %}
+    protoc person.proto -o person.pb2
 
 To build the Python module, first compile the C library (see below), then:
 
-{% highlight bash %}
-cd python
-./build_inplace
-python setup.py test
-python setup.py build
-python setup.py install
-{% endhighlight %}
+    cd python
+    ./build_inplace
+    python setup.py test
+    python setup.py build
+    python setup.py install
 
 For Debian and Ubuntu users:
 
-{% highlight bash %}
-cd python
-debian/rules binary
-dpkg -i ../*.deb
-{% endhighlight %}
+    cd python
+    debian/rules binary
+    dpkg -i ../*.deb
 
 C library
 ---------
@@ -61,9 +53,7 @@ The C library was originally released by Simon Kallweit. More documentation on t
 
 To compile:
 
-{% highlight bash %}
-./autogen.sh && ./configure && make
-{% endhighlight %}
+    ./autogen.sh && ./configure && make
 
 Currently, the test build step requires Google's protobuf 2.3.0+. If you're just interested in building the Python library, you can ignore build failures in the top level test/ directory.
 
