@@ -26,11 +26,12 @@ def main():
   typename = ""
   skip = 0
   count = -1
+  mapcode = None
   pb2file = None
   fin = sys.stdin
   fout = sys.stdout
 
-  opts, args = getopt.getopt(sys.argv[1:], 'R:W:p:F:d:m:s:c:')
+  opts, args = getopt.getopt(sys.argv[1:], 'R:W:p:F:d:m:s:c:e:')
 
   for o, a in opts:
     if o == '-R':
@@ -47,6 +48,8 @@ def main():
       skip = int(a)
     elif o == '-c':
       count = int(a)
+    elif o == '-e':
+      mapcode = compile(a,'<string>','exec')
 
   if len(args): fin = file(shift(args))
   if len(args): fout = file(shift(args), 'w')
@@ -80,6 +83,9 @@ def main():
 
     if count >= 0 and written >= count:
       break
+
+    if mapcode != None:
+      exec mapcode in record
 
     for k in fields:
 
