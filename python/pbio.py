@@ -31,6 +31,7 @@ def main():
   endcode = None
   codeglobals = {}
   pb2file = None
+  pb2codec = None
   fin = sys.stdin
   fout = sys.stdout
 
@@ -61,12 +62,13 @@ def main():
   if len(args): fin = file(shift(args))
   if len(args): fout = file(shift(args), 'w')
 
-  codec = lwpb.codec.MessageCodec(pb2file=pb2file, typename=typename)
+  if pb2file:
+    pb2codec = lwpb.codec.MessageCodec(pb2file=pb2file, typename=typename)
 
   # reader
 
   if reader_format == 'pb':
-    reader = lwpb.stream.StreamReader(fin, codec=codec)
+    reader = lwpb.stream.StreamReader(fin, codec=pb2codec)
   elif reader_format == 'txt':
     reader = percent.stream.PercentCodecReader(fin, '\t', fields)
   else:
@@ -75,7 +77,7 @@ def main():
   # writer
 
   if writer_format == 'pb':
-    writer = lwpb.stream.StreamWriter(fout, codec=codec)
+    writer = lwpb.stream.StreamWriter(fout, codec=pb2codec)
   elif writer_format == 'txt':
     writer = percent.stream.PercentCodecWriter(fout, '\t', fields)
   else:
