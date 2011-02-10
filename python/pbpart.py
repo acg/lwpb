@@ -29,7 +29,7 @@ def main():
   infile = '-'
   verbose = 0
 
-  opts, args = getopt.getopt(sys.argv[1:], 'p:k:m:e:B:E:v')
+  opts, args = getopt.getopt(sys.argv[1:], 'p:k:m:e:B:E:t:v')
 
   for o, a in opts:
     if o == '-p':
