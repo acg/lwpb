@@ -6,9 +6,6 @@
 
 import sys
 import getopt
-import os
-import string
-import re
 import lwpb
 import lwpb.stream
 import lwpb.codec
