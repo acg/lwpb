@@ -9,7 +9,6 @@ import getopt
 import lwpb
 import lwpb.stream
 import lwpb.codec
-import percent.stream
 
 
 def shift(L): e = L[0] ; del L[0:1] ; return e
