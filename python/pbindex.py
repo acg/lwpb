@@ -80,7 +80,7 @@ def main():
   pb2codec = lwpb.codec.MessageCodec( pb2file=pb2file, typename=typename )
 
   if reader_format == 'pb':
-    reader = lwpb.stream.Streamreader( fin, codec=pb2codec )
+    reader = lwpb.stream.StreamReader( fin, codec=pb2codec )
   elif reader_format == 'txt':
     import percent.stream
     reader = percent.stream.PercentCodecReader( fin, '\t', fields )
