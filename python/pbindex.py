@@ -16,6 +16,9 @@ def shift(L): e = L[0] ; del L[0:1] ; return e
 
 def main():
 
+  reader_format = 'pb'
+  delim = '\t'
+  fields = []
   key = None
   typename = ""
   pb2file = None
@@ -28,10 +31,16 @@ def main():
   infile = '-'
   verbose = 0
 
-  opts, args = getopt.getopt(sys.argv[1:], 'p:k:i:o:t:m:v')
+  opts, args = getopt.getopt(sys.argv[1:], 'R:F:d:p:k:i:o:t:m:v')
 
   for o, a in opts:
-    if o == '-p':
+    if o == '-R':
+      reader_format = a
+    elif o == '-F':
+      fields = a.split(',')
+    elif o == '-d':
+      delim = a
+    elif o == '-p':
       pb2file = a
     elif o == '-k':
       key = a
@@ -58,8 +67,8 @@ def main():
   if indextype == 'cdb':
 
     import cdb
-    outfile = "%s.%s.%s.idx" % (infile, key, indextype)
-    tempfile = "%s.%s.%s.tmp" % (infile, key, indextype)
+    if not outfile: outfile = "%s-%s-%s.idx" % (infile, key, indextype)
+    if not tempfile: tempfile = "%s.tmp" % outfile
     indexer = cdb.cdbmake( outfile, tempfile )
 
   elif indextype == None:
@@ -68,8 +77,15 @@ def main():
 
   # create the stream reader
 
-  pb2codec = lwpb.codec.MessageCodec(pb2file=pb2file, typename=typename)
-  reader = lwpb.stream.StreamReader(fin, codec=pb2codec)
+  pb2codec = lwpb.codec.MessageCodec( pb2file=pb2file, typename=typename )
+
+  if reader_format == 'pb':
+    reader = lwpb.stream.Streamreader( fin, codec=pb2codec )
+  elif reader_format == 'txt':
+    import percent.stream
+    reader = percent.stream.PercentCodecReader( fin, '\t', fields )
+  else:
+    raise Exception("bad reader format")
 
   # index all the records
 
