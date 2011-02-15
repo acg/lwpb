@@ -19,7 +19,9 @@ class PercentCodec:
     for c in safeset: self.chrtohex[c] = c
     self.chrtohex['%'] = '%%'
 
-    self.hextochr = dict(('%02x' % i, chr(i)) for i in range(256))
+    h1 = dict( ('%02x' % i, chr(i)) for i in range(256) )
+    h2 = dict( ('%02X' % i, chr(i)) for i in range(256) )
+    self.hextochr = dict( h1, **h2 )
     self.hextochr['%'] = '%'
 
     self.regex = re.compile('%(%|[a-fA-F0-9]{2})')
