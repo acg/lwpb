@@ -17,6 +17,7 @@ def shift(L): e = L[0] ; del L[0:1] ; return e
 
 def main():
 
+  reader_format = 'pb'
   writer_format = 'pb'
   delim = '\t'
   fields = []
@@ -32,10 +33,12 @@ def main():
   infile = None
   verbose = 0
 
-  opts, args = getopt.getopt(sys.argv[1:], 'W:F:d:p:k:i:x:t:m:v')
+  opts, args = getopt.getopt(sys.argv[1:], 'R:W:F:d:p:k:i:x:t:m:v')
 
   for o, a in opts:
-    if o == '-W':
+    if o == '-R':
+      reader_format = a
+    elif o == '-W':
       writer_format = a
     elif o == '-F':
       fields = a.split(',')
@@ -74,16 +77,26 @@ def main():
 
     raise Exception("missing index type parameter, specify with -i")
 
-  # create the stream reader and writer
+  if reader_format == 'pb' or writer_format == 'pb':
+    pb2codec = lwpb.codec.MessageCodec( pb2file=pb2file, typename=typename )
 
-  pb2codec = lwpb.codec.MessageCodec( pb2file=pb2file, typename=typename )
-  reader = lwpb.stream.StreamReader( fin, codec=pb2codec )
+  # create the stream reader
+
+  if reader_format == 'pb':
+    reader = lwpb.stream.StreamReader( fin, codec=pb2codec )
+  elif reader_format == 'txt':
+    import percent.stream
+    reader = percent.stream.PercentCodecReader( fin, delim, fields )
+  else:
+    raise Exception("bad reader format")
+
+  # create the stream reader
 
   if writer_format == 'pb':
     writer = lwpb.stream.StreamWriter( fout, codec=pb2codec )
   elif writer_format == 'txt':
     import percent.stream
-    writer = percent.stream.PercentCodecWriter( fout, '\t', fields )
+    writer = percent.stream.PercentCodecWriter( fout, delim, fields )
   else:
     raise Exception("bad writer format")
 
@@ -91,10 +104,12 @@ def main():
 
   for line in sys.stdin:
     indexkey = line.strip('\r\n')
-    offset = long( indexreader.get(indexkey) )
-    fin.seek( offset, os.SEEK_SET )
-    record = reader.read()
-    writer.write( record )
+
+    for indexvalue in indexreader.getall(indexkey):
+      offset = long( indexvalue )
+      fin.seek( offset, os.SEEK_SET )
+      record = reader.read()
+      writer.write( record )
 
   return 0
 
