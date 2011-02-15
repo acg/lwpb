@@ -12,29 +12,40 @@ class PercentCodecReader:
     self.delim = delim
     self.fields = fields
     self.escaper = PercentCodec(safe=string.printable, unsafe="\r\n\t\v\f"+delim)
-
-  def __iter__(self):
-
     self.current_number = 0
     self.current_offset = 0
 
-    for line in self.f:
+  def __iter__(self):
 
-      self.current_raw = line
-      self.current_number += 1
-      self.current_length = len(line)
-      self.current_offset += self.current_length
+    eof = False
 
-      values = line.rstrip('\r\n').split(self.delim)
-      flat = {}
+    while not eof:
+      record = self.read()
+      if record == None:
+        eof = True
+      else:
+        yield record
 
-      for i in range(0, len(values)):
-        k = self.fields[i]
-        flat[k] = self.escaper.decode(values[i])
+  def read(self):
 
-      self.current_record = unflatten(flat)
-      yield self.current_record
+    line = self.f.readline()
+    if line == "":
+      return None
 
+    self.current_raw = line
+    self.current_number += 1
+    self.current_length = len(line)
+    self.current_offset += self.current_length
+
+    values = line.rstrip('\r\n').split(self.delim)
+    flat = {}
+
+    for i in range(0, len(values)):
+      k = self.fields[i]
+      flat[k] = self.escaper.decode(values[i])
+
+    self.current_record = unflatten(flat)
+    return self.current_record
 
 
 class PercentCodecWriter:
