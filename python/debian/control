@@ -5,12 +5,13 @@ Maintainer: Alan Grow <alangrow@gmail.com>
 Build-depends: debhelper (>= 7), python-support
 Standards-Version: 0.1.0
 Homepage: http://code.google.com/p/lwpb/
+Vcs-Git: https://acg@github.com/acg/python-cdb.git
 
 Package: python-lwpb
 Architecture: all
 Section: python
-Build-Depends: python-support (>= 1.0.0), python (>= 2.6), protobuf-compiler (>= 2.3.0)
-Depends: ${misc:Depends}, ${python:Depends}, python (>= 2.6)
+Build-Depends: python-support (>= 1.0.0), python (>= 2.5), protobuf-compiler (>= 2.3.0)
+Depends: ${misc:Depends}, ${python:Depends}, python (>= 2.5)
 # Recommends: python-pycurl
 Description: Python Lightweight Protocol Buffers
  Fast, lightweight decoding and encoding of Google's Protocol Buffers in Python.
