@@ -9,7 +9,6 @@ import getopt
 import lwpb
 import lwpb.stream
 import lwpb.codec
-import percent.stream
 
 
 def shift(L): e = L[0] ; del L[0:1] ; return e
@@ -39,6 +38,8 @@ def main():
       reader_format = a
     elif o == '-W':
       writer_format = a
+    elif o == '-d':
+      delim = a
     elif o == '-p':
       pb2file = a
     elif o == '-F':
@@ -67,6 +68,7 @@ def main():
   if reader_format == 'pb':
     reader = lwpb.stream.StreamReader(fin, codec=pb2codec)
   elif reader_format == 'txt':
+    import percent.stream
     reader = percent.stream.PercentCodecReader(fin, '\t', fields)
   else:
     raise Exception("bad reader format")
@@ -76,6 +78,7 @@ def main():
   if writer_format == 'pb':
     writer = lwpb.stream.StreamWriter(fout, codec=pb2codec)
   elif writer_format == 'txt':
+    import percent.stream
     writer = percent.stream.PercentCodecWriter(fout, '\t', fields)
   else:
     raise Exception("bad writer format")
