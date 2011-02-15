@@ -69,7 +69,7 @@ def main():
     reader = lwpb.stream.StreamReader(fin, codec=pb2codec)
   elif reader_format == 'txt':
     import percent.stream
-    reader = percent.stream.PercentCodecReader(fin, '\t', fields)
+    reader = percent.stream.PercentCodecReader(fin, delim, fields)
   else:
     raise Exception("bad reader format")
 
@@ -79,7 +79,7 @@ def main():
     writer = lwpb.stream.StreamWriter(fout, codec=pb2codec)
   elif writer_format == 'txt':
     import percent.stream
-    writer = percent.stream.PercentCodecWriter(fout, '\t', fields)
+    writer = percent.stream.PercentCodecWriter(fout, delim, fields)
   else:
     raise Exception("bad writer format")
 
