@@ -11,6 +11,7 @@ class PercentCodecReader:
     self.codec = codec
     self.current_number = 0
     self.current_offset = 0
+    self.current_length = 0
 
   def __iter__(self):
 
@@ -25,6 +26,8 @@ class PercentCodecReader:
 
   def read(self):
 
+    self.current_offset += self.current_length
+
     line = self.f.readline()
     if line == "":
       return None
@@ -32,7 +35,6 @@ class PercentCodecReader:
     self.current_raw = line
     self.current_number += 1
     self.current_length = len(line)
-    self.current_offset += self.current_length
     self.current_record = self.codec.decode( line )
 
     return self.current_record
