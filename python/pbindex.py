@@ -2,14 +2,11 @@
 
 '''
   pbindex - create an index on field in a protobuf stream
-    currently only supports one index type: -i cdb
+    currently only supports one index types: -i cdb
 '''
 
 import sys
 import getopt
-import lwpb
-import lwpb.stream
-import lwpb.codec
 
 
 def shift(L): e = L[0] ; del L[0:1] ; return e
@@ -77,15 +74,19 @@ def main():
 
   # create the stream reader
 
-  pb2codec = lwpb.codec.MessageCodec( pb2file=pb2file, typename=typename )
-
   if reader_format == 'pb':
+    import lwpb.stream
+    import lwpb.codec
+    pb2codec = lwpb.codec.MessageCodec( pb2file=pb2file, typename=typename )
     reader = lwpb.stream.StreamReader( fin, codec=pb2codec )
   elif reader_format == 'txt':
     import percent.stream
-    reader = percent.stream.PercentCodecReader( fin, '\t', fields )
+    import percent.codec
+    txtcodec = percent.codec.PercentCodec( fields, delim )
+    reader = percent.stream.PercentCodecReader( fin, txtcodec )
   else:
     raise Exception("bad reader format")
+
 
   # index all the records
 
