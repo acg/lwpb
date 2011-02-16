@@ -8,9 +8,6 @@
 import sys
 import os
 import getopt
-import lwpb
-import lwpb.stream
-import lwpb.codec
 
 
 def shift(L): e = L[0] ; del L[0:1] ; return e
@@ -24,7 +21,6 @@ def main():
   key = None
   typename = ""
   pb2file = None
-  pb2codec = None
   indextype = None
   indexreader = None
   indexfile = None
@@ -77,28 +73,38 @@ def main():
 
     raise Exception("missing index type parameter, specify with -i")
 
-  if reader_format == 'pb' or writer_format == 'pb':
+  # initialize reader / writer codecs
+
+  if pb2file:
+    import lwpb.codec
     pb2codec = lwpb.codec.MessageCodec( pb2file=pb2file, typename=typename )
+
+  if len(fields):
+    import percent.codec
+    txtcodec = percent.codec.PercentCodec( fields, delim )
 
   # create the stream reader
 
   if reader_format == 'pb':
+    import lwpb.stream
     reader = lwpb.stream.StreamReader( fin, codec=pb2codec )
   elif reader_format == 'txt':
     import percent.stream
-    reader = percent.stream.PercentCodecReader( fin, delim, fields )
+    reader = percent.stream.PercentCodecReader( fin, txtcodec )
   else:
     raise Exception("bad reader format")
 
-  # create the stream reader
+  # create the stream writer
 
   if writer_format == 'pb':
+    import lwpb.stream
     writer = lwpb.stream.StreamWriter( fout, codec=pb2codec )
   elif writer_format == 'txt':
     import percent.stream
-    writer = percent.stream.PercentCodecWriter( fout, delim, fields )
+    writer = percent.stream.PercentCodecWriter( fout, txtcodec )
   else:
     raise Exception("bad writer format")
+
 
   # lookup, read, and write records
 

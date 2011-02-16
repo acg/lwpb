@@ -6,9 +6,6 @@
 
 import sys
 import getopt
-import lwpb
-import lwpb.stream
-import lwpb.codec
 
 
 def shift(L): e = L[0] ; del L[0:1] ; return e
@@ -27,7 +24,7 @@ def main():
   endcode = None
   codeglobals = {}
   pb2file = None
-  pb2codec = None
+  codec = None
   fin = sys.stdin
   fout = sys.stdout
 
@@ -61,25 +58,32 @@ def main():
   if len(args): fout = file(shift(args), 'w')
 
   if pb2file:
-    pb2codec = lwpb.codec.MessageCodec(pb2file=pb2file, typename=typename)
+    import lwpb.codec
+    pb2codec = lwpb.codec.MessageCodec( pb2file=pb2file, typename=typename )
+
+  if len(fields):
+    import percent.codec
+    txtcodec = percent.codec.PercentCodec( fields, delim )
 
   # reader
 
   if reader_format == 'pb':
-    reader = lwpb.stream.StreamReader(fin, codec=pb2codec)
+    import lwpb.stream
+    reader = lwpb.stream.StreamReader( fin, codec=pb2codec )
   elif reader_format == 'txt':
     import percent.stream
-    reader = percent.stream.PercentCodecReader(fin, delim, fields)
+    reader = percent.stream.PercentCodecReader( fin, txtcodec )
   else:
     raise Exception("bad reader format")
 
   # writer
 
   if writer_format == 'pb':
-    writer = lwpb.stream.StreamWriter(fout, codec=pb2codec)
+    import lwpb.stream
+    writer = lwpb.stream.StreamWriter( fout, codec=pb2codec )
   elif writer_format == 'txt':
     import percent.stream
-    writer = percent.stream.PercentCodecWriter(fout, delim, fields)
+    writer = percent.stream.PercentCodecWriter( fout, txtcodec )
   else:
     raise Exception("bad writer format")
 
