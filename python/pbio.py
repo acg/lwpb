@@ -15,7 +15,8 @@ def main():
   reader_format = 'pb'
   writer_format = 'txt'
   delim = '\t'
-  fields = []
+  infields = []
+  outfields = []
   typename = ""
   skip = 0
   count = -1
@@ -23,12 +24,13 @@ def main():
   mapcode = None
   endcode = None
   codeglobals = {}
+  aggregate = None
   pb2file = None
   codec = None
   fin = sys.stdin
   fout = sys.stdout
 
-  opts, args = getopt.getopt(sys.argv[1:], 'R:W:p:F:d:m:s:c:e:B:E:')
+  opts, args = getopt.getopt(sys.argv[1:], 'R:W:p:F:I:O:d:m:s:c:e:B:E:A:')
 
   for o, a in opts:
     if o == '-R':
@@ -40,7 +42,11 @@ def main():
     elif o == '-p':
       pb2file = a
     elif o == '-F':
-      fields = a.split(',')
+      infields = outfields = a.split(',')
+    elif o == '-I':
+      infields = a.split(',')
+    elif o == '-O':
+      outfields = a.split(',')
     elif o == '-m':
       typename = a
     elif o == '-s':
@@ -53,17 +59,23 @@ def main():
       begincode = compile(a,"-B '%s'" % a,'exec')
     elif o == '-E':
       endcode = compile(a,"-E '%s'" % a,'exec')
+    elif o == '-A':
+      aggregate = a
 
   if len(args): fin = file(shift(args))
   if len(args): fout = file(shift(args), 'w')
 
-  if pb2file:
+  if reader_format == 'pb' or writer_format == 'pb':
     import lwpb.codec
     pb2codec = lwpb.codec.MessageCodec( pb2file=pb2file, typename=typename )
 
-  if len(fields):
+  if reader_format == 'txt':
     import percent.codec
-    txtcodec = percent.codec.PercentCodec( fields, delim )
+    intxtcodec = percent.codec.PercentCodec( infields, delim )
+
+  if writer_format == 'txt':
+    import percent.codec
+    outtxtcodec = percent.codec.PercentCodec( outfields, delim )
 
   # reader
 
@@ -72,7 +84,7 @@ def main():
     reader = lwpb.stream.StreamReader( fin, codec=pb2codec )
   elif reader_format == 'txt':
     import percent.stream
-    reader = percent.stream.PercentCodecReader( fin, txtcodec )
+    reader = percent.stream.PercentCodecReader( fin, intxtcodec )
   else:
     raise Exception("bad reader format")
 
@@ -83,11 +95,20 @@ def main():
     writer = lwpb.stream.StreamWriter( fout, codec=pb2codec )
   elif writer_format == 'txt':
     import percent.stream
-    writer = percent.stream.PercentCodecWriter( fout, txtcodec )
+    writer = percent.stream.PercentCodecWriter( fout, outtxtcodec )
   else:
     raise Exception("bad writer format")
 
+  def emit(record):
+    if writer_format == 'pb' and '_RECORD' in record:
+      writer.write_raw( record['_RECORD'] )
+    else:
+      writer.write( record )
+
+  codeglobals['emit'] = emit
+
   written = 0
+  lastkey = None
 
   if begincode != None:
     exec begincode in codeglobals
@@ -97,38 +118,51 @@ def main():
 
   for record in reader:
 
+    # skip to first record
+
     if reader.current_number < skip:
       continue
+
+    # stop after <count> records
 
     if count >= 0 and written >= count:
       break
 
+    # in aggregate mode (-A key), run -B and -E code at key boundaries
+
+    if aggregate != None:
+      key = record.get( aggregate, None )
+      if lastkey != None and key != lastkey:
+        if endcode != None: exec endcode in codeglobals
+        if begincode != None: exec begincode in codeglobals
+      lastkey = key
+
     if mapcode != None:
       exec mapcode in codeglobals, record
 
-    for k in fields:
+    if record.get('_SKIP', False):
+      continue
+
+    for k in infields:
 
       if k in record:
         continue
 
       v = None
 
-      if k == '$RECORD':
+      if k == '_RECORD':
         v = reader.current_raw
-      elif k == '$NUMBER':
+      elif k == '_NUMBER':
         v = reader.current_number
-      elif k == '$OFFSET':
+      elif k == '_OFFSET':
         v = reader.current_offset
-      elif k == '$LENGTH':
+      elif k == '_LENGTH':
         v = reader.current_length
 
       if v != None:
         record[k] = str(v)
 
-    if writer_format == 'pb' and '$RECORD' in record:
-      writer.write_raw( record['$RECORD'] )
-    else:
-      writer.write( record )
+    emit(record)
 
     written += 1
 
