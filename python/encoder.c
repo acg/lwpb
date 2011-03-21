@@ -40,8 +40,7 @@ pyobject_encode(
   PyObject* obj,
   struct lwpb_encoder2 *encoder,
   const struct lwpb_msg_desc *msg_desc,
-  u8_t* buf,
-  int* error)
+  u8_t* buf)
 {
   size_t len = 0;
   size_t extralen = 0;
@@ -50,11 +49,12 @@ pyobject_encode(
   union lwpb_value val;
   PyObject* pyval = NULL;
   PyObject* pylist = NULL;
+  int error = 0;
 
   /* Python object must be a dict to be encoded as a message. */
 
   if (!PyDict_Check(obj)) {
-    *error = 1; // FIXME more specific error code
+    PyErr_SetString(PyExc_TypeError, "encode expects a dict");
     return -1;
   }
 
@@ -114,15 +114,19 @@ pyobject_encode(
 
         extralen += MSG_RESERVE_BYTES;
         nestedbuf = valuebuf ? valuebuf + MSG_RESERVE_BYTES : 0;
-        nestedlen = pyobject_encode(pyval, encoder, field_desc->msg_desc, nestedbuf, error);
-        if (*error) break;
+        nestedlen = pyobject_encode(pyval, encoder, field_desc->msg_desc, nestedbuf);
+
+        if (nestedlen < 0) {
+          error = 1;
+          break;
+        }
 
         val.message.data = nestedbuf;
         val.message.len = nestedlen;
       }
       else {
         if (py_to_lwpb(&val, pyval, field_desc->opts.typ) < 0) {
-          *error = 1; // FIXME more specific error code
+          error = 1;
           break;
         }
       }
@@ -133,7 +137,7 @@ pyobject_encode(
     }
 
     Py_XDECREF(pylist);
-    if (*error) return -1;
+    if (error) return -1;
 
     /* If the field is packed repeated, leave packed encoder mode
        and re-encode with the length prefix. */
@@ -143,7 +147,6 @@ pyobject_encode(
       val.message.data = fieldbuf;
       val.message.len = fieldlen;
       fieldlen = lwpb_encoder2_add_field(encoder, field_desc, &val, buf);
-      if (*error) return -1;
     }
 
     if (buf) buf += fieldlen;
@@ -171,7 +174,6 @@ Encoder_encode(Encoder *self, PyObject *args)
   PyObject* string = NULL;
   size_t len;
   u8_t *buf = 0;
-  int error = 0;
   int pass;
 
   /*
@@ -185,12 +187,10 @@ Encoder_encode(Encoder *self, PyObject *args)
   for (pass=0; pass<2; pass++)
   {
     lwpb_encoder2_start(&self->encoder, &descriptor->msg_desc[msgnum]);
-    len = pyobject_encode(dict, &self->encoder, &descriptor->msg_desc[msgnum], buf, &error);
+    len = pyobject_encode(dict, &self->encoder, &descriptor->msg_desc[msgnum], buf);
 
-    if (error) {
-      PyErr_Format(PyExc_RuntimeError, "encode error: %d", error); // FIXME exception class
+    if (len < 0)
       break;
-    }
 
     if (pass == 0) {
       if (!(buf = calloc(1, len))) {
@@ -198,8 +198,7 @@ Encoder_encode(Encoder *self, PyObject *args)
         break;
       }
     } else if (pass == 1) {
-      if (!(string = PyString_FromStringAndSize((char*)buf, len)))
-        break;
+      string = PyString_FromStringAndSize((char*)buf, len);
     }
   }
 
