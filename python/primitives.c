@@ -1,7 +1,8 @@
 #include "primitives.h"
 #include "Python.h"
+#include "pythoncompat.h"
 #include <lwpb/lwpb.h>
-
+#include <stdint.h>
 
 /* Utility functions: scalar type conversion */
 
