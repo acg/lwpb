@@ -3,6 +3,7 @@
 #include <lwpb/lwpb.h>
 #include "descriptor.h"
 #include "primitives.h"
+#include "pythoncompat.h"
 
 
 typedef struct {

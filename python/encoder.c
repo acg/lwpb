@@ -4,6 +4,7 @@
 #include <lwpb/core/encoder2.h>
 #include "descriptor.h"
 #include "primitives.h"
+#include "pythoncompat.h"
 
 
 /* Encoder methods */
