@@ -3,7 +3,7 @@
 #include <lwpb/lwpb.h>
 #include <stdio.h>  // for Descriptor_debug_print()
 #include "primitives.h"
-
+#include "pythoncompat.h"
 
 /* Descriptor methods */
 
