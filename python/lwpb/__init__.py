@@ -49,7 +49,21 @@ PROTOFILE_DEFINITION = {
            "label": LABEL_REPEATED,
            "type": TYPE_MESSAGE,
            "type_name": ".google.protobuf.DescriptorProto",
-        }
+        },
+        {
+           "name": "enum_type",
+           "number": 5,
+           "label": LABEL_REPEATED,
+           "type": TYPE_MESSAGE,
+           "type_name": ".google.protobuf.EnumDescriptorProto",
+        },
+        {
+           "name": "options",
+           "number": 8,
+           "label": LABEL_OPTIONAL,
+           "type": TYPE_MESSAGE,
+           "type_name": ".google.protobuf.FileOptions",
+        },
       ]
     },
     {
@@ -69,6 +83,27 @@ PROTOFILE_DEFINITION = {
            "type": TYPE_MESSAGE,
            "type_name": ".google.protobuf.FieldDescriptorProto",
         },
+        {
+           "name": "nested_type",
+           "number": 3,
+           "label": LABEL_REPEATED,
+           "type": TYPE_MESSAGE,
+           "type_name": ".google.protobuf.DescriptorProto",
+        },
+        {
+           "name": "enum_type",
+           "number": 4,
+           "label": LABEL_REPEATED,
+           "type": TYPE_MESSAGE,
+           "type_name": ".google.protobuf.EnumDescriptorProto",
+        },
+        {
+           "name": "extension",
+           "number": 7,
+           "label": LABEL_REPEATED,
+           "type": TYPE_MESSAGE,
+           "type_name": ".google.protobuf.FileDescriptorProto",
+        },
       ]
     },
     {
@@ -80,6 +115,12 @@ PROTOFILE_DEFINITION = {
            "number": 1,
            "label": LABEL_OPTIONAL,
            "type": TYPE_STRING,
+        },
+        {
+           "name": "extendee",
+           "number": 2,
+           "label": LABEL_OPTIONAL,
+           "type": TYPE_INT32,
         },
         {
            "name": "number",
@@ -146,6 +187,68 @@ PROTOFILE_DEFINITION = {
         },
       ]
     },
-  ]
+    {
+      "name": "EnumDescriptorProto",
+      "field":
+      [
+        {
+           "name": "name",
+           "number": 1,
+           "label": LABEL_OPTIONAL,
+           "type": TYPE_STRING,
+        },
+        {
+           "name": "value",
+           "number": 2,
+           "label": LABEL_REPEATED,
+           "type": TYPE_MESSAGE,
+           "type_name": ".google.protobuf.EnumValueDescriptorProto",
+        },
+      ]
+    },
+    {
+      "name": "EnumValueDescriptorProto",
+      "field":
+      [
+        {
+           "name": "name",
+           "number": 1,
+           "label": LABEL_OPTIONAL,
+           "type": TYPE_STRING,
+        },
+        {
+           "name": "number",
+           "number": 2,
+           "label": LABEL_OPTIONAL,
+           "type": TYPE_INT32,
+        },
+      ]
+    },
+    {
+      "name": "FileOptions",
+      "field":
+      [
+        {
+           "name": "java_package",
+           "number": 1,
+           "label": LABEL_OPTIONAL,
+           "type": TYPE_STRING,
+        },
+        {
+           "name": "java_outer_classname",
+           "number": 8,
+           "label": LABEL_OPTIONAL,
+           "type": TYPE_STRING,
+        },
+        {
+           "name": "java_multiple_files",
+           "number": 10,
+           "label": LABEL_OPTIONAL,
+           "type": TYPE_BOOL,
+           "default": False,
+        },
+      ]
+    },
+  ],
 }
 
