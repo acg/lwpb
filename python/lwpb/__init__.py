@@ -120,7 +120,7 @@ PROTOFILE_DEFINITION = {
            "name": "extendee",
            "number": 2,
            "label": LABEL_OPTIONAL,
-           "type": TYPE_INT32,
+           "type": TYPE_STRING,
         },
         {
            "name": "number",
