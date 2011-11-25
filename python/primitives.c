@@ -3,6 +3,7 @@
 #include "pythoncompat.h"
 #include <lwpb/lwpb.h>
 #include <stdint.h>
+#include <stdio.h>   // sscanf()
 
 /* Utility functions: scalar type conversion */
 
@@ -175,6 +176,62 @@ py_to_lwpb(union lwpb_value* p, PyObject *val, unsigned int type)
       p->string.str = str;
       p->string.len = len;
       return 0;
+    }
+  }
+}
+
+
+int
+pystring_to_lwpb(union lwpb_value* p, PyObject *val, unsigned int type)
+{
+  char *str;
+  Py_ssize_t len;
+  if (PyString_AsStringAndSize(val, &str, &len) < 0)
+    return -1;
+
+  switch(type) {
+    default:
+      return -1;
+    case LWPB_DOUBLE:
+      return sscanf( str, "%lf", &p->double_ ) ? 0 : -1;
+    case LWPB_FLOAT:
+      return sscanf( str, "%f", &p->float_ ) ? 0 : -1;
+    case LWPB_INT64:
+    case LWPB_SINT64:
+    case LWPB_SFIXED64:
+#if LONG_MAX >= INT64_MAX
+      return sscanf( str, "%d", &p->int32 ) ? 0 : -1;
+#else
+      return sscanf( str, "%Ld", &p->int64 ) ? 0 : -1;
+#endif
+    case LWPB_UINT64:
+    case LWPB_FIXED64:
+      return sscanf( str, "%Lu", &p->uint64 ) ? 0 : -1;
+    case LWPB_SFIXED32:
+    case LWPB_SINT32:
+    case LWPB_INT32:
+    case LWPB_ENUM:
+      return sscanf( str, "%d", &p->int32 ) ? 0 : -1;
+    case LWPB_FIXED32:
+    case LWPB_UINT32:
+      return sscanf( str, "%u", &p->uint32 ) ? 0 : -1;
+    case LWPB_BOOL: {
+      if (!strcmp( "true", str ))
+        p->bool = 1;
+      else if (!strcmp( "false", str ))
+        p->bool = 0;
+      else
+        return -1;
+      return 0;
+    }
+    case LWPB_STRING: {
+      p->string.str = str;
+      p->string.len = len;
+      return 0;
+    }
+    case LWPB_BYTES: {
+      /* TODO handle C-escaped value */
+      return -1;
     }
   }
 }

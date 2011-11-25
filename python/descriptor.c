@@ -220,10 +220,16 @@ Descriptor_init(Descriptor *self, PyObject *arg, PyObject *kwds)
              If it's a string, make sure we create and use a private copy. */
 
           if ((prop = PyDict_GetItemString(field, "default_value"))) {
-            if (!py_to_lwpb(&f->def, prop, f->opts.typ)) {
-              f->opts.flags |= LWPB_HAS_DEFAULT;
-              if (PyString_Check(prop))
-                f->def.string.str = Descriptor_store_string(self, prop);
+            if (PyString_Check(prop) && !pystring_to_lwpb(&f->def, prop, f->opts.typ))
+                f->opts.flags |= LWPB_HAS_DEFAULT;
+            else {
+              PyErr_Format(
+                PyExc_RuntimeError,
+                "invalid default value for field %s.%s.%s",
+                package, m->name, f->name
+              );
+              error = -1;
+              goto init_cleanup;
             }
           }
 

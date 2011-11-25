@@ -170,7 +170,7 @@ PROTOFILE_DEFINITION = {
            "number": 1,
            "label": LABEL_OPTIONAL,
            "type": TYPE_ENUM,
-           "default": 0,
+           "default_value": "0",
         },
         {
            "name": "packed",
@@ -183,7 +183,7 @@ PROTOFILE_DEFINITION = {
            "number": 3,
            "label": LABEL_OPTIONAL,
            "type": TYPE_BOOL,
-           "default_value": False,
+           "default_value": "false",
         },
       ]
     },
@@ -245,7 +245,7 @@ PROTOFILE_DEFINITION = {
            "number": 10,
            "label": LABEL_OPTIONAL,
            "type": TYPE_BOOL,
-           "default": False,
+           "default_value": "false",
         },
       ]
     },

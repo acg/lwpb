@@ -10,5 +10,8 @@ lwpb_to_py(union lwpb_value *p, unsigned int type);
 int
 py_to_lwpb(union lwpb_value* p, PyObject *val, unsigned int type);
 
+int
+pystring_to_lwpb(union lwpb_value* p, PyObject *val, unsigned int type);
+
 #endif
 
