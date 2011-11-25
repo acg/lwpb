@@ -165,13 +165,14 @@ PROTOFILE_DEFINITION = {
       "name": "FieldOptions",
       "field":
       [
-        {
-           "name": "ctype",
-           "number": 1,
-           "label": LABEL_OPTIONAL,
-           "type": TYPE_ENUM,
-           "default_value": "0",
-        },
+# FIXME uncomment this when we can lookup (resolve) nested enum symbols
+#        {
+#           "name": "ctype",
+#           "number": 1,
+#           "label": LABEL_OPTIONAL,
+#           "type": TYPE_ENUM,
+#           "default_value": "STRING",
+#        },
         {
            "name": "packed",
            "number": 2,

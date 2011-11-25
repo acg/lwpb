@@ -83,6 +83,11 @@ Descriptor_store_string(Descriptor *self, PyObject* str)
 }
 
 
+/* Helper functions for Descriptor_init */
+long
+lookup_enum(PyObject *dict, PyObject *name);
+
+
 static int
 Descriptor_init(Descriptor *self, PyObject *arg, PyObject *kwds)
 {
@@ -219,10 +224,25 @@ Descriptor_init(Descriptor *self, PyObject *arg, PyObject *kwds)
           /* Convert the Python default value for a field to an lwpb value.
              If it's a string, make sure we create and use a private copy. */
 
-          if ((prop = PyDict_GetItemString(field, "default_value"))) {
-            if (PyString_Check(prop) && !pystring_to_lwpb(&f->def, prop, f->opts.typ))
-                f->opts.flags |= LWPB_HAS_DEFAULT;
-            else {
+          if ((prop = PyDict_GetItemString(field, "default_value")))
+          {
+            int okdefault = 0;
+
+            if (PyString_Check(prop)) {
+              switch (f->opts.typ) {
+                default:
+                  okdefault = !pystring_to_lwpb(&f->def, prop, f->opts.typ);
+                  break;
+                case LWPB_ENUM:
+                  if ((f->def.int32 = lookup_enum(msgtype, prop)) >= 0)
+                    okdefault = 1;
+                  else if ((f->def.int32 = lookup_enum(dict, prop)) >= 0)
+                    okdefault = 1;
+                  break;
+              }
+            }
+
+            if (!okdefault) {
               PyErr_Format(
                 PyExc_RuntimeError,
                 "invalid default value for field %s.%s.%s",
@@ -231,6 +251,8 @@ Descriptor_init(Descriptor *self, PyObject *arg, PyObject *kwds)
               error = -1;
               goto init_cleanup;
             }
+
+            f->opts.flags |= LWPB_HAS_DEFAULT;
           }
 
           /* If "type_name" is set for this field, it names a message
@@ -297,6 +319,57 @@ init_cleanup:
 }
 
 
+/* Lookup the numeric value of an enum symbol in a descriptor dict. */
+/* NB: This method is not exposed to Python. */
+long
+lookup_enum(PyObject *dict, PyObject *name)
+{
+  PyObject* enumtypes;
+  int i;
+  int j;
+
+  if ((enumtypes = PyDict_GetItemString(dict, "enum_type")))
+  {
+    if (!PyList_Check(enumtypes)) {
+      PyErr_SetString(PyExc_RuntimeError, "enum_type: list expected");
+      return -1;
+    }
+
+    Py_ssize_t enumtypes_len = PyList_Size(enumtypes);
+
+    for (i=0; i<enumtypes_len; i++)
+    {
+      PyObject* enumtype;
+      PyObject* enumvalues;
+
+      if (!(enumtype = PyList_GetItem(enumtypes, i)) || !PyDict_Check(enumtype))
+        continue;
+      if (!(enumvalues = PyDict_GetItemString(enumtype, "value")) || !PyList_Check(enumvalues))
+        continue;
+
+      Py_ssize_t enumvalues_len = PyList_Size(enumvalues);
+
+      for (j=0; j<enumvalues_len; j++)
+      {
+        PyObject* enumvalue;
+        PyObject* enumname;
+        PyObject* enumnumber;
+
+        if (!(enumvalue = PyList_GetItem(enumvalues, j)) || !PyDict_Check(enumvalue))
+          continue;
+        if (!(enumname = PyDict_GetItemString(enumvalue, "name")) || !PyString_Check(enumname))
+          continue;
+        if (PyObject_Compare(enumname, name))
+          continue;
+        if (!(enumnumber = PyDict_GetItemString(enumvalue, "number")) || !PyInt_Check(enumnumber))
+          continue;
+        return PyInt_AsLong(enumnumber);
+      }
+    }
+  }
+
+  return -1;
+}
 
 
 static PyObject *
