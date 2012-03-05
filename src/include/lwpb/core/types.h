@@ -136,7 +136,7 @@ union lwpb_value {
     } message;
     lwpb_enum_t enum_;
     int null;
-} value;
+};
 
 /* Forward declaration */
 struct lwpb_msg_desc;
