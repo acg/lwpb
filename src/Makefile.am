@@ -19,5 +19,5 @@ lwpb/rpc/transport.c \
 lwpb/utils/struct_decoder.c \
 lwpb/utils/utils.c
 
-liblwpb_la_CFLAGS = -I./include -I./lwpb/core -I./lwpb/rpc
+liblwpb_la_CFLAGS = -fPIC -I./include -I./lwpb/core -I./lwpb/rpc
 
