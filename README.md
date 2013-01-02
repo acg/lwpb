@@ -53,7 +53,11 @@ The C library was originally released by Simon Kallweit. More documentation on t
 
 To compile:
 
-    ./autogen.sh && ./configure && make
+    make
+
+To test it:
+
+    make check
 
 <span id="performance"></span>
 
