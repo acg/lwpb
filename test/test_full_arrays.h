@@ -18,7 +18,7 @@
  * limitations under the License.
  */
 
-#include <lwpb/arch/cc.h>
+#include <stdint.h>
 
 
 #define THOUSAND     1000
@@ -28,28 +28,28 @@
 #define QUADRILLION  1000000000000000LL
 #define QUINTILLION  1000000000000000000LL
 
-s32_t int32_arr0[2] = { -1, 1 };
-s32_t int32_arr1[5] = { 42, 666, -1123123, 0, 47 };
-s32_t int32_arr_min_max[2] = { S32_MIN, S32_MAX };
+int32_t int32_arr0[2] = { -1, 1 };
+int32_t int32_arr1[5] = { 42, 666, -1123123, 0, 47 };
+int32_t int32_arr_min_max[2] = { INT32_MIN, INT32_MAX };
 
-u32_t uint32_roundnumbers[4] = { BILLION, MILLION, 1, 0 };
-u32_t uint32_0_max[2] = { U32_MIN, U32_MAX };
+uint32_t uint32_roundnumbers[4] = { BILLION, MILLION, 1, 0 };
+uint32_t uint32_0_max[2] = { 0, UINT32_MAX };
 
-s64_t int64_roundnumbers[15] = { -QUINTILLION, -QUADRILLION, -TRILLION,
+int64_t int64_roundnumbers[15] = { -QUINTILLION, -QUADRILLION, -TRILLION,
                                  -BILLION, -MILLION, -THOUSAND,
                                  1,
                                  THOUSAND, MILLION, BILLION,
                                  TRILLION, QUADRILLION, QUINTILLION };
-s64_t int64_min_max[2] = { S64_MIN, S64_MAX };
+int64_t int64_min_max[2] = { INT64_MIN, INT64_MAX };
 
-u64_t uint64_roundnumbers[9] = { 1,
+uint64_t uint64_roundnumbers[9] = { 1,
                                  THOUSAND, MILLION, BILLION,
                                  TRILLION, QUADRILLION, QUINTILLION };
-u64_t uint64_0_1_max[3] = { U64_MIN, 1, U64_MAX };
-u64_t uint64_random[] = { 0,
+uint64_t uint64_0_1_max[3] = { 0, 1, UINT64_MAX };
+uint64_t uint64_random[] = { 0,
                           666,
                           4200000000ULL,
-                          16ULL * (u64_t) QUINTILLION + 33 };
+                          16ULL * (uint64_t) QUINTILLION + 33 };
 
 #define FLOATING_POINT_RANDOM \
 -1000.0, -100.0, -42.0, 0, 666, 131313
