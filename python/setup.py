@@ -33,7 +33,7 @@ setup(
       extra_compile_args=['-fPIC','-Wall'],
       include_dirs=['../src/include'],
       define_macros=[],
-      library_dirs=['../src/.libs'],
+      library_dirs=['../src/'],
       libraries=['lwpb'],
     ),
   ],
