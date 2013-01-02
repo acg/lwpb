@@ -27,6 +27,9 @@ all : $(TARGET)
 $(TARGET) : $(OBJECTS)
 	$(AR) -cr $@ $^
 
+check :
+	$(MAKE) -C ./test check
+
 clean :
 	rm -f $(TARGET) $(OBJECTS)
 
