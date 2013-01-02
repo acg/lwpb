@@ -55,8 +55,6 @@ To compile:
 
     ./autogen.sh && ./configure && make
 
-Currently, the test build step requires Google's protobuf 2.3.0+. If you're just interested in building the Python library, you can ignore build failures in the top level test/ directory.
-
 <span id="performance"></span>
 
 Performance
