@@ -20,13 +20,15 @@ Python library
 
 Quick Python synopsis:
 
-    from lwpb.codec import MessageCodec
+```py
+from lwpb.codec import MessageCodec
 
-    codec = MessageCodec( pb2file='person.pb2', typename='example.Person' )
-    serialized = codec.encode( { 'name': 'John Doe', 'id': 1234  } )
-    deserialized = codec.decode( serialized )
+codec = MessageCodec( pb2file='person.pb2', typename='example.Person' )
+serialized = codec.encode( { 'name': 'John Doe', 'id': 1234  } )
+deserialized = codec.decode( serialized )
 
-    print deserialized
+print deserialized
+```
 
 This expects a compiled .proto file you can generate with:
 
